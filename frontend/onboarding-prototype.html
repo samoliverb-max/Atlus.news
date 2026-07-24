@@ -35,10 +35,10 @@
     border:1px solid var(--accent);border-radius:10px;padding:11px 18px;font-size:13px;
     font-family:Helvetica,sans-serif;opacity:0;transition:opacity .3s;pointer-events:none;max-width:92%;z-index:9}
   .toast.show{opacity:1}
-  textarea,select{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;
+  textarea,select,input[type=email]{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;
     color:var(--ink);padding:13px;font-size:15px;font-family:Georgia,serif}
   textarea{min-height:85px;resize:vertical}
-  textarea:focus,select:focus{outline:none;border-color:var(--accent)}
+  textarea:focus,select:focus,input[type=email]:focus{outline:none;border-color:var(--accent)}
   .kgrid{display:flex;flex-direction:column;gap:12px}
   .krow{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;
     background:var(--card2);border-radius:10px;padding:11px 13px}
@@ -112,7 +112,17 @@
 </div>
 
 <script>
-/* ========== GRAPH (subset of the ~1,200-node IPTC vocabulary; full map in the explorer) ========== */
+/* ========== BACKEND WIRING ========== */
+// Point this at wherever backend/src/server.ts is running.
+const API_BASE = "http://localhost:4000";
+
+/* ========== GRAPH (subset of the ~1,200-node IPTC vocabulary; full map in the explorer) ==========
+   Every qcode below is a real IPTC Media Topic qcode (verified against the live
+   cv.iptc.org feed) — this is the same identifier space the backend's full
+   ~1,200-node graph uses, just a small curated slice for the onboarding chips.
+   Answers sent to the API are these same real qcodes, so they resolve directly
+   against the backend's topics table (see backend/src/sources.ts for the same
+   mapping, ported from an earlier illustrative-subset version of this file). */
 const TOPICS={
 "medtop:11000000":{l:"Politics",lvl:1},"medtop:04000000":{l:"Economics & business",lvl:1},
 "medtop:13000000":{l:"Science & technology",lvl:1},"medtop:06000000":{l:"Environment & climate",lvl:1},
@@ -123,35 +133,35 @@ const TOPICS={
 "medtop:14000000":{l:"Society",lvl:1},"medtop:15000000":{l:"Sport",lvl:1},
 "medtop:16000000":{l:"Conflict, war & peace",lvl:1},"medtop:03000000":{l:"Disasters & emergencies",lvl:1},
 "medtop:17000000":{l:"Weather",lvl:1},
-"medtop:ai":{l:"Artificial intelligence",p:"medtop:13000000",lvl:2},"medtop:space":{l:"Space & astronomy",p:"medtop:13000000",lvl:2},
-"medtop:biotech":{l:"Biotech & genetics",p:"medtop:13000000",lvl:2},"medtop:research":{l:"Scientific research",p:"medtop:13000000",lvl:2},
-"medtop:macro":{l:"Macroeconomics",p:"medtop:04000000",lvl:2},"medtop:markets":{l:"Markets & finance",p:"medtop:04000000",lvl:2},
-"medtop:energy":{l:"Energy & resources",p:"medtop:04000000",lvl:2},"medtop:startups":{l:"Business & startups",p:"medtop:04000000",lvl:2},
-"medtop:govt":{l:"Government & policy",p:"medtop:11000000",lvl:2},"medtop:intl":{l:"International relations",p:"medtop:11000000",lvl:2},
-"medtop:election":{l:"Elections",p:"medtop:11000000",lvl:2},"medtop:techreg":{l:"Technology regulation",p:"medtop:11000000",lvl:2},
-"medtop:enpolicy":{l:"Energy policy",p:"medtop:11000000",lvl:2},
-"medtop:climate":{l:"Climate change",p:"medtop:06000000",lvl:2},"medtop:nature":{l:"Nature & ecosystems",p:"medtop:06000000",lvl:2},
-"medtop:meddiscovery":{l:"Medical research",p:"medtop:07000000",lvl:2},"medtop:pubhealth":{l:"Public health",p:"medtop:07000000",lvl:2},
-"medtop:media":{l:"News media & journalism",p:"medtop:01000000",lvl:2},"medtop:lit":{l:"Books & literature",p:"medtop:01000000",lvl:2},
-"medtop:histideas":{l:"History & ideas",p:"medtop:01000000",lvl:2},
-"medtop:wages":{l:"Wages & employment",p:"medtop:09000000",lvl:2},"medtop:demog":{l:"Demographics & migration",p:"medtop:14000000",lvl:2}};
-const RELATED=[["medtop:energy","medtop:enpolicy"],["medtop:ai","medtop:techreg"],["medtop:climate","medtop:energy"],
-["medtop:macro","medtop:wages"],["medtop:markets","medtop:intl"],["medtop:biotech","medtop:meddiscovery"],
-["medtop:demog","medtop:macro"],["medtop:media","medtop:techreg"],["medtop:histideas","medtop:intl"],["medtop:climate","medtop:nature"]];
+"medtop:20001298":{l:"Artificial intelligence",p:"medtop:13000000",lvl:2},"medtop:20000739":{l:"Space & astronomy",p:"medtop:13000000",lvl:2},
+"medtop:20000711":{l:"Biotech & genetics",p:"medtop:13000000",lvl:2},"medtop:20000735":{l:"Scientific research",p:"medtop:13000000",lvl:2},
+"medtop:20000346":{l:"Macroeconomics",p:"medtop:04000000",lvl:2},"medtop:20000385":{l:"Markets & finance",p:"medtop:04000000",lvl:2},
+"medtop:20000256":{l:"Energy & resources",p:"medtop:04000000",lvl:2},"medtop:20001158":{l:"Business & startups",p:"medtop:04000000",lvl:2},
+"medtop:20000593":{l:"Government & policy",p:"medtop:11000000",lvl:2},"medtop:20000638":{l:"International relations",p:"medtop:11000000",lvl:2},
+"medtop:20000574":{l:"Elections",p:"medtop:11000000",lvl:2},"medtop:20000636":{l:"Technology regulation",p:"medtop:11000000",lvl:2},
+"medtop:20000423":{l:"Energy policy",p:"medtop:11000000",lvl:2},
+"medtop:20000418":{l:"Climate change",p:"medtop:06000000",lvl:2},"medtop:20000441":{l:"Nature & ecosystems",p:"medtop:06000000",lvl:2},
+"medtop:20000737":{l:"Medical research",p:"medtop:07000000",lvl:2},"medtop:20001358":{l:"Public health",p:"medtop:07000000",lvl:2},
+"medtop:20000046":{l:"News media & journalism",p:"medtop:01000000",lvl:2},"medtop:20000013":{l:"Books & literature",p:"medtop:01000000",lvl:2},
+"medtop:20000747":{l:"History & ideas",p:"medtop:01000000",lvl:2},
+"medtop:20000518":{l:"Wages & employment",p:"medtop:09000000",lvl:2},"medtop:20000770":{l:"Demographics & migration",p:"medtop:14000000",lvl:2}};
+const RELATED=[["medtop:20000256","medtop:20000423"],["medtop:20001298","medtop:20000636"],["medtop:20000418","medtop:20000256"],
+["medtop:20000346","medtop:20000518"],["medtop:20000385","medtop:20000638"],["medtop:20000711","medtop:20000737"],
+["medtop:20000770","medtop:20000346"],["medtop:20000046","medtop:20000636"],["medtop:20000747","medtop:20000638"],["medtop:20000418","medtop:20000441"]];
 const SOURCES=[
 /* --- most-read outlets (UK-led, per Reuters Institute usage rankings) --- */
-{n:"BBC News",g:"outlets",d:{"medtop:govt":.6,"medtop:intl":.5,"medtop:11000000":.5,"medtop:14000000":.3}},
-{n:"Sky News",g:"outlets",d:{"medtop:govt":.5,"medtop:11000000":.5,"medtop:02000000":.3}},
-{n:"The Guardian",g:"outlets",d:{"medtop:govt":.6,"medtop:climate":.6,"medtop:media":.4,"medtop:01000000":.4}},
+{n:"BBC News",g:"outlets",d:{"medtop:20000593":.6,"medtop:20000638":.5,"medtop:11000000":.5,"medtop:14000000":.3}},
+{n:"Sky News",g:"outlets",d:{"medtop:20000593":.5,"medtop:11000000":.5,"medtop:02000000":.3}},
+{n:"The Guardian",g:"outlets",d:{"medtop:20000593":.6,"medtop:20000418":.6,"medtop:20000046":.4,"medtop:01000000":.4}},
 {n:"Daily Mail / MailOnline",g:"outlets",d:{"medtop:08000000":.6,"medtop:02000000":.4,"medtop:10000000":.4}},
-{n:"The Times",g:"outlets",d:{"medtop:govt":.6,"medtop:04000000":.4,"medtop:01000000":.3}},
-{n:"The Telegraph",g:"outlets",d:{"medtop:govt":.6,"medtop:04000000":.4,"medtop:15000000":.3}},
-{n:"Financial Times",g:"outlets",d:{"medtop:markets":.9,"medtop:macro":.8,"medtop:startups":.5,"medtop:intl":.4}},
-{n:"The Economist",g:"outlets",d:{"medtop:macro":.7,"medtop:intl":.7,"medtop:govt":.5}},
+{n:"The Times",g:"outlets",d:{"medtop:20000593":.6,"medtop:04000000":.4,"medtop:01000000":.3}},
+{n:"The Telegraph",g:"outlets",d:{"medtop:20000593":.6,"medtop:04000000":.4,"medtop:15000000":.3}},
+{n:"Financial Times",g:"outlets",d:{"medtop:20000385":.9,"medtop:20000346":.8,"medtop:20001158":.5,"medtop:20000638":.4}},
+{n:"The Economist",g:"outlets",d:{"medtop:20000346":.7,"medtop:20000638":.7,"medtop:20000593":.5}},
 {n:"The Sun",g:"outlets",d:{"medtop:15000000":.6,"medtop:08000000":.5,"medtop:10000000":.3}},
-{n:"ITV News",g:"outlets",d:{"medtop:govt":.5,"medtop:14000000":.4}},
-{n:"New York Times",g:"outlets",d:{"medtop:govt":.5,"medtop:01000000":.5,"medtop:13000000":.4}},
-{n:"CNN",g:"outlets",d:{"medtop:intl":.5,"medtop:11000000":.5}},
+{n:"ITV News",g:"outlets",d:{"medtop:20000593":.5,"medtop:14000000":.4}},
+{n:"New York Times",g:"outlets",d:{"medtop:20000593":.5,"medtop:01000000":.5,"medtop:13000000":.4}},
+{n:"CNN",g:"outlets",d:{"medtop:20000638":.5,"medtop:11000000":.5}},
 /* --- aggregators & platforms (how most people actually meet news) --- */
 {n:"Apple News",g:"platforms",d:{"medtop:11000000":.3,"medtop:10000000":.3,"medtop:08000000":.2},agg:true},
 {n:"Google News / Discover",g:"platforms",d:{"medtop:11000000":.3,"medtop:13000000":.3},agg:true},
@@ -161,15 +171,15 @@ const SOURCES=[
 {n:"X / Twitter",g:"platforms",d:{"medtop:11000000":.4,"medtop:13000000":.3,"medtop:15000000":.2},agg:true},
 {n:"Facebook",g:"platforms",d:{"medtop:08000000":.3,"medtop:14000000":.2},agg:true},
 {n:"Reddit",g:"platforms",d:{"medtop:13000000":.4,"medtop:10000000":.3},agg:true},
-{n:"LinkedIn",g:"platforms",d:{"medtop:startups":.4,"medtop:09000000":.3},agg:true},
-{n:"Podcasts",g:"platforms",d:{"medtop:11000000":.3,"medtop:01000000":.3,"medtop:histideas":.2},agg:true},
-{n:"Substack newsletters",g:"platforms",d:{"medtop:13000000":.3,"medtop:11000000":.3,"medtop:histideas":.3},agg:true},
+{n:"LinkedIn",g:"platforms",d:{"medtop:20001158":.4,"medtop:09000000":.3},agg:true},
+{n:"Podcasts",g:"platforms",d:{"medtop:11000000":.3,"medtop:01000000":.3,"medtop:20000747":.2},agg:true},
+{n:"Substack newsletters",g:"platforms",d:{"medtop:13000000":.3,"medtop:11000000":.3,"medtop:20000747":.3},agg:true},
 {n:"WhatsApp / group chats",g:"platforms",d:{"medtop:08000000":.2},agg:true}];
-const GOAL_KEYWORDS={economics:"medtop:macro",economy:"medtop:macro",inflation:"medtop:macro",finance:"medtop:markets",
-ai:"medtop:ai",technology:"medtop:13000000",climate:"medtop:climate",energy:"medtop:energy",environment:"medtop:06000000",
-politics:"medtop:11000000",geopolitics:"medtop:intl",international:"medtop:intl",china:"medtop:intl",health:"medtop:07000000",
-medicine:"medtop:meddiscovery",history:"medtop:histideas",media:"medtop:media",regulation:"medtop:techreg",policy:"medtop:govt",
-migration:"medtop:demog",work:"medtop:wages",labour:"medtop:wages",science:"medtop:research",space:"medtop:space"};
+const GOAL_KEYWORDS={economics:"medtop:20000346",economy:"medtop:20000346",inflation:"medtop:20000346",finance:"medtop:20000385",
+ai:"medtop:20001298",technology:"medtop:13000000",climate:"medtop:20000418",energy:"medtop:20000256",environment:"medtop:06000000",
+politics:"medtop:11000000",geopolitics:"medtop:20000638",international:"medtop:20000638",china:"medtop:20000638",health:"medtop:07000000",
+medicine:"medtop:20000737",history:"medtop:20000747",media:"medtop:20000046",regulation:"medtop:20000636",policy:"medtop:20000593",
+migration:"medtop:20000770",work:"medtop:20000518",labour:"medtop:20000518",science:"medtop:20000735",space:"medtop:20000739"};
 
 /* ========== POLITICAL MODULE — issue statements, Pew-style (never self-labelling) ==========
    4 axes: econ (market -1 <-> state +1), soc (traditional -1 <-> progressive +1),
@@ -209,30 +219,33 @@ ZA:"South Africa",MA:"Morocco",SA:"Saudi Arabia",AE:"UAE",IL:"Israel",IR:"Iran",
 IN:"India",PK:"Pakistan",BD:"Bangladesh",CN:"China",JP:"Japan",KR:"South Korea",ID:"Indonesia",PH:"Philippines",
 VN:"Vietnam",TH:"Thailand",SG:"Singapore",AU:"Australia",NZ:"New Zealand"};
 
-/* ========== SAMPLE CORPUS (metadata only; geo + viewpoint tags added) ========== */
+/* ========== SAMPLE CORPUS (metadata only; geo + viewpoint tags added) ==========
+   Preview-only: this is the same illustrative sample the "first issue" screen
+   always used. Real recommendations are a later stage (article ingestion +
+   the daily recommender job) — out of scope for this onboarding build. */
 const ARTICLES=[
-{t:"Why the grid, not the panel, is the climate bottleneck",s:"Works in Progress",n:["medtop:energy","medtop:climate"],lv:2,geo:["US","UK"]},
-{t:"What the latest inflation print actually tells us",s:"Financial Times",n:["medtop:macro"],lv:2,geo:["UK"]},
-{t:"A beginner's map of how central banks think",s:"Econlib",n:["medtop:macro"],lv:1,geo:[]},
-{t:"The quiet race to regulate frontier AI models",s:"The Guardian",n:["medtop:ai","medtop:techreg"],lv:2,geo:["UK","US"],vp:{inst:-.4}},
-{t:"How transformer models actually work",s:"Works in Progress",n:["medtop:ai"],lv:1,geo:[]},
-{t:"Energy policy is where climate ambition meets arithmetic",s:"BBC InDepth",n:["medtop:enpolicy","medtop:energy"],lv:2,geo:["UK"],vp:{econ:.3}},
-{t:"The demographic cliff reshaping East Asian economies",s:"The Diplomat",n:["medtop:demog","medtop:macro"],lv:2,geo:["JP","KR","CN"]},
-{t:"CRISPR's second act: from lab to clinic",s:"New York Times",n:["medtop:biotech","medtop:meddiscovery"],lv:2,geo:["US"]},
-{t:"What ancient trade routes teach us about modern supply chains",s:"Aeon",n:["medtop:histideas","medtop:intl"],lv:2,geo:["CN","TR"]},
-{t:"The global south's new non-alignment",s:"The Diplomat",n:["medtop:intl"],lv:2,geo:["IN","BR","ZA"],vp:{intl:.4}},
-{t:"Why local journalism keeps democracies honest",s:"The Guardian",n:["medtop:media","medtop:govt"],lv:1,geo:["UK"],vp:{inst:-.3}},
-{t:"Rewilding at scale: Europe's boldest experiment",s:"BBC InDepth",n:["medtop:nature","medtop:climate"],lv:1,geo:["PL","ES"]},
-{t:"Markets are repricing political risk. Here's how",s:"Financial Times",n:["medtop:markets","medtop:intl"],lv:2,geo:["US","CN"]},
-{t:"The wage puzzle: why pay lags productivity",s:"Econlib",n:["medtop:wages","medtop:macro"],lv:2,geo:["US","UK"],vp:{econ:-.3}},
-{t:"A short history of the idea of progress",s:"Aeon",n:["medtop:histideas"],lv:1,geo:[]},
-{t:"Public health's quiet wins nobody notices",s:"New York Times",n:["medtop:pubhealth"],lv:1,geo:["US"]},
-{t:"The new space economy is closer than you think",s:"Works in Progress",n:["medtop:space","medtop:startups"],lv:1,geo:["US"]},
-{t:"Elections in the age of synthetic media",s:"The Guardian",n:["medtop:election","medtop:ai","medtop:media"],lv:2,geo:["US","IN"],vp:{inst:.2}},
-{t:"The case for markets in everything",s:"Econlib",n:["medtop:macro","medtop:govt"],lv:2,geo:[],vp:{econ:-.7}},
-{t:"Why industrial strategy is back everywhere",s:"Financial Times",n:["medtop:macro","medtop:govt"],lv:2,geo:["UK","DE","US"],vp:{econ:.6}},
-{t:"Borders, belonging and the new migration politics",s:"BBC InDepth",n:["medtop:demog","medtop:govt"],lv:2,geo:["UK","DE"],vp:{soc:.5,intl:.3}},
-{t:"The quiet strength of national communities",s:"Aeon",n:["medtop:demog","medtop:histideas"],lv:2,geo:[],vp:{soc:-.5,intl:-.4}}];
+{t:"Why the grid, not the panel, is the climate bottleneck",s:"Works in Progress",n:["medtop:20000256","medtop:20000418"],lv:2,geo:["US","UK"]},
+{t:"What the latest inflation print actually tells us",s:"Financial Times",n:["medtop:20000346"],lv:2,geo:["UK"]},
+{t:"A beginner's map of how central banks think",s:"Econlib",n:["medtop:20000346"],lv:1,geo:[]},
+{t:"The quiet race to regulate frontier AI models",s:"The Guardian",n:["medtop:20001298","medtop:20000636"],lv:2,geo:["UK","US"],vp:{inst:-.4}},
+{t:"How transformer models actually work",s:"Works in Progress",n:["medtop:20001298"],lv:1,geo:[]},
+{t:"Energy policy is where climate ambition meets arithmetic",s:"BBC InDepth",n:["medtop:20000423","medtop:20000256"],lv:2,geo:["UK"],vp:{econ:.3}},
+{t:"The demographic cliff reshaping East Asian economies",s:"The Diplomat",n:["medtop:20000770","medtop:20000346"],lv:2,geo:["JP","KR","CN"]},
+{t:"CRISPR's second act: from lab to clinic",s:"New York Times",n:["medtop:20000711","medtop:20000737"],lv:2,geo:["US"]},
+{t:"What ancient trade routes teach us about modern supply chains",s:"Aeon",n:["medtop:20000747","medtop:20000638"],lv:2,geo:["CN","TR"]},
+{t:"The global south's new non-alignment",s:"The Diplomat",n:["medtop:20000638"],lv:2,geo:["IN","BR","ZA"],vp:{intl:.4}},
+{t:"Why local journalism keeps democracies honest",s:"The Guardian",n:["medtop:20000046","medtop:20000593"],lv:1,geo:["UK"],vp:{inst:-.3}},
+{t:"Rewilding at scale: Europe's boldest experiment",s:"BBC InDepth",n:["medtop:20000441","medtop:20000418"],lv:1,geo:["PL","ES"]},
+{t:"Markets are repricing political risk. Here's how",s:"Financial Times",n:["medtop:20000385","medtop:20000638"],lv:2,geo:["US","CN"]},
+{t:"The wage puzzle: why pay lags productivity",s:"Econlib",n:["medtop:20000518","medtop:20000346"],lv:2,geo:["US","UK"],vp:{econ:-.3}},
+{t:"A short history of the idea of progress",s:"Aeon",n:["medtop:20000747"],lv:1,geo:[]},
+{t:"Public health's quiet wins nobody notices",s:"New York Times",n:["medtop:20001358"],lv:1,geo:["US"]},
+{t:"The new space economy is closer than you think",s:"Works in Progress",n:["medtop:20000739","medtop:20001158"],lv:1,geo:["US"]},
+{t:"Elections in the age of synthetic media",s:"The Guardian",n:["medtop:20000574","medtop:20001298","medtop:20000046"],lv:2,geo:["US","IN"],vp:{inst:.2}},
+{t:"The case for markets in everything",s:"Econlib",n:["medtop:20000346","medtop:20000593"],lv:2,geo:[],vp:{econ:-.7}},
+{t:"Why industrial strategy is back everywhere",s:"Financial Times",n:["medtop:20000346","medtop:20000593"],lv:2,geo:["UK","DE","US"],vp:{econ:.6}},
+{t:"Borders, belonging and the new migration politics",s:"BBC InDepth",n:["medtop:20000770","medtop:20000593"],lv:2,geo:["UK","DE"],vp:{soc:.5,intl:.3}},
+{t:"The quiet strength of national communities",s:"Aeon",n:["medtop:20000770","medtop:20000747"],lv:2,geo:[],vp:{soc:-.5,intl:-.4}}];
 
 /* ========== GRAPH HELPERS ========== */
 const children=q=>Object.keys(TOPICS).filter(k=>TOPICS[k].p===q);
@@ -247,13 +260,16 @@ function hopDistance(a,b,max=4){if(a===b)return 0;let f=[a],seen=new Set([a]);
 /* ========== STATE ========== */
 const S={step:0,P:{},G:{},K:{},picks:[],subs:[],sources:[],goalText:"",know:{},reach:1,excl:[],mode:3,
  polConsent:null,pol:{econ:0,soc:0,intl:0,inst:0},polAnswered:0,lens:{},geo:{},
- demog:{age:"",edu:"",region:"",work:""},demogConsent:null,sens:{eth:"",rel:"",ori:""}};
+ demog:{age:"",edu:"",region:"",work:""},demogConsent:null,sens:{eth:"",rel:"",ori:""},
+ email:"",resumeToken:null};
 const addW=(v,q,w)=>{v[q]=Math.min(1,(v[q]||0)+w);};
 function spread(v,q,w){addW(v,q,w);for(const[m,t]of neighbours(q)){
  if(t==="child")addW(v,m,w*.35);else if(t==="parent")addW(v,m,w*.45);
  else if(t==="related")addW(v,m,w*.4);else if(t==="sibling")addW(v,m,w*.15);}}
 
-/* ========== RECOMMENDER (now geo- and lens-aware) ========== */
+/* ========== RECOMMENDER (now geo- and lens-aware) ==========
+   Preview-only, client-side, sample corpus — real recommendation is a later
+   stage (see CLAUDE.md build order). Unchanged from the reference prototype. */
 function recommend(){
  const excl=new Set(S.excl);
  const topP=Object.entries(S.P).filter(([q,w])=>w>=.45).map(([q])=>q);
@@ -304,13 +320,24 @@ function recommend(){
  return out.slice(0,S.mode);
 }
 
+/* ========== API HELPER ========== */
+async function postStep(path,body){
+ try{
+  const res=await fetch(API_BASE+path,{method:"POST",
+   headers:{"Content-Type":"application/json","X-Atlus-Resume":S.resumeToken||""},
+   body:JSON.stringify(body)});
+  if(!res.ok){const e=await res.json().catch(()=>({}));toast("Couldn't save: "+(e.error||res.status));return{ok:false};}
+  return{ok:true,data:await res.json()};
+ }catch(err){toast("Network error — is the API running at "+API_BASE+"?");return{ok:false};}
+}
+
 /* ========== UI ========== */
 const $=id=>document.getElementById(id);
 const el=h=>{const d=document.createElement("div");d.innerHTML=h;return d.firstElementChild;};
 function toast(m){$("toast").textContent=m;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),2600);}
 const STEPS=["welcome","topics","depth","sources","goals","knowledge","polconsent","politics","lens","geo","reach","delivery","demog","sensitive","profile","issue"];
 function go(n){S.step=n;$("pbar").style.width=(n/(STEPS.length-1)*100)+"%";render();window.scrollTo(0,0);}
-const saveLater=()=>toast("Progress saved. In production: a magic link lands in your inbox to resume exactly here.");
+const saveLater=()=>toast("Progress saved. A magic link (this page's URL, with your resume token) lands in your inbox to resume exactly here.");
 const navRow=(back,fwd,txt="Continue",dis="")=>`<div class="nav"><button class="btn ghost" onclick="go(${back})">Back</button>
  <button class="btn" ${dis} id="nx" onclick="${fwd}">${txt}</button></div><button class="save" onclick="saveLater()">Save & finish later</button>`;
 
@@ -324,12 +351,14 @@ function render(){
   This setup is deliberately long, because you're training your own reader. Every answer saves as you go;
   stop anytime and a link in your inbox resumes you exactly where you left off. Sensitive sections are
   clearly marked, always optional, and always explained.</p>
-  <div class="nav"><span></span><button class="btn" onclick="go(1)">Begin</button></div></div>`));
+  <p class="sub" style="margin-bottom:8px">Where should your first issue land?</p>
+  <input type="email" id="em" placeholder="you@example.com" value="${S.email}" style="margin-bottom:16px">
+  <div class="nav"><span></span><button class="btn" onclick="beginOnboarding()">Begin</button></div></div>`));
 
  if(step==="topics"){
   const c=el(`<div class="card">${stepnum}<h1>What do you enjoy reading about?</h1>
    <p class="sub">Pick at least three. These are the 17 top branches of the news industry's own topic map (~1,200 topics deep).
-   <a class="exp-link" href="atlus-iptc-explorer.html" target="_blank" style="display:inline">Browse the full map →</a></p>
+   <a class="exp-link" href="iptc-explorer.html" target="_blank" style="display:inline">Browse the full map →</a></p>
    <div class="chips" id="ch"></div>${navRow(0,"stepTopics()","Continue","disabled")}</div>`);
   Object.keys(TOPICS).filter(q=>TOPICS[q].lvl===1).forEach(q=>{
    const b=el(`<button class="chip${S.picks.includes(q)?" on":""}">${TOPICS[q].l}</button>`);
@@ -394,8 +423,8 @@ function render(){
    <p class="why">Political opinion is special-category data under UK GDPR. We process it only with your explicit consent,
    only to select and frame your articles the way you direct, never for anything else, and you can view, change or erase it at any time.
    Skipping this section changes nothing else about Atlus.</p></div>
-   <div class="nav"><button class="btn ghost" onclick="S.polConsent='no';go(9)">Skip this section</button>
-   <button class="btn" onclick="S.polConsent='yes';go(7)">I consent — continue</button></div>
+   <div class="nav"><button class="btn ghost" onclick="stepPolConsent(false)">Skip this section</button>
+   <button class="btn" onclick="stepPolConsent(true)">I consent — continue</button></div>
    <button class="save" onclick="saveLater()">Save & finish later</button></div>`));}
 
  /* ---------- POLITICAL: issue sliders ---------- */
@@ -420,7 +449,7 @@ function render(){
   const c=el(`<div class="card">${stepnum}<h1>Now: how should we use it?</h1>
    <p class="sub">Your dials read: <b style="color:var(--blue)">${axSummary}</b>.
    For each charged topic, choose the lens — this is the whole point of asking.</p>
-   <div class="kgrid" id="lg"></div>${navRow(7,"go(9)")}</div>`);
+   <div class="kgrid" id="lg"></div>${navRow(7,"stepLens()")}</div>`);
   LENS_TOPICS.forEach(q=>{
    const r=el(`<div class="krow"><span class="t">${TOPICS[q].l}</span><span class="kopts"></span></div>`);
    [["Match me","match"],["Balance","balance"],["Challenge me","challenge"]].forEach(([lbl,v])=>{
@@ -442,7 +471,7 @@ function render(){
    <span><i style="background:var(--card2)"></i>Neutral</span></div>
    <div class="map" id="map"></div>
    <p class="sub" style="font-size:12px">Prototype tile-map of 46 countries; production uses a full vector world map with every country and region groupings.</p>
-   ${navRow(S.polConsent==='yes'?8:6,"go(10)")}</div>`);
+   ${navRow(S.polConsent==='yes'?8:6,"stepGeo()")}</div>`);
   const map=c.querySelector("#map");
   for(let r=0;r<12;r++)for(let col=0;col<24;col++){
    const code=Object.keys(GEO).find(k=>GEO[k][0]===col&&GEO[k][1]===r);
@@ -462,7 +491,7 @@ function render(){
    <input type="range" min="0" max="2" step="1" value="${S.reach}" id="rr">
    <div class="slider-labels"><span>Gentle</span><span>Balanced</span><span>Adventurous</span></div>
    <p class="sub" style="margin-top:20px">Anything you'd rather we kept out?</p>
-   <div class="chips" id="ex"></div>${navRow(9,"go(11)")}</div>`);
+   <div class="chips" id="ex"></div>${navRow(9,"stepReach()")}</div>`);
   c.querySelector("#rr").oninput=e=>S.reach=+e.target.value;
   ["medtop:15000000","medtop:03000000","medtop:02000000","medtop:16000000","medtop:08000000","medtop:17000000"].forEach(q=>{
    const b=el(`<button class="chip excl${S.excl.includes(q)?" on":""}">${TOPICS[q].l}</button>`);
@@ -472,7 +501,7 @@ function render(){
  if(step==="delivery"){
   const c=el(`<div class="card">${stepnum}<h1>How much, each day?</h1>
    <p class="sub">A finite, deliberate set — never a feed.</p><div class="modes" id="mm"></div>
-   ${navRow(10,"go(12)")}</div>`);
+   ${navRow(10,"stepDelivery()")}</div>`);
   [[1,"Light","1 article"],[3,"Standard","3 articles"],[5,"Deep","5 articles"]].forEach(([v,n,d])=>{
    const m=el(`<div class="mode${S.mode===v?" on":""}"><b>${n}</b><span>${d}</span></div>`);
    m.onclick=()=>{S.mode=v;c.querySelectorAll(".mode").forEach(x=>x.classList.remove("on"));m.classList.add("on");};
@@ -502,8 +531,8 @@ function render(){
     <p class="why">These are special-category data under UK GDPR. We ask for explicit consent, every field has
     "prefer not to say", skipping is completely fine, and you can erase these answers at any time. They are never
     shared, sold, or used in any advertising sense — Atlus has no advertisers.</p></div>
-    <div class="nav"><button class="btn ghost" onclick="S.demogConsent='no';go(14)">Skip this section</button>
-    <button class="btn" onclick="S.demogConsent='yes';render()">I consent — show the questions</button></div>
+    <div class="nav"><button class="btn ghost" onclick="stepSensitiveConsent(false)">Skip this section</button>
+    <button class="btn" onclick="stepSensitiveConsent(true)">I consent — show the questions</button></div>
     <button class="save" onclick="saveLater()">Save & finish later</button></div>`));}
   else{
    const sel=(id,opts,cur)=>`<select id="${id}"><option value="">Prefer not to say</option>
@@ -515,31 +544,12 @@ function render(){
      <div class="krow"><span class="t">Sexual orientation</span><span style="flex:1;max-width:280px">${sel("s_ori",["Heterosexual / straight","Gay or lesbian","Bisexual","Other"],S.sens.ori)}</span></div>
     </div>${navRow(12,"stepSensitive()")}</div>`));}}
 
- /* ---------- PROFILE READ-BACK ---------- */
+ /* ---------- PROFILE READ-BACK (fetched from the backend — this is derived truth, not the local preview state) ---------- */
  if(step==="profile"){
-  const topOf=(v,n)=>Object.entries(v).sort((a,b)=>b[1]-a[1]).slice(0,n).map(([q,w])=>`${TOPICS[q].l} (${w.toFixed(2)})`).join(" · ")||"—";
-  const polLine=S.polConsent==="yes"&&S.polAnswered>0
-   ?Object.entries(S.pol).map(([a,v])=>`${AXIS_LABELS[a][v>0?1:0]} ${Math.abs(v)<.1?"(centre)":`(${(Math.abs(v)*100|0)}%)`}`).join(" · ")
-    +`<br><span style="color:var(--muted)">Lens: ${LENS_TOPICS.map(q=>`${TOPICS[q].l} → ${S.lens[q]||"balance"}`).join(" · ")}</span>`
-   :"Not provided — politics coverage defaults to balance across viewpoints.";
-  const geoLine=Object.keys(S.geo).length?Object.entries(S.geo).sort((a,b)=>b[1]-a[1])
-   .map(([c,v])=>`${GEO_NAMES[c]} ${v===2?"(very)":v===1?"(somewhat)":"(avoid)"}`).join(" · "):"No geographic weighting set.";
-  const demogLine=[S.demog.age,S.demog.edu,S.demog.region,S.demog.work].filter(Boolean).join(" · ")||"Not provided.";
-  stg.append(el(`<div class="card">${stepnum}<h1>Here's what we now believe about you.</h1>
-   <p class="sub">Every line below is a claim you can correct — here, later on your profile page, or by chat. Never sold; only ever used to pick and frame your articles.</p>
-   <div class="prof">
-    <div class="prow pp"><b>Preference — feeds Core</b>${topOf(S.P,5)}</div>
-    <div class="prow gg"><b>Goals — steers Stretch</b>${topOf(S.G,4)}</div>
-    <div class="prow kk"><b>Knowledge — sets the pitch</b>${topOf(S.K,4)}</div>
-    <div class="prow pol"><b>Political vantage — used only as you directed</b>${polLine}</div>
-    <div class="prow geo"><b>Geography</b>${geoLine}</div>
-    <div class="prow cc"><b>About you</b>${demogLine}${S.demogConsent==="yes"?" · sensitive details held under explicit consent":""}</div>
-    <div class="prow cc"><b>Settings</b>${["Gentle","Balanced","Adventurous"][S.reach]} discovery · ${S.mode} article${S.mode>1?"s":""}/day · ${S.excl.length?S.excl.map(q=>TOPICS[q].l).join(", ")+" excluded":"no exclusions"}</div>
-   </div>
-   <div class="nav"><button class="btn ghost" onclick="go(13)">Back</button>
-   <button class="btn" onclick="go(15)">Looks right — build my first issue</button></div></div>`));}
+  stg.append(el(`<div class="card">${stepnum}<h1>Here's what we now believe about you.</h1><p class="sub">Loading your saved profile…</p></div>`));
+  renderProfile(stg);}
 
- /* ---------- FIRST ISSUE ---------- */
+ /* ---------- FIRST ISSUE (unchanged local preview) ---------- */
  if(step==="issue"){
   const recs=recommend();
   const c=el(`<div class="card"><h1>Tomorrow morning, 7am.</h1>
@@ -565,26 +575,206 @@ function render(){
   stg.append(c);}
 }
 
-/* ========== STEP COMMITS ========== */
-function stepTopics(){S.picks.forEach(q=>spread(S.P,q,.6));go(2);}
-function stepDepth(){S.subs.forEach(q=>spread(S.P,q,.75));go(3);}
-function stepSources(){S.sources.forEach(n=>{const s=SOURCES.find(x=>x.n===n);
- Object.entries(s.d).forEach(([q,w])=>{addW(S.P,q,w*(s.agg?.25:.4));if(!s.agg)addW(S.K,q,w*.5);});});go(4);}
-function stepGoals(){S.goalText=$("gt")?$("gt").value:S.goalText;
+/* ========== PROFILE SCREEN: fetch + render backend-derived truth ========== */
+async function renderProfile(stg){
+ let p;
+ try{
+  const res=await fetch(API_BASE+"/onboarding/profile",{headers:{"X-Atlus-Resume":S.resumeToken||""}});
+  if(!res.ok)throw new Error(String(res.status));
+  p=await res.json();
+ }catch(err){
+  stg.innerHTML="";
+  stg.append(el(`<div class="card"><div class="stepnum">Step 14 of ${STEPS.length-1}</div><h1>Couldn't load your profile.</h1>
+   <p class="sub">Is the API running at ${API_BASE}? <button class="btn ghost" onclick="renderProfile($('stage'))">Retry</button></p>
+   <div class="nav"><button class="btn ghost" onclick="go(13)">Back</button></div></div>`));
+  return;
+ }
+ const topOf=arr=>(arr||[]).map(x=>`${x.label} (${x.weight.toFixed(2)})`).join(" · ")||"—";
+ const polLine=p.political
+  ?["econ","soc","intl","inst"].map(a=>{const v=p.political[a]||0;
+    return `${AXIS_LABELS[a][v>0?1:0]} ${Math.abs(v)<.1?"(centre)":`(${(Math.abs(v)*100|0)}%)`}`;}).join(" · ")
+   +(p.political.lenses?`<br><span style="color:var(--muted)">Lens: ${Object.entries(p.political.lenses).map(([q,m])=>`${(TOPICS[q]&&TOPICS[q].l)||q} → ${m}`).join(" · ")}</span>`:"")
+  :"Not provided — politics coverage defaults to balance across viewpoints.";
+ const geoLine=(p.geo&&p.geo.length)?p.geo.map(g=>`${GEO_NAMES[g.country]||g.country} ${g.interest===2?"(very)":g.interest===1?"(somewhat)":"(avoid)"}`).join(" · "):"No geographic weighting set.";
+ const demogLine=p.demographics?[p.demographics.age_band,p.demographics.education,p.demographics.region,p.demographics.work_field].filter(Boolean).join(" · ")||"Not provided.":"Not provided.";
+ const excl=(p.excluded||[]).map(x=>x.label).join(", ");
+ const cfg=p.config||{};
+ stg.innerHTML="";
+ stg.append(el(`<div class="card"><div class="stepnum">Step 14 of ${STEPS.length-1}</div><h1>Here's what we now believe about you.</h1>
+  <p class="sub">Every line below is a claim you can correct — here, later on your profile page, or by chat. Never sold; only ever used to pick and frame your articles.</p>
+  <div class="prof">
+   <div class="prow pp"><b>Preference — feeds Core</b>${topOf(p.preference)}</div>
+   <div class="prow gg"><b>Goals — steers Stretch</b>${topOf(p.goals)}</div>
+   <div class="prow kk"><b>Knowledge — sets the pitch</b>${topOf(p.knowledge)}</div>
+   <div class="prow pol"><b>Political vantage — used only as you directed</b>${polLine}</div>
+   <div class="prow geo"><b>Geography</b>${geoLine}</div>
+   <div class="prow cc"><b>About you</b>${demogLine}${p.has_sensitive_consent?" · sensitive details held under explicit consent":""}</div>
+   <div class="prow cc"><b>Settings</b>${["Gentle","Balanced","Adventurous"][cfg.discovery_reach??1]} discovery · ${cfg.mode||S.mode} article${(cfg.mode||S.mode)>1?"s":""}/day · ${excl?excl+" excluded":"no exclusions"}</div>
+  </div>
+  <div class="nav"><button class="btn ghost" onclick="go(13)">Back</button>
+  <button class="btn" onclick="stepComplete()">Looks right — build my first issue</button></div></div>`));
+}
+
+/* ========== STEP COMMITS ==========
+   Each step saves the raw answer to the backend (server-side spreading
+   activation is the system of record), then replays the same commit
+   locally so the "first issue" preview screen keeps working unchanged. */
+async function beginOnboarding(){
+ const email=$("em")?$("em").value.trim():"";
+ if(!email){toast("Enter your email to begin.");return;}
+ try{
+  const res=await fetch(API_BASE+"/onboarding/start",{method:"POST",
+   headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
+  if(!res.ok){toast("Couldn't start — is the API running at "+API_BASE+"?");return;}
+  const data=await res.json();
+  S.email=email;S.resumeToken=data.resume_token;
+  history.replaceState(null,"",location.pathname+"?r="+data.resume_token);
+  go(1);
+ }catch(err){toast("Network error — is the API running at "+API_BASE+"?");}
+}
+
+async function stepTopics(){
+ const r=await postStep("/onboarding/topics",{step:"topics",topic_qcodes:S.picks});
+ if(!r.ok)return;
+ S.picks.forEach(q=>spread(S.P,q,.6));go(2);}
+
+async function stepDepth(){
+ const r=await postStep("/onboarding/depth",{step:"depth",subtopic_qcodes:S.subs});
+ if(!r.ok)return;
+ S.subs.forEach(q=>spread(S.P,q,.75));go(3);}
+
+async function stepSources(){
+ const outlets=S.sources.filter(n=>SOURCES.find(x=>x.n===n)?.g==="outlets");
+ const platforms=S.sources.filter(n=>SOURCES.find(x=>x.n===n)?.g==="platforms");
+ const r=await postStep("/onboarding/sources",{step:"sources",outlets,platforms});
+ if(!r.ok)return;
+ S.sources.forEach(n=>{const s=SOURCES.find(x=>x.n===n);
+  Object.entries(s.d).forEach(([q,w])=>{addW(S.P,q,w*(s.agg?.25:.4));if(!s.agg)addW(S.K,q,w*.5);});});
+ go(4);}
+
+async function stepGoals(){
+ S.goalText=$("gt")?$("gt").value:S.goalText;
+ const r=await postStep("/onboarding/goals",{step:"goals",goal_text:S.goalText});
+ if(!r.ok)return;
  const txt=S.goalText.toLowerCase();const nodes=[];
  Object.entries(GOAL_KEYWORDS).forEach(([kw,q])=>{if(txt.includes(kw)&&!nodes.includes(q))nodes.push(q);});
- (nodes.length?nodes:Object.entries(S.P).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([q])=>q)).forEach(q=>spread(S.G,q,.7));go(5);}
-function stepKnowledge(){Object.entries(S.know).forEach(([q,v])=>spread(S.K,q,v));go(6);}
-function stepPolitics(){ // fold slider answers onto the four axes
+ (nodes.length?nodes:Object.entries(S.P).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([q])=>q)).forEach(q=>spread(S.G,q,.7));
+ go(5);}
+
+async function stepKnowledge(){
+ const r=await postStep("/onboarding/knowledge",{step:"knowledge",levels:S.know});
+ if(!r.ok)return;
+ Object.entries(S.know).forEach(([q,v])=>spread(S.K,q,v));go(6);}
+
+async function stepPolConsent(consent){
+ const consented_at=new Date().toISOString();
+ const r=await postStep("/onboarding/political-consent",{step:"political_consent",consent,consented_at});
+ if(!r.ok)return;
+ S.polConsent=consent?"yes":"no";go(consent?7:9);}
+
+async function stepPolitics(){
+ const issue_responses=ISSUES.map((it,i)=>it._v===undefined?null:{id:i,axis:it.ax,dir:it.dir,value:it._v}).filter(Boolean);
+ const r=await postStep("/onboarding/political",{step:"political",issue_responses});
+ if(!r.ok)return;
  const sums={econ:[0,0],soc:[0,0],intl:[0,0],inst:[0,0]};S.polAnswered=0;
  ISSUES.forEach(it=>{if(it._v===undefined)return;S.polAnswered++;
-  const signed=((it._v-50)/50)*it.dir; sums[it.ax][0]+=signed;sums[it.ax][1]++;});
+  const signed=((it._v-50)/50)*it.dir;sums[it.ax][0]+=signed;sums[it.ax][1]++;});
  Object.keys(sums).forEach(ax=>{S.pol[ax]=sums[ax][1]?sums[ax][0]/sums[ax][1]:0;});
  go(8);}
-function stepDemog(){S.demog={age:$("d_age").value,edu:$("d_edu").value,region:$("d_reg").value,work:$("d_work").value};go(13);}
-function stepSensitive(){S.sens={eth:$("s_eth").value,rel:$("s_rel").value,ori:$("s_ori").value};go(14);}
 
-go(0);
+async function stepLens(){
+ const r=await postStep("/onboarding/lens",{step:"lens",lenses:S.lens});
+ if(!r.ok)return;
+ go(9);}
+
+async function stepGeo(){
+ const r=await postStep("/onboarding/geography",{step:"geography",interests:S.geo});
+ if(!r.ok)return;
+ go(10);}
+
+async function stepReach(){
+ const r=await postStep("/onboarding/reach",{step:"reach",discovery_reach:S.reach,excluded_qcodes:S.excl});
+ if(!r.ok)return;
+ go(11);}
+
+async function stepDelivery(){
+ const r=await postStep("/onboarding/delivery",{step:"delivery",mode:S.mode,send_time:"07:00",timezone:"Europe/London",cadence:"daily"});
+ if(!r.ok)return;
+ go(12);}
+
+async function stepDemog(){
+ S.demog={age:$("d_age").value,edu:$("d_edu").value,region:$("d_reg").value,work:$("d_work").value};
+ const r=await postStep("/onboarding/demographics",{step:"demographics",
+  age_band:S.demog.age||null,education:S.demog.edu||null,region:S.demog.region||null,work_field:S.demog.work||null});
+ if(!r.ok)return;
+ go(13);}
+
+async function stepSensitiveConsent(consent){
+ const consented_at=new Date().toISOString();
+ const r=await postStep("/onboarding/demographics-consent",{step:"sensitive_consent",consent,consented_at});
+ if(!r.ok)return;
+ S.demogConsent=consent?"yes":"no";
+ if(consent)render();else go(14);}
+
+async function stepSensitive(){
+ S.sens={eth:$("s_eth").value,rel:$("s_rel").value,ori:$("s_ori").value};
+ const r=await postStep("/onboarding/sensitive",{step:"sensitive",
+  ethnicity:S.sens.eth||null,religion:S.sens.rel||null,orientation:S.sens.ori||null});
+ if(!r.ok)return;
+ go(14);}
+
+async function stepComplete(){
+ const r=await postStep("/onboarding/complete",{});
+ if(!r.ok)return;
+ go(15);}
+
+/* ========== RESUME: rehydrate S from GET /onboarding/state, replaying each
+   saved step's local commit so the "issue" preview still works, then jump
+   to wherever the reader left off. ========== */
+async function rehydrate(token){
+ let state;
+ try{
+  const res=await fetch(API_BASE+"/onboarding/state",{headers:{"X-Atlus-Resume":token}});
+  if(!res.ok)return false;
+  state=await res.json();
+ }catch(err){return false;}
+ S.resumeToken=token;
+ const a=state.answers;
+ let next=1;
+ if(a.topics){S.picks=a.topics.topic_qcodes.slice();S.picks.forEach(q=>spread(S.P,q,.6));next=2;}
+ if(a.depth){S.subs=a.depth.subtopic_qcodes.slice();S.subs.forEach(q=>spread(S.P,q,.75));next=3;}
+ if(a.sources){S.sources=[...a.sources.outlets,...a.sources.platforms];
+  S.sources.forEach(n=>{const s=SOURCES.find(x=>x.n===n);if(!s)return;
+   Object.entries(s.d).forEach(([q,w])=>{addW(S.P,q,w*(s.agg?.25:.4));if(!s.agg)addW(S.K,q,w*.5);});});next=4;}
+ if(a.goals){S.goalText=a.goals.goal_text;
+  const txt=S.goalText.toLowerCase();const nodes=[];
+  Object.entries(GOAL_KEYWORDS).forEach(([kw,q])=>{if(txt.includes(kw)&&!nodes.includes(q))nodes.push(q);});
+  (nodes.length?nodes:Object.entries(S.P).sort((x,y)=>y[1]-x[1]).slice(0,2).map(([q])=>q)).forEach(q=>spread(S.G,q,.7));next=5;}
+ if(a.knowledge){S.know=a.knowledge.levels;Object.entries(S.know).forEach(([q,v])=>spread(S.K,q,v));next=6;}
+ if(a.political_consent){S.polConsent=a.political_consent.consent?"yes":"no";next=a.political_consent.consent?7:9;}
+ if(a.political){const sums={econ:[0,0],soc:[0,0],intl:[0,0],inst:[0,0]};
+  a.political.issue_responses.forEach(r=>{const it=ISSUES[r.id];if(it)it._v=r.value;
+   sums[r.axis][0]+=((r.value-50)/50)*r.dir;sums[r.axis][1]++;});
+  S.polAnswered=a.political.issue_responses.length;
+  Object.keys(sums).forEach(ax=>{S.pol[ax]=sums[ax][1]?sums[ax][0]/sums[ax][1]:0;});next=8;}
+ if(a.lens){S.lens=a.lens.lenses;next=9;}
+ if(a.geography){S.geo=a.geography.interests;next=10;}
+ if(a.reach){S.reach=a.reach.discovery_reach;S.excl=a.reach.excluded_qcodes.slice();next=11;}
+ if(a.delivery){S.mode=a.delivery.mode;next=12;}
+ if(a.demographics){S.demog={age:a.demographics.age_band||"",edu:a.demographics.education||"",
+  region:a.demographics.region||"",work:a.demographics.work_field||""};next=13;}
+ if(a.sensitive_consent){S.demogConsent=a.sensitive_consent.consent?"yes":"no";
+  next=a.sensitive_consent.consent?13:14;}
+ if(a.sensitive){S.sens={eth:a.sensitive.ethnicity||"",rel:a.sensitive.religion||"",ori:a.sensitive.orientation||""};next=14;}
+ go(next);
+ return true;
+}
+
+(async function boot(){
+ const token=new URLSearchParams(location.search).get("r");
+ if(token){const ok=await rehydrate(token);if(ok)return;}
+ go(0);
+})();
 </script>
 </body>
 </html>
