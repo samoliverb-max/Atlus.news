@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s \"https://cv.iptc.org/newscodes/mediatopic?format=json&lang=en-GB\" -o /private/tmp/claude-501/-Users-samoliver-Library-Application-Support-Claude-local-agent-mode-sessions-e92530be-c3dd-49ef-a0f1-3dd80c4a35f0-637ef11b-96a5-4059-8d79-62a3aa803747-local-52a70402-4c5c-4df4-94e5-1af6f6f40c7d-outpu-5xkk0y/0d68a7ff-b79e-4ad8-804e-0682e4623aea/scratchpad/iptc.json --max-time 30 -w \"HTTP %{http_code}, size %{size_download} bytes\\\\n\")",
+      "Bash(python3 -c ' *)"
+    ]
+  }
+}

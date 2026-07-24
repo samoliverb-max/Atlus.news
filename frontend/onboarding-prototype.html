@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atlus — Onboarding v2</title>
+<style>
+  :root{--bg:#0e1116;--card:#171c24;--card2:#1e2530;--ink:#e8e6e1;--muted:#9aa3b2;
+    --accent:#e4b363;--green:#7fb4a2;--purple:#c98bdb;--line:#2a3240;--danger:#d97b66;--blue:#7da7d9}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:Georgia,serif;min-height:100vh}
+  .wrap{max-width:680px;margin:0 auto;padding:28px 20px 90px}
+  .logo{font-family:Helvetica,Arial,sans-serif;font-weight:700;letter-spacing:.06em;font-size:22px}
+  .logo span{color:var(--accent)}
+  .tag{color:var(--muted);font-size:12.5px;font-family:Helvetica,sans-serif;margin:4px 0 20px}
+  .progress{height:4px;background:var(--line);border-radius:2px;margin-bottom:24px;overflow:hidden}
+  .progress b{display:block;height:100%;background:var(--accent);width:0%;transition:width .4s}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px}
+  h1{font-size:23px;line-height:1.25;margin-bottom:8px;font-weight:600}
+  .sub{color:var(--muted);font-size:14.5px;line-height:1.55;margin-bottom:20px}
+  .chips{display:flex;flex-wrap:wrap;gap:9px}
+  .chip{border:1px solid var(--line);background:var(--card2);color:var(--ink);border-radius:20px;
+    padding:8px 15px;font-size:13.5px;cursor:pointer;font-family:Helvetica,sans-serif;transition:all .15s}
+  .chip:hover{border-color:var(--accent)}
+  .chip.on{background:var(--accent);color:#1a1408;border-color:var(--accent);font-weight:600}
+  .chip.excl.on{background:var(--danger);border-color:var(--danger);color:#fff}
+  .nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;gap:10px}
+  button.btn{font-family:Helvetica,sans-serif;font-size:14.5px;border:none;border-radius:10px;
+    padding:12px 22px;cursor:pointer;background:var(--accent);color:#1a1408;font-weight:700}
+  button.btn:disabled{opacity:.35;cursor:not-allowed}
+  button.ghost{background:none;border:1px solid var(--line);color:var(--muted)}
+  .save{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;
+    font-family:Helvetica,sans-serif;text-decoration:underline;margin-top:16px;display:block}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--card2);
+    border:1px solid var(--accent);border-radius:10px;padding:11px 18px;font-size:13px;
+    font-family:Helvetica,sans-serif;opacity:0;transition:opacity .3s;pointer-events:none;max-width:92%;z-index:9}
+  .toast.show{opacity:1}
+  textarea,select{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;
+    color:var(--ink);padding:13px;font-size:15px;font-family:Georgia,serif}
+  textarea{min-height:85px;resize:vertical}
+  textarea:focus,select:focus{outline:none;border-color:var(--accent)}
+  .kgrid{display:flex;flex-direction:column;gap:12px}
+  .krow{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;
+    background:var(--card2);border-radius:10px;padding:11px 13px}
+  .krow .t{font-size:14px}
+  .kopts{display:flex;gap:5px;flex-wrap:wrap}
+  .kopt{font-family:Helvetica,sans-serif;font-size:11.5px;padding:6px 10px;border-radius:14px;
+    border:1px solid var(--line);background:none;color:var(--muted);cursor:pointer}
+  .kopt.on{background:var(--green);color:#0d1a15;border-color:var(--green);font-weight:700}
+  .kopt.on.acc{background:var(--accent);color:#1a1408;border-color:var(--accent)}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .slider-labels{display:flex;justify-content:space-between;font-family:Helvetica,sans-serif;
+    font-size:11.5px;color:var(--muted);margin-top:4px}
+  .modes{display:flex;gap:10px}
+  .mode{flex:1;border:1px solid var(--line);border-radius:12px;padding:15px 8px;text-align:center;cursor:pointer;background:var(--card2)}
+  .mode.on{border-color:var(--accent);background:#241f14}
+  .mode b{display:block;font-size:16px;margin-bottom:2px}
+  .mode span{font-size:11.5px;color:var(--muted);font-family:Helvetica,sans-serif}
+  .prof{display:flex;flex-direction:column;gap:9px}
+  .prow{background:var(--card2);border-radius:10px;padding:12px 14px;font-size:13.5px;line-height:1.55}
+  .prow b{font-family:Helvetica,sans-serif;font-size:11px;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:3px}
+  .prow.pp b{color:var(--green)} .prow.gg b{color:var(--accent)} .prow.kk b{color:var(--purple)}
+  .prow.pol b{color:var(--blue)} .prow.geo b{color:var(--danger)} .prow.cc b{color:var(--muted)}
+  .art{border:1px solid var(--line);border-radius:12px;padding:17px;margin-bottom:13px;background:var(--card2)}
+  .cat{font-family:Helvetica,sans-serif;font-size:10.5px;font-weight:700;letter-spacing:.1em;
+    text-transform:uppercase;padding:3px 9px;border-radius:10px;display:inline-block;margin-bottom:8px}
+  .cat.core{background:rgba(127,180,162,.15);color:var(--green)}
+  .cat.stretch{background:rgba(228,179,99,.15);color:var(--accent)}
+  .cat.discovery{background:rgba(201,139,219,.15);color:var(--purple)}
+  .art h3{font-size:16.5px;line-height:1.3;margin-bottom:4px}
+  .art .src{font-family:Helvetica,sans-serif;font-size:11.5px;color:var(--muted);margin-bottom:7px}
+  .art .why{font-size:13px;color:var(--muted);font-style:italic;line-height:1.45;border-left:2px solid var(--line);padding-left:10px;margin-top:7px}
+  .fb{display:flex;gap:5px;margin-top:11px;flex-wrap:wrap}
+  .fb button{font-family:Helvetica,sans-serif;font-size:11px;padding:5px 10px;border-radius:12px;
+    border:1px solid var(--line);background:none;color:var(--muted);cursor:pointer}
+  .fb button:hover{border-color:var(--accent);color:var(--ink)}
+  .fb button.tapped{background:var(--green);color:#0d1a15;border-color:var(--green)}
+  .note{font-size:12px;color:var(--muted);font-family:Helvetica,sans-serif;margin-top:18px;line-height:1.5;border-top:1px solid var(--line);padding-top:12px}
+  .subgroup{margin-bottom:16px}
+  .subgroup .gt{font-family:Helvetica,sans-serif;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+  /* consent */
+  .consent{border:1px solid var(--blue);border-radius:12px;padding:16px;background:rgba(125,167,217,.06);margin-bottom:16px}
+  .consent p{font-size:13.5px;line-height:1.55;color:var(--ink)}
+  .consent .why{color:var(--muted);font-size:12.5px;margin-top:8px}
+  /* political sliders */
+  .issue{background:var(--card2);border-radius:11px;padding:14px 16px;margin-bottom:12px}
+  .issue p{font-size:14.5px;line-height:1.45;margin-bottom:10px}
+  .issue .axis{font-family:Helvetica,sans-serif;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin-bottom:5px}
+  /* geo map */
+  .map{display:grid;grid-template-columns:repeat(24,1fr);gap:3px;margin-bottom:14px}
+  .tile{aspect-ratio:1;border-radius:4px;background:var(--card2);border:1px solid var(--line);cursor:pointer;
+    position:relative;font-family:Helvetica,sans-serif;font-size:8.5px;display:flex;align-items:center;
+    justify-content:center;color:var(--muted);overflow:hidden;user-select:none}
+  .tile:hover{border-color:var(--accent);z-index:2}
+  .tile.i1{background:rgba(228,179,99,.45);color:#1a1408;font-weight:700}
+  .tile.i2{background:var(--accent);color:#1a1408;font-weight:700}
+  .tile.i-1{background:rgba(217,123,102,.4);color:var(--ink)}
+  .tile.sea{background:none;border:none;cursor:default}
+  .maplegend{display:flex;gap:14px;font-family:Helvetica,sans-serif;font-size:11.5px;color:var(--muted);flex-wrap:wrap;margin-bottom:8px}
+  .maplegend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+  .exp-link{display:block;margin-top:14px;font-size:13px;color:var(--purple)}
+  .stepnum{font-family:Helvetica,sans-serif;font-size:10.5px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">atl<span>u</span>s</div>
+  <div class="tag">Onboarding v2 · volunteered data only · every answer editable later, none ever sold</div>
+  <div class="progress"><b id="pbar"></b></div>
+  <div id="stage"></div>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ========== GRAPH (subset of the ~1,200-node IPTC vocabulary; full map in the explorer) ========== */
+const TOPICS={
+"medtop:11000000":{l:"Politics",lvl:1},"medtop:04000000":{l:"Economics & business",lvl:1},
+"medtop:13000000":{l:"Science & technology",lvl:1},"medtop:06000000":{l:"Environment & climate",lvl:1},
+"medtop:07000000":{l:"Health",lvl:1},"medtop:01000000":{l:"Arts, culture & media",lvl:1},
+"medtop:02000000":{l:"Crime, law & justice",lvl:1},"medtop:05000000":{l:"Education",lvl:1},
+"medtop:08000000":{l:"Human interest",lvl:1},"medtop:09000000":{l:"Work & labour",lvl:1},
+"medtop:10000000":{l:"Lifestyle & leisure",lvl:1},"medtop:12000000":{l:"Religion & belief",lvl:1},
+"medtop:14000000":{l:"Society",lvl:1},"medtop:15000000":{l:"Sport",lvl:1},
+"medtop:16000000":{l:"Conflict, war & peace",lvl:1},"medtop:03000000":{l:"Disasters & emergencies",lvl:1},
+"medtop:17000000":{l:"Weather",lvl:1},
+"medtop:ai":{l:"Artificial intelligence",p:"medtop:13000000",lvl:2},"medtop:space":{l:"Space & astronomy",p:"medtop:13000000",lvl:2},
+"medtop:biotech":{l:"Biotech & genetics",p:"medtop:13000000",lvl:2},"medtop:research":{l:"Scientific research",p:"medtop:13000000",lvl:2},
+"medtop:macro":{l:"Macroeconomics",p:"medtop:04000000",lvl:2},"medtop:markets":{l:"Markets & finance",p:"medtop:04000000",lvl:2},
+"medtop:energy":{l:"Energy & resources",p:"medtop:04000000",lvl:2},"medtop:startups":{l:"Business & startups",p:"medtop:04000000",lvl:2},
+"medtop:govt":{l:"Government & policy",p:"medtop:11000000",lvl:2},"medtop:intl":{l:"International relations",p:"medtop:11000000",lvl:2},
+"medtop:election":{l:"Elections",p:"medtop:11000000",lvl:2},"medtop:techreg":{l:"Technology regulation",p:"medtop:11000000",lvl:2},
+"medtop:enpolicy":{l:"Energy policy",p:"medtop:11000000",lvl:2},
+"medtop:climate":{l:"Climate change",p:"medtop:06000000",lvl:2},"medtop:nature":{l:"Nature & ecosystems",p:"medtop:06000000",lvl:2},
+"medtop:meddiscovery":{l:"Medical research",p:"medtop:07000000",lvl:2},"medtop:pubhealth":{l:"Public health",p:"medtop:07000000",lvl:2},
+"medtop:media":{l:"News media & journalism",p:"medtop:01000000",lvl:2},"medtop:lit":{l:"Books & literature",p:"medtop:01000000",lvl:2},
+"medtop:histideas":{l:"History & ideas",p:"medtop:01000000",lvl:2},
+"medtop:wages":{l:"Wages & employment",p:"medtop:09000000",lvl:2},"medtop:demog":{l:"Demographics & migration",p:"medtop:14000000",lvl:2}};
+const RELATED=[["medtop:energy","medtop:enpolicy"],["medtop:ai","medtop:techreg"],["medtop:climate","medtop:energy"],
+["medtop:macro","medtop:wages"],["medtop:markets","medtop:intl"],["medtop:biotech","medtop:meddiscovery"],
+["medtop:demog","medtop:macro"],["medtop:media","medtop:techreg"],["medtop:histideas","medtop:intl"],["medtop:climate","medtop:nature"]];
+const SOURCES=[
+/* --- most-read outlets (UK-led, per Reuters Institute usage rankings) --- */
+{n:"BBC News",g:"outlets",d:{"medtop:govt":.6,"medtop:intl":.5,"medtop:11000000":.5,"medtop:14000000":.3}},
+{n:"Sky News",g:"outlets",d:{"medtop:govt":.5,"medtop:11000000":.5,"medtop:02000000":.3}},
+{n:"The Guardian",g:"outlets",d:{"medtop:govt":.6,"medtop:climate":.6,"medtop:media":.4,"medtop:01000000":.4}},
+{n:"Daily Mail / MailOnline",g:"outlets",d:{"medtop:08000000":.6,"medtop:02000000":.4,"medtop:10000000":.4}},
+{n:"The Times",g:"outlets",d:{"medtop:govt":.6,"medtop:04000000":.4,"medtop:01000000":.3}},
+{n:"The Telegraph",g:"outlets",d:{"medtop:govt":.6,"medtop:04000000":.4,"medtop:15000000":.3}},
+{n:"Financial Times",g:"outlets",d:{"medtop:markets":.9,"medtop:macro":.8,"medtop:startups":.5,"medtop:intl":.4}},
+{n:"The Economist",g:"outlets",d:{"medtop:macro":.7,"medtop:intl":.7,"medtop:govt":.5}},
+{n:"The Sun",g:"outlets",d:{"medtop:15000000":.6,"medtop:08000000":.5,"medtop:10000000":.3}},
+{n:"ITV News",g:"outlets",d:{"medtop:govt":.5,"medtop:14000000":.4}},
+{n:"New York Times",g:"outlets",d:{"medtop:govt":.5,"medtop:01000000":.5,"medtop:13000000":.4}},
+{n:"CNN",g:"outlets",d:{"medtop:intl":.5,"medtop:11000000":.5}},
+/* --- aggregators & platforms (how most people actually meet news) --- */
+{n:"Apple News",g:"platforms",d:{"medtop:11000000":.3,"medtop:10000000":.3,"medtop:08000000":.2},agg:true},
+{n:"Google News / Discover",g:"platforms",d:{"medtop:11000000":.3,"medtop:13000000":.3},agg:true},
+{n:"YouTube",g:"platforms",d:{"medtop:13000000":.3,"medtop:01000000":.3},agg:true},
+{n:"TikTok",g:"platforms",d:{"medtop:08000000":.3,"medtop:10000000":.3,"medtop:01000000":.2},agg:true},
+{n:"Instagram",g:"platforms",d:{"medtop:10000000":.3,"medtop:08000000":.3,"medtop:01000000":.2},agg:true},
+{n:"X / Twitter",g:"platforms",d:{"medtop:11000000":.4,"medtop:13000000":.3,"medtop:15000000":.2},agg:true},
+{n:"Facebook",g:"platforms",d:{"medtop:08000000":.3,"medtop:14000000":.2},agg:true},
+{n:"Reddit",g:"platforms",d:{"medtop:13000000":.4,"medtop:10000000":.3},agg:true},
+{n:"LinkedIn",g:"platforms",d:{"medtop:startups":.4,"medtop:09000000":.3},agg:true},
+{n:"Podcasts",g:"platforms",d:{"medtop:11000000":.3,"medtop:01000000":.3,"medtop:histideas":.2},agg:true},
+{n:"Substack newsletters",g:"platforms",d:{"medtop:13000000":.3,"medtop:11000000":.3,"medtop:histideas":.3},agg:true},
+{n:"WhatsApp / group chats",g:"platforms",d:{"medtop:08000000":.2},agg:true}];
+const GOAL_KEYWORDS={economics:"medtop:macro",economy:"medtop:macro",inflation:"medtop:macro",finance:"medtop:markets",
+ai:"medtop:ai",technology:"medtop:13000000",climate:"medtop:climate",energy:"medtop:energy",environment:"medtop:06000000",
+politics:"medtop:11000000",geopolitics:"medtop:intl",international:"medtop:intl",china:"medtop:intl",health:"medtop:07000000",
+medicine:"medtop:meddiscovery",history:"medtop:histideas",media:"medtop:media",regulation:"medtop:techreg",policy:"medtop:govt",
+migration:"medtop:demog",work:"medtop:wages",labour:"medtop:wages",science:"medtop:research",space:"medtop:space"};
+
+/* ========== POLITICAL MODULE — issue statements, Pew-style (never self-labelling) ==========
+   4 axes: econ (market -1 <-> state +1), soc (traditional -1 <-> progressive +1),
+   intl (national -1 <-> global +1), inst (institutionalist -1 <-> reformist +1)   */
+const ISSUES=[
+ {ax:"econ",dir:+1,t:"When markets fail people, government should step in, even at a cost to efficiency."},
+ {ax:"econ",dir:-1,t:"Most things are done better by private enterprise than by the state."},
+ {ax:"econ",dir:+1,t:"The gap between rich and poor is a bigger problem than slow economic growth."},
+ {ax:"soc",dir:+1,t:"Society benefits when long-standing traditions are questioned and revised."},
+ {ax:"soc",dir:-1,t:"Changes to social norms have mostly gone too fast in the last decade."},
+ {ax:"soc",dir:+1,t:"Newcomers enrich a country's culture more than they strain it."},
+ {ax:"intl",dir:+1,t:"Global problems need global institutions, even when that limits national control."},
+ {ax:"intl",dir:-1,t:"A country's first duty is to its own citizens, ahead of international commitments."},
+ {ax:"intl",dir:+1,t:"Free trade helps ordinary people more than it hurts them."},
+ {ax:"inst",dir:-1,t:"Established institutions (courts, central banks, the civil service) deserve more trust than they currently get."},
+ {ax:"inst",dir:+1,t:"Real progress usually requires disrupting how things have always been done."},
+ {ax:"inst",dir:+1,t:"The political system needs fundamental reform, not careful tinkering."}];
+const AXIS_LABELS={econ:["Market-leaning","State-leaning"],soc:["Tradition-leaning","Change-leaning"],
+intl:["Nation-first","Globally-minded"],inst:["Institutionalist","Reform-minded"]};
+/* per-topic lens: how politically-charged coverage should relate to the reader's vantage point */
+const LENS_TOPICS=["medtop:11000000","medtop:04000000","medtop:14000000","medtop:06000000"];
+
+/* ========== GEO MODULE — tile world map (production: proper vector map) ==========
+   grid 24 cols x 12 rows; tiles placed roughly geographically. code -> [col,row,label] */
+const GEO={
+ CA:[3,2,"CA"],US:[4,3,"US"],MX:[3,5,"MX"],BR:[7,8,"BR"],AR:[6,10,"AR"],CO:[5,7,"CO"],CL:[5,9,"CL"],
+ UK:[10,2,"UK"],IE:[9,2,"IE"],FR:[10,3,"FR"],ES:[9,4,"ES"],PT:[8,4,"PT"],DE:[11,2,"DE"],IT:[11,4,"IT"],
+ NL:[11,1,"NL"],SE:[12,1,"SE"],PL:[12,2,"PL"],UA:[13,3,"UA"],TR:[13,4,"TR"],RU:[15,1,"RU"],
+ EG:[12,6,"EG"],NG:[10,7,"NG"],ET:[13,7,"ET"],KE:[13,8,"KE"],ZA:[12,10,"ZA"],MA:[9,5,"MA"],
+ SA:[14,5,"SA"],AE:[15,6,"AE"],IL:[13,5,"IL"],IR:[15,4,"IR"],IQ:[14,4,"IQ"],JO:[14,6,"JO"],KW:[15,5,"KW"],
+ IN:[17,5,"IN"],PK:[16,4,"PK"],BD:[18,5,"BD"],CN:[18,3,"CN"],JP:[21,3,"JP"],KR:[20,3,"KR"],
+ ID:[19,8,"ID"],PH:[20,6,"PH"],VN:[19,5,"VN"],TH:[18,6,"TH"],SG:[18,7,"SG"],AU:[21,9,"AU"],NZ:[23,11,"NZ"]};
+const GEO_NAMES={CA:"Canada",US:"United States",MX:"Mexico",BR:"Brazil",AR:"Argentina",CO:"Colombia",CL:"Chile",
+UK:"United Kingdom",IE:"Ireland",FR:"France",ES:"Spain",PT:"Portugal",DE:"Germany",IT:"Italy",NL:"Netherlands",
+SE:"Sweden",PL:"Poland",UA:"Ukraine",TR:"Türkiye",RU:"Russia",EG:"Egypt",NG:"Nigeria",ET:"Ethiopia",KE:"Kenya",
+ZA:"South Africa",MA:"Morocco",SA:"Saudi Arabia",AE:"UAE",IL:"Israel",IR:"Iran",IQ:"Iraq",JO:"Jordan",KW:"Kuwait",
+IN:"India",PK:"Pakistan",BD:"Bangladesh",CN:"China",JP:"Japan",KR:"South Korea",ID:"Indonesia",PH:"Philippines",
+VN:"Vietnam",TH:"Thailand",SG:"Singapore",AU:"Australia",NZ:"New Zealand"};
+
+/* ========== SAMPLE CORPUS (metadata only; geo + viewpoint tags added) ========== */
+const ARTICLES=[
+{t:"Why the grid, not the panel, is the climate bottleneck",s:"Works in Progress",n:["medtop:energy","medtop:climate"],lv:2,geo:["US","UK"]},
+{t:"What the latest inflation print actually tells us",s:"Financial Times",n:["medtop:macro"],lv:2,geo:["UK"]},
+{t:"A beginner's map of how central banks think",s:"Econlib",n:["medtop:macro"],lv:1,geo:[]},
+{t:"The quiet race to regulate frontier AI models",s:"The Guardian",n:["medtop:ai","medtop:techreg"],lv:2,geo:["UK","US"],vp:{inst:-.4}},
+{t:"How transformer models actually work",s:"Works in Progress",n:["medtop:ai"],lv:1,geo:[]},
+{t:"Energy policy is where climate ambition meets arithmetic",s:"BBC InDepth",n:["medtop:enpolicy","medtop:energy"],lv:2,geo:["UK"],vp:{econ:.3}},
+{t:"The demographic cliff reshaping East Asian economies",s:"The Diplomat",n:["medtop:demog","medtop:macro"],lv:2,geo:["JP","KR","CN"]},
+{t:"CRISPR's second act: from lab to clinic",s:"New York Times",n:["medtop:biotech","medtop:meddiscovery"],lv:2,geo:["US"]},
+{t:"What ancient trade routes teach us about modern supply chains",s:"Aeon",n:["medtop:histideas","medtop:intl"],lv:2,geo:["CN","TR"]},
+{t:"The global south's new non-alignment",s:"The Diplomat",n:["medtop:intl"],lv:2,geo:["IN","BR","ZA"],vp:{intl:.4}},
+{t:"Why local journalism keeps democracies honest",s:"The Guardian",n:["medtop:media","medtop:govt"],lv:1,geo:["UK"],vp:{inst:-.3}},
+{t:"Rewilding at scale: Europe's boldest experiment",s:"BBC InDepth",n:["medtop:nature","medtop:climate"],lv:1,geo:["PL","ES"]},
+{t:"Markets are repricing political risk. Here's how",s:"Financial Times",n:["medtop:markets","medtop:intl"],lv:2,geo:["US","CN"]},
+{t:"The wage puzzle: why pay lags productivity",s:"Econlib",n:["medtop:wages","medtop:macro"],lv:2,geo:["US","UK"],vp:{econ:-.3}},
+{t:"A short history of the idea of progress",s:"Aeon",n:["medtop:histideas"],lv:1,geo:[]},
+{t:"Public health's quiet wins nobody notices",s:"New York Times",n:["medtop:pubhealth"],lv:1,geo:["US"]},
+{t:"The new space economy is closer than you think",s:"Works in Progress",n:["medtop:space","medtop:startups"],lv:1,geo:["US"]},
+{t:"Elections in the age of synthetic media",s:"The Guardian",n:["medtop:election","medtop:ai","medtop:media"],lv:2,geo:["US","IN"],vp:{inst:.2}},
+{t:"The case for markets in everything",s:"Econlib",n:["medtop:macro","medtop:govt"],lv:2,geo:[],vp:{econ:-.7}},
+{t:"Why industrial strategy is back everywhere",s:"Financial Times",n:["medtop:macro","medtop:govt"],lv:2,geo:["UK","DE","US"],vp:{econ:.6}},
+{t:"Borders, belonging and the new migration politics",s:"BBC InDepth",n:["medtop:demog","medtop:govt"],lv:2,geo:["UK","DE"],vp:{soc:.5,intl:.3}},
+{t:"The quiet strength of national communities",s:"Aeon",n:["medtop:demog","medtop:histideas"],lv:2,geo:[],vp:{soc:-.5,intl:-.4}}];
+
+/* ========== GRAPH HELPERS ========== */
+const children=q=>Object.keys(TOPICS).filter(k=>TOPICS[k].p===q);
+const neighbours=q=>{const out=[];const t=TOPICS[q];
+ if(t.p)out.push([t.p,"parent"]);children(q).forEach(c=>out.push([c,"child"]));
+ if(t.p)children(t.p).filter(s=>s!==q).forEach(s=>out.push([s,"sibling"]));
+ RELATED.forEach(([a,b])=>{if(a===q)out.push([b,"related"]);if(b===q)out.push([a,"related"]);});return out;};
+function hopDistance(a,b,max=4){if(a===b)return 0;let f=[a],seen=new Set([a]);
+ for(let d=1;d<=max;d++){const nx=[];for(const n of f)for(const[m]of neighbours(n))
+ if(!seen.has(m)){if(m===b)return d;seen.add(m);nx.push(m);}f=nx;}return max+1;}
+
+/* ========== STATE ========== */
+const S={step:0,P:{},G:{},K:{},picks:[],subs:[],sources:[],goalText:"",know:{},reach:1,excl:[],mode:3,
+ polConsent:null,pol:{econ:0,soc:0,intl:0,inst:0},polAnswered:0,lens:{},geo:{},
+ demog:{age:"",edu:"",region:"",work:""},demogConsent:null,sens:{eth:"",rel:"",ori:""}};
+const addW=(v,q,w)=>{v[q]=Math.min(1,(v[q]||0)+w);};
+function spread(v,q,w){addW(v,q,w);for(const[m,t]of neighbours(q)){
+ if(t==="child")addW(v,m,w*.35);else if(t==="parent")addW(v,m,w*.45);
+ else if(t==="related")addW(v,m,w*.4);else if(t==="sibling")addW(v,m,w*.15);}}
+
+/* ========== RECOMMENDER (now geo- and lens-aware) ========== */
+function recommend(){
+ const excl=new Set(S.excl);
+ const topP=Object.entries(S.P).filter(([q,w])=>w>=.45).map(([q])=>q);
+ const scored=ARTICLES.map(a=>{
+  if(a.n.some(q=>excl.has(q)||excl.has(TOPICS[q].p)))return null;
+  const minHop=Math.min(...a.n.map(q=>Math.min(...(topP.length?topP:["x"]).map(p=>p==="x"?9:hopDistance(p,q)))));
+  const pScore=a.n.reduce((s,q)=>s+(S.P[q]||0),0);
+  const gScore=a.n.reduce((s,q)=>s+(S.G[q]||0),0);
+  const kAvg=a.n.reduce((s,q)=>s+(S.K[q]||0),0)/a.n.length;
+  if(a.lv===2?kAvg<.3:kAvg>=.7)return null;
+  /* geo bonus: volunteered country interest */
+  let geoB=0,geoWhy="";
+  (a.geo||[]).forEach(c=>{const gi=S.geo[c]||0;
+   if(gi===2){geoB+=.8;geoWhy=GEO_NAMES[c];}else if(gi===1){geoB+=.35;geoWhy=geoWhy||GEO_NAMES[c];}
+   else if(gi===-1)geoB-=.8;});
+  /* political lens: vantage handling on charged articles */
+  let lensB=0,lensWhy="";
+  if(a.vp&&S.polConsent==="yes"&&S.polAnswered>0){
+   const branch=a.n.map(q=>TOPICS[q].p||q).find(b=>LENS_TOPICS.includes(b))||
+                (a.n.find(q=>LENS_TOPICS.includes(q)));
+   const mode=branch?(S.lens[branch]||"balance"):"balance";
+   const align=Object.entries(a.vp).reduce((s,[ax,v])=>s+v*(S.pol[ax]||0),0); // + agrees, - challenges
+   if(mode==="match"){if(align>0){lensB=.4;lensWhy="matches your vantage point, as you asked for this topic";}else if(align<-.15)lensB=-.4;}
+   if(mode==="challenge"){if(align<0){lensB=.5;lensWhy="written from outside your vantage point — you asked to be challenged here";}else if(align>.15)lensB=-.5;}
+   if(mode==="balance"){lensB=.2-Math.abs(align)*.2;lensWhy=Math.abs(align)>.3?"":"sits near the centre of this debate";}
+  }
+  let cat=null,why="";
+  if(minHop===0&&pScore>.5){cat="core";why=`Squarely inside your stated interests (${a.n.map(q=>TOPICS[q].l).join(", ")}).`;}
+  else if(minHop>=1&&minHop<=2){cat="stretch";
+   const via=a.n.map(q=>{const near=topP.map(p=>[p,hopDistance(p,q)]).sort((x,y)=>x[1]-y[1])[0];
+    const rel=RELATED.find(([x,y])=>(x===near?.[0]&&y===q)||(y===near?.[0]&&x===q));
+    return near?{p:near[0],q,rel}:null;}).filter(Boolean)[0];
+   if(via)why=via.rel?`You read ${TOPICS[via.p].l} closely; ${TOPICS[via.q].l} borders it on the topic map (cross-branch link).`
+    :`One step from your ${TOPICS[via.p].l} interest on the topic map.`;
+   if(gScore>.3)why+=" It also serves your stated goal.";}
+  else if(minHop>=3){cat="discovery";
+   why=`Deliberately outside your usual map (${a.n.map(q=>TOPICS[q].l).join(", ")}) — within your ${["Gentle","Balanced","Adventurous"][S.reach]} reach.`;}
+  if(!cat)return null;
+  if(geoWhy)why+=` Touches ${geoWhy}, which you flagged on your map.`;
+  if(lensWhy)why+=` It ${lensWhy}.`;
+  const score=pScore*2+gScore*1.5+(cat==="stretch"?.8:0)+(cat==="discovery"?.3:0)+geoB+lensB;
+  return{...a,cat,why,score,minHop};
+ }).filter(Boolean);
+ const pick=(c,n)=>scored.filter(a=>a.cat===c).sort((a,b)=>b.score-a.score).slice(0,n);
+ const q=S.mode===1?{core:1,stretch:0,discovery:0}:S.mode===3?{core:1,stretch:1,discovery:1}:{core:2,stretch:2,discovery:1};
+ let out=[...pick("core",q.core),...pick("stretch",q.stretch),...pick("discovery",q.discovery)];
+ if(out.length<S.mode)out=out.concat(scored.filter(a=>!out.includes(a)).sort((a,b)=>b.score-a.score).slice(0,S.mode-out.length));
+ return out.slice(0,S.mode);
+}
+
+/* ========== UI ========== */
+const $=id=>document.getElementById(id);
+const el=h=>{const d=document.createElement("div");d.innerHTML=h;return d.firstElementChild;};
+function toast(m){$("toast").textContent=m;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),2600);}
+const STEPS=["welcome","topics","depth","sources","goals","knowledge","polconsent","politics","lens","geo","reach","delivery","demog","sensitive","profile","issue"];
+function go(n){S.step=n;$("pbar").style.width=(n/(STEPS.length-1)*100)+"%";render();window.scrollTo(0,0);}
+const saveLater=()=>toast("Progress saved. In production: a magic link lands in your inbox to resume exactly here.");
+const navRow=(back,fwd,txt="Continue",dis="")=>`<div class="nav"><button class="btn ghost" onclick="go(${back})">Back</button>
+ <button class="btn" ${dis} id="nx" onclick="${fwd}">${txt}</button></div><button class="save" onclick="saveLater()">Save & finish later</button>`;
+
+function render(){
+ const stg=$("stage");stg.innerHTML="";const step=STEPS[S.step];
+ const stepnum=`<div class="stepnum">Step ${S.step} of ${STEPS.length-1}</div>`;
+
+ if(step==="welcome")stg.append(el(`<div class="card">
+  <h1>A thorough setup, on purpose.</h1>
+  <p class="sub">Atlus runs entirely on what you choose to tell us — no tracking, no inference behind your back.
+  This setup is deliberately long, because you're training your own reader. Every answer saves as you go;
+  stop anytime and a link in your inbox resumes you exactly where you left off. Sensitive sections are
+  clearly marked, always optional, and always explained.</p>
+  <div class="nav"><span></span><button class="btn" onclick="go(1)">Begin</button></div></div>`));
+
+ if(step==="topics"){
+  const c=el(`<div class="card">${stepnum}<h1>What do you enjoy reading about?</h1>
+   <p class="sub">Pick at least three. These are the 17 top branches of the news industry's own topic map (~1,200 topics deep).
+   <a class="exp-link" href="atlus-iptc-explorer.html" target="_blank" style="display:inline">Browse the full map →</a></p>
+   <div class="chips" id="ch"></div>${navRow(0,"stepTopics()","Continue","disabled")}</div>`);
+  Object.keys(TOPICS).filter(q=>TOPICS[q].lvl===1).forEach(q=>{
+   const b=el(`<button class="chip${S.picks.includes(q)?" on":""}">${TOPICS[q].l}</button>`);
+   b.onclick=()=>{S.picks.includes(q)?S.picks.splice(S.picks.indexOf(q),1):S.picks.push(q);
+    b.classList.toggle("on");c.querySelector("#nx").disabled=S.picks.length<3;};
+   c.querySelector("#ch").append(b);});
+  c.querySelector("#nx").disabled=S.picks.length<3;stg.append(c);}
+
+ if(step==="depth"){
+  const c=el(`<div class="card">${stepnum}<h1>Go a level deeper.</h1>
+   <p class="sub">Each tap moves your Preference weight from a broad branch onto precise nodes. The map has up to five levels —
+   the deeper levels fill in automatically from your reading feedback later.</p>
+   <div id="groups"></div>${navRow(1,"stepDepth()")}</div>`);
+  S.picks.forEach(q=>{const kids=children(q);if(!kids.length)return;
+   const g=el(`<div class="subgroup"><div class="gt">${TOPICS[q].l}</div><div class="chips"></div></div>`);
+   kids.forEach(k=>{const b=el(`<button class="chip${S.subs.includes(k)?" on":""}">${TOPICS[k].l}</button>`);
+    b.onclick=()=>{S.subs.includes(k)?S.subs.splice(S.subs.indexOf(k),1):S.subs.push(k);b.classList.toggle("on");};
+    g.querySelector(".chips").append(b);});
+   c.querySelector("#groups").append(g);});stg.append(c);}
+
+ if(step==="sources"){
+  const c=el(`<div class="card">${stepnum}<h1>Where do you get news right now?</h1>
+   <p class="sub">Be honest — TikTok counts. Outlets carry a topic fingerprint that seeds your taste and starting level;
+   platforms tell us how news reaches you today, and where your current diet may be narrow.
+   We never quiz you on what a choice already implies.</p>
+   <div class="subgroup"><div class="gt">News outlets</div><div class="chips" id="ch_outlets"></div></div>
+   <div class="subgroup"><div class="gt">Apps, feeds & platforms</div><div class="chips" id="ch_platforms"></div></div>
+   ${navRow(2,"stepSources()")}</div>`);
+  SOURCES.forEach(s=>{const b=el(`<button class="chip${S.sources.includes(s.n)?" on":""}">${s.n}</button>`);
+   b.onclick=()=>{S.sources.includes(s.n)?S.sources.splice(S.sources.indexOf(s.n),1):S.sources.push(s.n);b.classList.toggle("on");};
+   c.querySelector("#ch_"+s.g).append(b);});stg.append(c);}
+
+ if(step==="goals"){
+  const c=el(`<div class="card">${stepnum}<h1>What do you want to understand better?</h1>
+   <p class="sub">In your own words — this sets the direction your Stretch articles walk toward.</p>
+   <div class="chips" style="margin-bottom:12px" id="ex"></div>
+   <textarea id="gt" placeholder="e.g. I want a firmer grasp of economics, and to follow AI without the hype…">${S.goalText}</textarea>
+   ${navRow(3,"stepGoals()")}</div>`);
+  ["I want balanced news, not just what I agree with","I want to follow AI without the hype",
+   "I want a firmer grasp of economics","I want to understand climate and energy properly"].forEach(t=>{
+   const b=el(`<button class="chip">${t}</button>`);
+   b.onclick=()=>{const ta=c.querySelector("#gt");ta.value=(ta.value?ta.value+" ":"")+t+".";};
+   c.querySelector("#ex").append(b);});stg.append(c);}
+
+ if(step==="knowledge"){
+  const c=el(`<div class="card">${stepnum}<h1>Where are you already well-read?</h1>
+   <p class="sub">Sets the sophistication floor per node — no explainers where you're strong, no deep-ends where you're new.</p>
+   <div class="kgrid" id="kg"></div>${navRow(4,"stepKnowledge()")}</div>`);
+  S.picks.forEach(q=>{const r=el(`<div class="krow"><span class="t">${TOPICS[q].l}</span><span class="kopts"></span></div>`);
+   [["New to this",.1],["Casual",.45],["Read closely",.9]].forEach(([lbl,v])=>{
+    const b=el(`<button class="kopt${S.know[q]===v?" on":""}">${lbl}</button>`);
+    b.onclick=()=>{S.know[q]=v;r.querySelectorAll(".kopt").forEach(x=>x.classList.remove("on"));b.classList.add("on");};
+    r.querySelector(".kopts").append(b);});
+   c.querySelector("#kg").append(r);});stg.append(c);}
+
+ /* ---------- POLITICAL: consent gate ---------- */
+ if(step==="polconsent"){
+  stg.append(el(`<div class="card">${stepnum}<h1>Your political vantage point <span style="font-size:13px;color:var(--muted)">(optional)</span></h1>
+   <div class="consent"><p><b>Why we ask.</b> Politics coverage lands differently depending on where you stand.
+   If you tell us your vantage point, you control how we use it — per topic, you choose whether coverage should
+   <i>match</i> it, <i>balance</i> across it, or deliberately <i>challenge</i> it.</p>
+   <p class="why">Political opinion is special-category data under UK GDPR. We process it only with your explicit consent,
+   only to select and frame your articles the way you direct, never for anything else, and you can view, change or erase it at any time.
+   Skipping this section changes nothing else about Atlus.</p></div>
+   <div class="nav"><button class="btn ghost" onclick="S.polConsent='no';go(9)">Skip this section</button>
+   <button class="btn" onclick="S.polConsent='yes';go(7)">I consent — continue</button></div>
+   <button class="save" onclick="saveLater()">Save & finish later</button></div>`));}
+
+ /* ---------- POLITICAL: issue sliders ---------- */
+ if(step==="politics"){
+  const c=el(`<div class="card">${stepnum}<h1>Where do you stand — issue by issue?</h1>
+   <p class="sub">No labels, no boxes: twelve concrete statements, four dials underneath (economic · social · international · institutional).
+   Slide each from strongly disagree to strongly agree. Skip any statement.</p>
+   <div id="iss"></div>${navRow(6,"stepPolitics()")}</div>`);
+  ISSUES.forEach((it,i)=>{
+   const v=it._v===undefined?50:it._v;
+   const r=el(`<div class="issue"><div class="axis">${{econ:"Economic",soc:"Social & cultural",intl:"International",inst:"Institutions & change"}[it.ax]}</div>
+    <p>${it.t}</p><input type="range" min="0" max="100" value="${v}" data-i="${i}">
+    <div class="slider-labels"><span>Strongly disagree</span><span>Neutral</span><span>Strongly agree</span></div></div>`);
+   r.querySelector("input").oninput=e=>{it._v=+e.target.value;};
+   c.querySelector("#iss").append(r);});
+  stg.append(c);}
+
+ /* ---------- POLITICAL: per-topic lens ---------- */
+ if(step==="lens"){
+  const axSummary=Object.entries(S.pol).filter(([a,v])=>Math.abs(v)>.1)
+   .map(([a,v])=>AXIS_LABELS[a][v>0?1:0]).join(" · ")||"near the centre on everything you answered";
+  const c=el(`<div class="card">${stepnum}<h1>Now: how should we use it?</h1>
+   <p class="sub">Your dials read: <b style="color:var(--blue)">${axSummary}</b>.
+   For each charged topic, choose the lens — this is the whole point of asking.</p>
+   <div class="kgrid" id="lg"></div>${navRow(7,"go(9)")}</div>`);
+  LENS_TOPICS.forEach(q=>{
+   const r=el(`<div class="krow"><span class="t">${TOPICS[q].l}</span><span class="kopts"></span></div>`);
+   [["Match me","match"],["Balance","balance"],["Challenge me","challenge"]].forEach(([lbl,v])=>{
+    const b=el(`<button class="kopt${(S.lens[q]||"balance")===v?" on acc":""}">${lbl}</button>`);
+    b.onclick=()=>{S.lens[q]=v;r.querySelectorAll(".kopt").forEach(x=>x.classList.remove("on","acc"));b.classList.add("on","acc");};
+    r.querySelector(".kopts").append(b);});
+   c.querySelector("#lg").append(r);});
+  stg.append(c);}
+
+ /* ---------- GEOGRAPHY ---------- */
+ if(step==="geo"){
+  const c=el(`<div class="card">${stepnum}<h1>Where in the world?</h1>
+   <p class="sub">Tap countries to cycle: <b style="color:var(--accent)">very interested</b> →
+   interested → <b style="color:var(--danger)">rather not</b> → neutral. This weights coverage geography —
+   your international sources (The Diplomat, Jordan Times, Kuwait Times…) make this real.</p>
+   <div class="maplegend"><span><i style="background:var(--accent)"></i>Very interested</span>
+   <span><i style="background:rgba(228,179,99,.45)"></i>Interested</span>
+   <span><i style="background:rgba(217,123,102,.4)"></i>Rather not</span>
+   <span><i style="background:var(--card2)"></i>Neutral</span></div>
+   <div class="map" id="map"></div>
+   <p class="sub" style="font-size:12px">Prototype tile-map of 46 countries; production uses a full vector world map with every country and region groupings.</p>
+   ${navRow(S.polConsent==='yes'?8:6,"go(10)")}</div>`);
+  const map=c.querySelector("#map");
+  for(let r=0;r<12;r++)for(let col=0;col<24;col++){
+   const code=Object.keys(GEO).find(k=>GEO[k][0]===col&&GEO[k][1]===r);
+   if(code){const gi=S.geo[code]||0;
+    const t=el(`<div class="tile${gi?" i"+gi:""}" title="${GEO_NAMES[code]}">${GEO[code][2]}</div>`);
+    t.onclick=()=>{const cur=S.geo[code]||0;const next=cur===0?2:cur===2?1:cur===1?-1:0;
+     if(next===0)delete S.geo[code];else S.geo[code]=next;
+     t.className="tile"+(next?" i"+next:"");
+     toast(`${GEO_NAMES[code]}: ${next===2?"very interested":next===1?"interested":next===-1?"rather not":"neutral"}`);};
+    map.append(t);}
+   else map.append(el(`<div class="tile sea"></div>`));}
+  stg.append(c);}
+
+ if(step==="reach"){
+  const c=el(`<div class="card">${stepnum}<h1>How far should we take you?</h1>
+   <p class="sub">Discovery articles walk hops across the topic map beyond your lit nodes. You hold the leash.</p>
+   <input type="range" min="0" max="2" step="1" value="${S.reach}" id="rr">
+   <div class="slider-labels"><span>Gentle</span><span>Balanced</span><span>Adventurous</span></div>
+   <p class="sub" style="margin-top:20px">Anything you'd rather we kept out?</p>
+   <div class="chips" id="ex"></div>${navRow(9,"go(11)")}</div>`);
+  c.querySelector("#rr").oninput=e=>S.reach=+e.target.value;
+  ["medtop:15000000","medtop:03000000","medtop:02000000","medtop:16000000","medtop:08000000","medtop:17000000"].forEach(q=>{
+   const b=el(`<button class="chip excl${S.excl.includes(q)?" on":""}">${TOPICS[q].l}</button>`);
+   b.onclick=()=>{S.excl.includes(q)?S.excl.splice(S.excl.indexOf(q),1):S.excl.push(q);b.classList.toggle("on");};
+   c.querySelector("#ex").append(b);});stg.append(c);}
+
+ if(step==="delivery"){
+  const c=el(`<div class="card">${stepnum}<h1>How much, each day?</h1>
+   <p class="sub">A finite, deliberate set — never a feed.</p><div class="modes" id="mm"></div>
+   ${navRow(10,"go(12)")}</div>`);
+  [[1,"Light","1 article"],[3,"Standard","3 articles"],[5,"Deep","5 articles"]].forEach(([v,n,d])=>{
+   const m=el(`<div class="mode${S.mode===v?" on":""}"><b>${n}</b><span>${d}</span></div>`);
+   m.onclick=()=>{S.mode=v;c.querySelectorAll(".mode").forEach(x=>x.classList.remove("on"));m.classList.add("on");};
+   c.querySelector("#mm").append(m);});stg.append(c);}
+
+ /* ---------- DEMOGRAPHICS: core (non-sensitive) ---------- */
+ if(step==="demog"){
+  const sel=(id,opts,cur)=>`<select id="${id}"><option value="">Prefer not to say</option>
+   ${opts.map(o=>`<option ${cur===o?"selected":""}>${o}</option>`).join("")}</select>`;
+  stg.append(el(`<div class="card">${stepnum}<h1>A little about you <span style="font-size:13px;color:var(--muted)">(all optional)</span></h1>
+   <p class="sub">Standard, non-sensitive basics — the same set most research panels collect. Used to understand who Atlus
+   serves and to calibrate reading level, never to profile you to anyone else.</p>
+   <div class="kgrid">
+    <div class="krow"><span class="t">Age</span><span style="flex:1;max-width:250px">${sel("d_age",["Under 18","18–24","25–34","35–44","45–54","55–64","65+"],S.demog.age)}</span></div>
+    <div class="krow"><span class="t">Education</span><span style="flex:1;max-width:250px">${sel("d_edu",["School","College / sixth form","Undergraduate degree","Postgraduate degree","Doctorate"],S.demog.edu)}</span></div>
+    <div class="krow"><span class="t">Where you live</span><span style="flex:1;max-width:250px">${sel("d_reg",["London","South England","North England","Midlands","Scotland","Wales","Northern Ireland","Ireland","Europe","North America","Elsewhere"],S.demog.region)}</span></div>
+    <div class="krow"><span class="t">Field of work / study</span><span style="flex:1;max-width:250px">${sel("d_work",["Student","Technology","Finance","Law","Healthcare","Academia / research","Media","Public sector","Creative","Trades / industry","Other"],S.demog.work)}</span></div>
+   </div>${navRow(11,"stepDemog()")}</div>`));}
+
+ /* ---------- DEMOGRAPHICS: sensitive (explicit consent) ---------- */
+ if(step==="sensitive"){
+  if(S.demogConsent===null){
+   stg.append(el(`<div class="card">${stepnum}<h1>Optional: sensitive details</h1>
+    <div class="consent"><p><b>Why we ask.</b> Ethnicity, religion and sexual orientation shape which stories feel
+    relevant and which perspectives are missing from a reader's diet. If you share them, we use them for exactly two things:
+    surfacing coverage you may care about, and checking — in aggregate — that Atlus serves readers of every background well.</p>
+    <p class="why">These are special-category data under UK GDPR. We ask for explicit consent, every field has
+    "prefer not to say", skipping is completely fine, and you can erase these answers at any time. They are never
+    shared, sold, or used in any advertising sense — Atlus has no advertisers.</p></div>
+    <div class="nav"><button class="btn ghost" onclick="S.demogConsent='no';go(14)">Skip this section</button>
+    <button class="btn" onclick="S.demogConsent='yes';render()">I consent — show the questions</button></div>
+    <button class="save" onclick="saveLater()">Save & finish later</button></div>`));}
+  else{
+   const sel=(id,opts,cur)=>`<select id="${id}"><option value="">Prefer not to say</option>
+    ${opts.map(o=>`<option ${cur===o?"selected":""}>${o}</option>`).join("")}</select>`;
+   stg.append(el(`<div class="card">${stepnum}<h1>Sensitive details <span style="font-size:13px;color:var(--muted)">(every field skippable)</span></h1>
+    <div class="kgrid">
+     <div class="krow"><span class="t">Ethnicity</span><span style="flex:1;max-width:280px">${sel("s_eth",["Asian or Asian British","Black, African, Caribbean or Black British","Mixed or multiple","White","Other"],S.sens.eth)}</span></div>
+     <div class="krow"><span class="t">Religion or belief</span><span style="flex:1;max-width:280px">${sel("s_rel",["No religion","Christian","Muslim","Hindu","Jewish","Sikh","Buddhist","Other"],S.sens.rel)}</span></div>
+     <div class="krow"><span class="t">Sexual orientation</span><span style="flex:1;max-width:280px">${sel("s_ori",["Heterosexual / straight","Gay or lesbian","Bisexual","Other"],S.sens.ori)}</span></div>
+    </div>${navRow(12,"stepSensitive()")}</div>`));}}
+
+ /* ---------- PROFILE READ-BACK ---------- */
+ if(step==="profile"){
+  const topOf=(v,n)=>Object.entries(v).sort((a,b)=>b[1]-a[1]).slice(0,n).map(([q,w])=>`${TOPICS[q].l} (${w.toFixed(2)})`).join(" · ")||"—";
+  const polLine=S.polConsent==="yes"&&S.polAnswered>0
+   ?Object.entries(S.pol).map(([a,v])=>`${AXIS_LABELS[a][v>0?1:0]} ${Math.abs(v)<.1?"(centre)":`(${(Math.abs(v)*100|0)}%)`}`).join(" · ")
+    +`<br><span style="color:var(--muted)">Lens: ${LENS_TOPICS.map(q=>`${TOPICS[q].l} → ${S.lens[q]||"balance"}`).join(" · ")}</span>`
+   :"Not provided — politics coverage defaults to balance across viewpoints.";
+  const geoLine=Object.keys(S.geo).length?Object.entries(S.geo).sort((a,b)=>b[1]-a[1])
+   .map(([c,v])=>`${GEO_NAMES[c]} ${v===2?"(very)":v===1?"(somewhat)":"(avoid)"}`).join(" · "):"No geographic weighting set.";
+  const demogLine=[S.demog.age,S.demog.edu,S.demog.region,S.demog.work].filter(Boolean).join(" · ")||"Not provided.";
+  stg.append(el(`<div class="card">${stepnum}<h1>Here's what we now believe about you.</h1>
+   <p class="sub">Every line below is a claim you can correct — here, later on your profile page, or by chat. Never sold; only ever used to pick and frame your articles.</p>
+   <div class="prof">
+    <div class="prow pp"><b>Preference — feeds Core</b>${topOf(S.P,5)}</div>
+    <div class="prow gg"><b>Goals — steers Stretch</b>${topOf(S.G,4)}</div>
+    <div class="prow kk"><b>Knowledge — sets the pitch</b>${topOf(S.K,4)}</div>
+    <div class="prow pol"><b>Political vantage — used only as you directed</b>${polLine}</div>
+    <div class="prow geo"><b>Geography</b>${geoLine}</div>
+    <div class="prow cc"><b>About you</b>${demogLine}${S.demogConsent==="yes"?" · sensitive details held under explicit consent":""}</div>
+    <div class="prow cc"><b>Settings</b>${["Gentle","Balanced","Adventurous"][S.reach]} discovery · ${S.mode} article${S.mode>1?"s":""}/day · ${S.excl.length?S.excl.map(q=>TOPICS[q].l).join(", ")+" excluded":"no exclusions"}</div>
+   </div>
+   <div class="nav"><button class="btn ghost" onclick="go(13)">Back</button>
+   <button class="btn" onclick="go(15)">Looks right — build my first issue</button></div></div>`));}
+
+ /* ---------- FIRST ISSUE ---------- */
+ if(step==="issue"){
+  const recs=recommend();
+  const c=el(`<div class="card"><h1>Tomorrow morning, 7am.</h1>
+   <p class="sub">Assembled by walking your node map — now geography-weighted and, where you consented, lens-aware. Every button is a volunteered graph-write.</p>
+   <div id="arts"></div>
+   <div class="note">Prototype: illustrative subset of the ~1,200-node IPTC graph, 46-country tile map, sample article metadata.
+   Production: full vocabulary (see the explorer), full vector world map, real ingestion, server-side resumable answers, signed one-tap email endpoints.</div>
+   <div class="nav"><button class="btn ghost" onclick="go(14)">Back to profile</button>
+   <button class="btn ghost" onclick="location.reload()">Restart</button></div></div>`);
+  recs.forEach(a=>{
+   const d=el(`<div class="art"><span class="cat ${a.cat}">${a.cat}</span>
+    <h3>${a.t}</h3><div class="src">${a.s} · ${a.n.map(q=>TOPICS[q].l).join(", ")}${a.geo&&a.geo.length?" · "+a.geo.join(", "):""}</div>
+    <div class="why">Why you're seeing this: ${a.why}</div>
+    <div class="fb"><button data-k="more">More like this</button><button data-k="less">Less like this</button>
+    <button data-k="basic">Too basic</button><button data-k="right">About right</button>
+    ${a.cat==="stretch"?'<button data-k="further">Stretch further</button>':""}</div></div>`);
+   d.querySelectorAll(".fb button").forEach(b=>{
+    b.onclick=()=>{b.classList.add("tapped");const k=b.dataset.k;
+     a.n.forEach(q=>{if(k==="more")addW(S.P,q,.15);if(k==="less")S.P[q]=Math.max(0,(S.P[q]||0)-.2);
+      if(k==="basic")addW(S.K,q,.2);if(k==="further")addW(S.G,q,.2);});
+     toast(`Noted — weights updated on ${a.n.map(q=>TOPICS[q].l).join(", ")}.`);};});
+   c.querySelector("#arts").append(d);});
+  stg.append(c);}
+}
+
+/* ========== STEP COMMITS ========== */
+function stepTopics(){S.picks.forEach(q=>spread(S.P,q,.6));go(2);}
+function stepDepth(){S.subs.forEach(q=>spread(S.P,q,.75));go(3);}
+function stepSources(){S.sources.forEach(n=>{const s=SOURCES.find(x=>x.n===n);
+ Object.entries(s.d).forEach(([q,w])=>{addW(S.P,q,w*(s.agg?.25:.4));if(!s.agg)addW(S.K,q,w*.5);});});go(4);}
+function stepGoals(){S.goalText=$("gt")?$("gt").value:S.goalText;
+ const txt=S.goalText.toLowerCase();const nodes=[];
+ Object.entries(GOAL_KEYWORDS).forEach(([kw,q])=>{if(txt.includes(kw)&&!nodes.includes(q))nodes.push(q);});
+ (nodes.length?nodes:Object.entries(S.P).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([q])=>q)).forEach(q=>spread(S.G,q,.7));go(5);}
+function stepKnowledge(){Object.entries(S.know).forEach(([q,v])=>spread(S.K,q,v));go(6);}
+function stepPolitics(){ // fold slider answers onto the four axes
+ const sums={econ:[0,0],soc:[0,0],intl:[0,0],inst:[0,0]};S.polAnswered=0;
+ ISSUES.forEach(it=>{if(it._v===undefined)return;S.polAnswered++;
+  const signed=((it._v-50)/50)*it.dir; sums[it.ax][0]+=signed;sums[it.ax][1]++;});
+ Object.keys(sums).forEach(ax=>{S.pol[ax]=sums[ax][1]?sums[ax][0]/sums[ax][1]:0;});
+ go(8);}
+function stepDemog(){S.demog={age:$("d_age").value,edu:$("d_edu").value,region:$("d_reg").value,work:$("d_work").value};go(13);}
+function stepSensitive(){S.sens={eth:$("s_eth").value,rel:$("s_rel").value,ori:$("s_ori").value};go(14);}
+
+go(0);
+</script>
+</body>
+</html>

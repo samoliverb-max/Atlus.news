@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atlus — IPTC Media Topics Explorer (all ~1,200 nodes)</title>
+<style>
+  :root{--bg:#0e1116;--card:#171c24;--card2:#1e2530;--ink:#e8e6e1;--muted:#9aa3b2;
+    --accent:#e4b363;--green:#7fb4a2;--purple:#c98bdb;--line:#2a3240}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:Georgia,serif;height:100vh;display:flex;flex-direction:column}
+  header{padding:14px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .logo{font-family:Helvetica,Arial,sans-serif;font-weight:700;letter-spacing:.06em;font-size:19px}
+  .logo span{color:var(--accent)}
+  .meta{font-family:Helvetica,Arial,sans-serif;font-size:12px;color:var(--muted)}
+  #search{margin-left:auto;background:var(--card2);border:1px solid var(--line);border-radius:8px;
+    color:var(--ink);padding:8px 12px;font-size:14px;width:260px;font-family:Helvetica,Arial,sans-serif}
+  #search:focus{outline:none;border-color:var(--accent)}
+  .tabs{display:flex;gap:2px}
+  .tab{font-family:Helvetica,Arial,sans-serif;font-size:12.5px;padding:7px 14px;cursor:pointer;
+    border:1px solid var(--line);background:none;color:var(--muted);border-radius:8px}
+  .tab.on{background:var(--accent);color:#1a1408;border-color:var(--accent);font-weight:700}
+  main{flex:1;display:flex;overflow:hidden}
+  #treepane{flex:1.1;overflow-y:auto;padding:14px 8px 40px 16px;border-right:1px solid var(--line)}
+  #detail{flex:.9;overflow-y:auto;padding:20px}
+  .node{font-size:14px;line-height:1.35;padding:3px 6px;border-radius:6px;cursor:pointer;
+    display:flex;align-items:baseline;gap:7px}
+  .node:hover{background:var(--card2)}
+  .node.sel{background:#241f14;outline:1px solid var(--accent)}
+  .node .tw{color:var(--muted);width:14px;font-family:monospace;flex-shrink:0}
+  .node .qc{font-family:monospace;font-size:10.5px;color:var(--muted);opacity:.7}
+  .node .lbl.hit{color:var(--accent)}
+  .kids{margin-left:18px;border-left:1px dotted var(--line);padding-left:4px}
+  .lvl1>.node .lbl{font-weight:700;font-size:15px}
+  .badge{font-family:Helvetica,Arial,sans-serif;font-size:10px;background:var(--card2);
+    border-radius:8px;padding:1px 7px;color:var(--muted)}
+  #detail h2{font-size:21px;margin-bottom:4px}
+  #detail .qcode{font-family:monospace;font-size:12px;color:var(--accent);margin-bottom:14px;display:block}
+  .dsec{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:12px}
+  .dsec b{font-family:Helvetica,Arial,sans-serif;font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--muted);display:block;margin-bottom:7px}
+  .dsec p{font-size:14.5px;line-height:1.55}
+  .lnk{display:inline-block;background:var(--card2);border-radius:14px;padding:5px 12px;margin:3px 4px 3px 0;
+    font-size:13px;cursor:pointer;border:1px solid var(--line)}
+  .lnk:hover{border-color:var(--accent)}
+  .lnk.wd{color:var(--purple)} .lnk.up{color:var(--green)}
+  a.ext{color:var(--purple);font-size:12.5px}
+  .atlus-map{border-left:3px solid var(--accent)}
+  .atlus-map p{font-size:13.5px;color:var(--muted)}
+  #status{padding:40px;text-align:center;font-family:Helvetica,Arial,sans-serif;color:var(--muted);font-size:14px;line-height:1.7}
+  #status .btn,#status label.btn{display:inline-block;background:var(--accent);color:#1a1408;font-weight:700;border:none;
+    border-radius:9px;padding:11px 20px;cursor:pointer;font-size:14px;margin:8px 4px}
+  #constellation{flex:1.6;position:relative}
+  canvas{width:100%;height:100%;display:block}
+  #cinfo{position:absolute;left:14px;bottom:12px;font-family:Helvetica,Arial,sans-serif;
+    font-size:12px;color:var(--muted);background:rgba(14,17,22,.85);padding:8px 12px;border-radius:8px;max-width:420px}
+  .hidden{display:none!important}
+  .stats{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px}
+  .stat{background:var(--card2);border-radius:8px;padding:8px 14px;font-family:Helvetica,Arial,sans-serif;font-size:12px;color:var(--muted)}
+  .stat b{color:var(--ink);font-size:16px;display:block}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">atl<span>u</span>s <span style="color:var(--muted);font-weight:400;font-size:13px">· topic map explorer</span></div>
+  <div class="meta" id="loadmeta">IPTC Media Topics · loading…</div>
+  <div class="tabs">
+    <button class="tab on" id="tabTree" onclick="setView('tree')">Tree</button>
+    <button class="tab" id="tabConst" onclick="setView('const')">Constellation</button>
+  </div>
+  <input id="search" placeholder="Search 1,200 topics… (e.g. inflation)" oninput="doSearch(this.value)">
+</header>
+<main>
+  <div id="status">
+    <p><b>Loading the live IPTC Media Topics vocabulary…</b><br>
+    Fetching the current official release directly from <span style="font-family:monospace">cv.iptc.org</span> (CC-BY 4.0).</p>
+  </div>
+  <div id="treepane" class="hidden"></div>
+  <div id="constellation" class="hidden"><canvas id="cv"></canvas><div id="cinfo"></div></div>
+  <div id="detail" class="hidden"></div>
+</main>
+
+<script>
+/* ================= DATA LOADING =================
+   Primary: live fetch of the full official vocabulary (always current).
+   Fallback: user downloads the JSON from IPTC and drops it here.        */
+const CV_URL = "https://cv.iptc.org/newscodes/mediatopic?format=json&lang=en-GB";
+let CONCEPTS = {};      // qcode -> {label, def, broader[], narrower[], related[], wikidata[], lvl}
+let TOP = [];           // 17 top-level qcodes
+let selected = null, view = "tree";
+
+const short = u => u.includes("mediatopic/") ? "medtop:"+u.split("mediatopic/")[1] : u;
+
+function ingest(json){
+  json.conceptSet.forEach(c=>{
+    const q = c.qcode || short(c.uri);
+    CONCEPTS[q] = {
+      q, label:(c.prefLabel&&(c.prefLabel["en-GB"]||c.prefLabel.en))||q,
+      def:(c.definition&&(c.definition["en-GB"]||c.definition.en))||"",
+      broader:(c.broader||[]).map(short),
+      narrower:(c.narrower||[]).map(short),
+      related:(c.related||[]).map(short),
+      wikidata:(c.exactMatch||[]).concat(c.closeMatch||[]).filter(u=>u.includes("wikidata")),
+      retired: !!c.retired
+    };
+  });
+  Object.values(CONCEPTS).forEach(c=>c.broader=c.broader.filter(b=>CONCEPTS[b]));
+  TOP = (json.hasTopConcept||[]).map(short).filter(q=>CONCEPTS[q]);
+  // compute levels + backfill reverse related
+  const setLvl=(q,l)=>{ const c=CONCEPTS[q]; if(!c||c.lvl&&c.lvl<=l) return; c.lvl=l;
+    c.narrower.forEach(n=>setLvl(n,l+1)); };
+  TOP.forEach(q=>setLvl(q,1));
+  Object.values(CONCEPTS).forEach(c=>c.related.forEach(r=>{
+    if(CONCEPTS[r]&&!CONCEPTS[r].related.includes(c.q)) CONCEPTS[r].related.push(c.q); }));
+  const live = Object.values(CONCEPTS).filter(c=>!c.retired);
+  document.getElementById("loadmeta").innerHTML =
+    `${live.length} live topics · ${TOP.length} branches · ${live.filter(c=>c.related.length).length} with cross-links · released ${json.dateReleased?json.dateReleased.slice(0,10):"—"}`;
+  boot();
+}
+
+fetch(CV_URL).then(r=>{ if(!r.ok) throw 0; return r.json(); }).then(ingest).catch(()=>{
+  document.getElementById("status").innerHTML = `
+    <p><b>Couldn't load live from cv.iptc.org</b> (the IPTC server may block cross-site requests, or you're offline).</p>
+    <p style="margin-top:10px">Two-click fallback:<br>
+    1. <a class="ext" href="${CV_URL}" download target="_blank">Download the official JSON from IPTC</a> (opens/saves in a new tab)<br>
+    2. Drop the file below.</p>
+    <label class="btn">Choose downloaded file<input type="file" accept=".json,application/json" style="display:none"
+      onchange="this.files[0].text().then(t=>ingest(JSON.parse(t)))"></label>
+    <p style="margin-top:14px">You can also browse IPTC's own viewer:
+    <a class="ext" href="https://www.iptc.org/std/NewsCodes/treeview/mediatopic/mediatopic-en-GB.html" target="_blank">official tree view →</a></p>`;
+});
+
+/* ================= TREE VIEW ================= */
+function boot(){
+  document.getElementById("status").classList.add("hidden");
+  document.getElementById("detail").classList.remove("hidden");
+  setView("tree"); renderTree(); select(TOP[0]);
+}
+function setView(v){
+  view=v;
+  document.getElementById("tabTree").classList.toggle("on",v==="tree");
+  document.getElementById("tabConst").classList.toggle("on",v==="const");
+  document.getElementById("treepane").classList.toggle("hidden",v!=="tree");
+  document.getElementById("constellation").classList.toggle("hidden",v!=="const");
+  if(v==="const") drawConstellation();
+}
+const open = new Set();
+function renderTree(filter){
+  const pane=document.getElementById("treepane"); pane.innerHTML="";
+  const matches = filter ? new Set(Object.values(CONCEPTS)
+    .filter(c=>!c.retired&&(c.label.toLowerCase().includes(filter)||c.q.includes(filter)))
+    .map(c=>c.q)) : null;
+  const visible = q => { if(!matches) return true; if(matches.has(q)) return true;
+    return CONCEPTS[q].narrower.some(visible); };
+  function nodeEl(q,depth){
+    const c=CONCEPTS[q]; if(!c||c.retired||!visible(q)) return null;
+    const kids=c.narrower.filter(n=>CONCEPTS[n]&&!CONCEPTS[n].retired);
+    const isOpen = open.has(q) || (matches&&kids.some(visible));
+    const wrap=document.createElement("div"); if(depth===1) wrap.className="lvl1";
+    const row=document.createElement("div");
+    row.className="node"+(selected===q?" sel":"");
+    row.innerHTML=`<span class="tw">${kids.length?(isOpen?"▾":"▸"):"·"}</span>
+      <span class="lbl${matches&&matches.has(q)?" hit":""}">${c.label}</span>
+      <span class="qc">${c.q.replace("medtop:","")}</span>
+      ${kids.length?`<span class="badge">${countDesc(q)}</span>`:""}
+      ${c.related.length?`<span class="badge" style="color:var(--purple)">⇄${c.related.length}</span>`:""}`;
+    row.onclick=()=>{ if(kids.length){ open.has(q)?open.delete(q):open.add(q); }
+      select(q); renderTree(filter); };
+    wrap.append(row);
+    if(kids.length&&isOpen){ const kwrap=document.createElement("div"); kwrap.className="kids";
+      kids.forEach(k=>{ const e=nodeEl(k,depth+1); if(e) kwrap.append(e); }); wrap.append(kwrap); }
+    return wrap;
+  }
+  TOP.forEach(q=>{ const e=nodeEl(q,1); if(e) pane.append(e); });
+}
+const countDesc = q => CONCEPTS[q].narrower.reduce((s,n)=>CONCEPTS[n]&&!CONCEPTS[n].retired?s+1+countDesc(n):s,0);
+let searchTimer;
+function doSearch(v){ clearTimeout(searchTimer);
+  searchTimer=setTimeout(()=>renderTree(v.trim().toLowerCase()||undefined),150); }
+
+/* ================= DETAIL + ATLUS MAPPING ================= */
+function pathTo(q){ const c=CONCEPTS[q]; if(!c.broader.length) return [q];
+  return pathTo(c.broader[0]).concat(q); }
+function select(q){
+  selected=q; const c=CONCEPTS[q]; if(!c) return;
+  const d=document.getElementById("detail");
+  const chip=(t,cls,fn)=>`<span class="lnk ${cls}" onclick="${fn}">${t}</span>`;
+  const branch = pathTo(q)[0];
+  d.innerHTML=`
+    <h2>${c.label}</h2><span class="qcode">${c.q} · level ${c.lvl||"?"} · branch: ${CONCEPTS[branch].label}</span>
+    <div class="dsec"><b>IPTC definition</b><p>${c.def||"—"}</p></div>
+    <div class="dsec"><b>Position in the tree</b>
+      <p>${pathTo(q).map((p,i)=>`<span class="lnk ${i<pathTo(q).length-1?"up":""}" onclick="jump('${p}')">${CONCEPTS[p].label}</span>${i<pathTo(q).length-1?" › ":""}`).join("")}</p>
+      ${c.narrower.filter(n=>CONCEPTS[n]&&!CONCEPTS[n].retired).length?`<p style="margin-top:8px">${c.narrower.filter(n=>CONCEPTS[n]&&!CONCEPTS[n].retired).map(n=>chip(CONCEPTS[n].label,"",`jump('${n}')`)).join("")}</p>`:"<p style='margin-top:8px;color:var(--muted);font-size:13px'>Leaf node — no children.</p>"}
+    </div>
+    ${c.related.length?`<div class="dsec"><b>Cross-branch links (skos:related) — premium Stretch edges</b>
+      <p>${c.related.map(r=>CONCEPTS[r]?chip("⇄ "+CONCEPTS[r].label,"wd",`jump('${r}')`):"").join("")}</p></div>`:""}
+    ${c.wikidata.length?`<div class="dsec"><b>Wikidata grounding</b>
+      <p>${c.wikidata.map(w=>`<a class="ext" href="${w}" target="_blank">${w.split("/").pop()} ↗</a>`).join(" · ")}</p></div>`:""}
+    <div class="dsec atlus-map"><b>How Atlus uses this node</b>
+      <p>A reader's <span style="color:var(--green)">Preference</span>, <span style="color:var(--accent)">Goal</span> and
+      <span style="color:var(--purple)">Knowledge</span> weights each hold a value on <i>${c.label}</i>.
+      Articles tagged here are <b style="color:var(--green);display:inline;text-transform:none;letter-spacing:0">Core</b> for readers with high Preference on it;
+      <b style="color:var(--accent);display:inline;text-transform:none;letter-spacing:0">Stretch</b> for readers whose weight sits 1–2 hops away
+      ${c.related.length?`(especially via its ${c.related.length} cross-branch link${c.related.length>1?"s":""})`:"(via parent, children and siblings)"};
+      <b style="color:var(--purple);display:inline;text-transform:none;letter-spacing:0">Discovery</b> for readers 3+ hops out.
+      Hops are counted on exactly the edges shown above.</p></div>`;
+  if(view==="const") drawConstellation();
+}
+function jump(q){ // open ancestors then select
+  pathTo(q).forEach(p=>open.add(p)); select(q); renderTree(document.getElementById("search").value.trim().toLowerCase()||undefined);
+  const sel=document.querySelector(".node.sel"); if(sel) sel.scrollIntoView({block:"center"});
+}
+
+/* ================= CONSTELLATION VIEW =================
+   All ~1,200 live nodes at once: 17 branches as radial clusters,
+   hierarchy as spokes, cross-branch related links as arcs.        */
+let pos={};
+function layout(w,h){
+  pos={}; const cx=w/2, cy=h/2, R=Math.min(w,h)*.40;
+  TOP.forEach((t,i)=>{
+    const a = i/TOP.length*2*Math.PI - Math.PI/2;
+    const bx=cx+Math.cos(a)*R, by=cy+Math.sin(a)*R;
+    pos[t]={x:bx,y:by,r:7,a};
+    const desc=[]; (function walk(q,d){ CONCEPTS[q].narrower.forEach(n=>{
+      if(CONCEPTS[n]&&!CONCEPTS[n].retired){ desc.push([n,d]); walk(n,d+1);} }); })(t,1);
+    desc.forEach(([q,d],j)=>{
+      const spread=.42, ja=a+((j/Math.max(desc.length-1,1))-.5)*spread*2;
+      const rr=R*(1-.16*d)-14;
+      pos[q]={x:cx+Math.cos(ja)*rr+(Math.random()-.5)*6, y:cy+Math.sin(ja)*rr+(Math.random()-.5)*6, r:d===1?3.5:2};
+    });
+  });
+}
+function drawConstellation(){
+  const cv=document.getElementById("cv"), pane=document.getElementById("constellation");
+  cv.width=pane.clientWidth*devicePixelRatio; cv.height=pane.clientHeight*devicePixelRatio;
+  const ctx=cv.getContext("2d"); ctx.scale(devicePixelRatio,devicePixelRatio);
+  const w=pane.clientWidth,hh=pane.clientHeight;
+  if(!Object.keys(pos).length) layout(w,hh);
+  ctx.clearRect(0,0,w,hh);
+  // hierarchy edges
+  ctx.strokeStyle="rgba(42,50,64,.55)"; ctx.lineWidth=.6;
+  Object.values(CONCEPTS).forEach(c=>{ if(c.retired||!pos[c.q]) return;
+    c.narrower.forEach(n=>{ if(!pos[n]) return;
+      ctx.beginPath(); ctx.moveTo(pos[c.q].x,pos[c.q].y); ctx.lineTo(pos[n].x,pos[n].y); ctx.stroke(); });
+  });
+  // related arcs
+  ctx.strokeStyle="rgba(201,139,219,.35)"; ctx.lineWidth=.8;
+  const done=new Set();
+  Object.values(CONCEPTS).forEach(c=>{ if(c.retired||!pos[c.q]) return;
+    c.related.forEach(r=>{ const k=[c.q,r].sort().join("|");
+      if(done.has(k)||!pos[r]) return; done.add(k);
+      const a=pos[c.q],b=pos[r],mx=(a.x+b.x)/2,my=(a.y+b.y)/2,cx2=w/2,cy2=hh/2;
+      ctx.beginPath(); ctx.moveTo(a.x,a.y);
+      ctx.quadraticCurveTo(mx+(cx2-mx)*.5,my+(cy2-my)*.5,b.x,b.y); ctx.stroke(); });
+  });
+  // nodes
+  Object.values(CONCEPTS).forEach(c=>{ if(c.retired||!pos[c.q]) return;
+    const p=pos[c.q];
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7);
+    ctx.fillStyle = c.q===selected ? "#e4b363" : c.lvl===1 ? "#7fb4a2" : c.related.length? "rgba(201,139,219,.9)" : "rgba(154,163,178,.65)";
+    ctx.fill();
+  });
+  // branch labels
+  ctx.font="700 11px Helvetica"; ctx.fillStyle="#e8e6e1";
+  TOP.forEach(t=>{ const p=pos[t];
+    const lbl=CONCEPTS[t].label.split(",")[0];
+    ctx.fillText(lbl, p.x+Math.cos(p.a)*16-(Math.cos(p.a)<0?ctx.measureText(lbl).width:0), p.y+Math.sin(p.a)*16+4); });
+  document.getElementById("cinfo").innerHTML =
+    `<b>${Object.values(CONCEPTS).filter(c=>!c.retired).length} topics</b> · grey lines = parent/child · purple arcs = cross-branch related links (the edges Stretch walks) · click any dot`;
+  cv.onclick=e=>{
+    const r=cv.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top;
+    let best=null,bd=12;
+    Object.entries(pos).forEach(([q,p])=>{ const d=Math.hypot(p.x-x,p.y-y); if(d<bd){bd=d;best=q;} });
+    if(best) select(best);
+  };
+}
+window.onresize=()=>{ if(view==="const"){ pos={}; drawConstellation(); } };
+</script>
+</body>
+</html>
