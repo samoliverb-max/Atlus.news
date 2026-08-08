@@ -33,7 +33,25 @@ npm run seed-sources  # seeds the outlet/platform fingerprints used by the sourc
 npm run dev            # starts the API on :4000 (PORT / DATABASE_URL from .env)
 ```
 
-Then open `frontend/onboarding-prototype.html` in a browser. It talks to `http://localhost:4000` by default — change the `API_BASE` constant near the top of its `<script>` if your API runs elsewhere. The API sends permissive CORS headers, so opening the HTML file directly (`file://`) or serving it from any static host both work.
+`server.ts` also serves `frontend/` itself — visiting the deployed URL's `/` opens `onboarding-prototype.html` directly, same origin, no CORS or `API_BASE` config needed. That's the one link to share once this is deployed. (Opening the HTML file locally via `file://` still works for quick dev — it falls back to `http://localhost:4000` automatically.)
+
+## Deploying
+
+There's a `Dockerfile` at the repo root (Bun-based, builds `backend/` + `frontend/` together) — should work on Render, Fly.io, Railway, or whatever free hosting is already arranged. Build from the repo root so both directories are in the build context:
+
+```bash
+docker build -t atlus-onboarding .
+```
+
+Whatever host you use: give it `DATABASE_URL` (pointing at a real Postgres) and optionally `PORT`, then run the one-time setup once against that database before (or right after) the first deploy:
+
+```bash
+docker run --rm -e DATABASE_URL=... atlus-onboarding bun run scripts/migrate.ts
+docker run --rm -e DATABASE_URL=... atlus-onboarding bun run scripts/load-iptc.ts
+docker run --rm -e DATABASE_URL=... atlus-onboarding bun run scripts/seed-sources.ts
+```
+
+Most PaaS hosts also let you run these as a one-off shell/exec command against the deployed container instead — whichever's easier with the specific host. After that, the deployed URL is the whole thing: onboarding UI at `/`, API alongside it.
 
 ## Running the tests
 
