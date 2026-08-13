@@ -447,6 +447,7 @@ function go(n){S.step=n;$("pbar").style.width=(n/(STEPS.length-1)*100)+"%";rende
 // really about handing the reader their resume link. Email delivery isn't wired
 // up yet, so copy it to the clipboard rather than promising an inbox.
 async function saveLater(){
+ if(DEMO){toast("Preview mode — there's no server here, so there's nothing to save or resume.");return;}
  if(!S.resumeToken){toast("Nothing to save yet — enter your email to begin.");return;}
  const link=location.origin+location.pathname+"?r="+S.resumeToken;
  try{
@@ -767,6 +768,8 @@ async function renderProfile(stg){
 async function beginOnboarding(){
  const email=$("em")?$("em").value.trim():"";
  if(!email){toast("Enter your email to begin.");return;}
+ // Preview mode: no account to create, just start the flow.
+ if(DEMO){S.email=email;go(1);return;}
  try{
   const res=await fetch(API_BASE+"/onboarding/start",{method:"POST",
    headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
