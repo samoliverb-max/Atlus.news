@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import * as React from "react";
 import type { ReactNode } from "react";
 import { Hero15a } from "@/components/atlus/Hero15a";
 import { SiteHeader, SiteFooter } from "@/components/atlus/SiteChrome";
@@ -376,7 +377,50 @@ function WhyNow() {
   );
 }
 
+// The onboarding app is a separate deploy (Express + the vanilla onboarding UI).
+// Joining the waitlist creates the reader's account there and hands straight off
+// into setup, carrying the resume token so a refresh picks up where they left off.
+const ONBOARDING_BASE =
+  import.meta.env.VITE_ONBOARDING_URL ??
+  (typeof window !== "undefined" && /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
+    ? "http://localhost:4000"
+    : "https://app.joinatlus.com");
+
 function Waitlist() {
+  const [status, setStatus] = React.useState<"idle" | "sending" | "error">("idle");
+  const [message, setMessage] = React.useState("");
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const email = new FormData(e.currentTarget).get("email");
+    if (typeof email !== "string" || !email) return;
+
+    setStatus("sending");
+    setMessage("");
+    try {
+      const res = await fetch(`${ONBOARDING_BASE}/onboarding/start`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) {
+        const body = (await res.json().catch(() => ({}))) as { error?: string };
+        setStatus("error");
+        setMessage(
+          res.status === 400
+            ? (body.error ?? "That doesn't look like a valid email address.")
+            : "Something went wrong. Please try again in a moment.",
+        );
+        return;
+      }
+      const { resume_token } = (await res.json()) as { resume_token: string };
+      window.location.href = `${ONBOARDING_BASE}/?r=${encodeURIComponent(resume_token)}`;
+    } catch {
+      setStatus("error");
+      setMessage("Couldn't reach Atlus. Check your connection and try again.");
+    }
+  }
+
   return (
     <section
       id="waitlist"
@@ -410,11 +454,12 @@ function Waitlist() {
 
         <form
           className="mx-auto flex max-w-md flex-col gap-3 sm:flex-row"
-          onSubmit={(e) => e.preventDefault()}
+          onSubmit={handleSubmit}
         >
           <label className="sr-only" htmlFor="email">Email</label>
           <input
             id="email"
+            name="email"
             type="email"
             required
             placeholder="you@morning.paper"
@@ -428,16 +473,26 @@ function Waitlist() {
           />
           <button
             type="submit"
-            className="rounded-full px-6 py-3 text-sm font-semibold tracking-wide"
+            disabled={status === "sending"}
+            className="rounded-full px-6 py-3 text-sm font-semibold tracking-wide disabled:opacity-60"
             style={{
               background: "var(--color-royal)",
               color: "var(--color-platinum)",
               fontFamily: "var(--font-serif)",
             }}
           >
-            Request early access
+            {status === "sending" ? "Starting…" : "Request early access"}
           </button>
         </form>
+        {status === "error" && (
+          <p
+            role="alert"
+            className="mt-4 text-sm"
+            style={{ color: "#B4402F", fontFamily: "var(--font-serif)" }}
+          >
+            {message}
+          </p>
+        )}
         <p className="mt-4 text-sm opacity-60" style={{ fontFamily: "var(--font-serif)" }}>
           No feed. No selling your data. One paper, when the day begins.
         </p>
