@@ -101,12 +101,17 @@
   .issue{background:var(--card2);border-radius:12px;padding:14px 16px;margin-bottom:12px}
   .issue p{font-size:14.5px;line-height:1.45;margin-bottom:10px}
   .issue .axis{font-family:var(--font-serif);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin-bottom:5px}
+  .issue-state{font-family:var(--font-serif);font-size:11px;color:var(--green);margin-top:7px}
+  .issue.untouched{opacity:.72}
+  .issue.untouched .issue-state{color:var(--muted);font-style:italic}
+  .issue.untouched input[type=range]{accent-color:rgba(248,249,250,.35)}
   /* geo map */
   .map{display:grid;grid-template-columns:repeat(24,1fr);gap:3px;margin-bottom:14px}
   .tile{aspect-ratio:1;border-radius:5px;background:var(--card2);border:1px solid var(--line);cursor:pointer;
     position:relative;font-family:var(--font-serif);font-size:8.5px;display:flex;align-items:center;
-    justify-content:center;color:var(--muted);overflow:hidden;user-select:none}
+    justify-content:center;color:var(--muted);overflow:hidden;user-select:none;padding:0}
   .tile:hover{border-color:var(--accent);z-index:2}
+  .tile:focus-visible{outline:2px solid var(--accent);outline-offset:1px;z-index:3}
   .tile.i1{background:rgba(255,107,53,.35);color:var(--ink);font-weight:700}
   .tile.i2{background:var(--accent);color:#fff;font-weight:700}
   .tile.i-1{background:rgba(229,106,92,.32);color:var(--ink)}
@@ -417,7 +422,19 @@ const el=h=>{const d=document.createElement("div");d.innerHTML=h;return d.firstE
 function toast(m){$("toast").textContent=m;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),2600);}
 const STEPS=["welcome","topics","depth","sources","goals","knowledge","polconsent","politics","lens","geo","reach","delivery","demog","sensitive","profile","issue"];
 function go(n){S.step=n;$("pbar").style.width=(n/(STEPS.length-1)*100)+"%";render();window.scrollTo(0,0);}
-const saveLater=()=>toast("Progress saved. A magic link (this page's URL, with your resume token) lands in your inbox to resume exactly here.");
+// Every step already persists server-side as it's answered, so "saving" here is
+// really about handing the reader their resume link. Email delivery isn't wired
+// up yet, so copy it to the clipboard rather than promising an inbox.
+async function saveLater(){
+ if(!S.resumeToken){toast("Nothing to save yet — enter your email to begin.");return;}
+ const link=location.origin+location.pathname+"?r="+S.resumeToken;
+ try{
+  await navigator.clipboard.writeText(link);
+  toast("Progress saved. Resume link copied to your clipboard — keep it to pick up exactly here.");
+ }catch(err){
+  toast("Progress saved. Resume here: "+link);
+ }
+}
 const navRow=(back,fwd,txt="Continue",dis="")=>`<div class="nav"><button class="btn ghost" onclick="go(${back})">Back</button>
  <button class="btn" ${dis} id="nx" onclick="${fwd}">${txt}</button></div><button class="save" onclick="saveLater()">Save & finish later</button>`;
 
@@ -515,10 +532,13 @@ function render(){
    <div id="iss"></div>${navRow(6,"stepPolitics()")}</div>`);
   ISSUES.forEach((it,i)=>{
    const v=it._v===undefined?50:it._v;
-   const r=el(`<div class="issue"><div class="axis">${{econ:"Economic",soc:"Social & cultural",intl:"International",inst:"Institutions & change"}[it.ax]}</div>
-    <p>${it.t}</p><input type="range" min="0" max="100" value="${v}" data-i="${i}">
-    <div class="slider-labels"><span>Strongly disagree</span><span>Neutral</span><span>Strongly agree</span></div></div>`);
-   r.querySelector("input").oninput=e=>{it._v=+e.target.value;};
+   const r=el(`<div class="issue${it._v===undefined?" untouched":""}"><div class="axis">${{econ:"Economic",soc:"Social & cultural",intl:"International",inst:"Institutions & change"}[it.ax]}</div>
+    <p>${it.t}</p><input type="range" min="0" max="100" value="${v}" data-i="${i}" aria-label="${it.t}">
+    <div class="slider-labels"><span>Strongly disagree</span><span>Neutral</span><span>Strongly agree</span></div>
+    <div class="issue-state">${it._v===undefined?"Not answered — leave it and we'll skip this one":"Answered"}</div></div>`);
+   r.querySelector("input").oninput=e=>{it._v=+e.target.value;
+    r.classList.remove("untouched");
+    r.querySelector(".issue-state").textContent="Answered";};
    c.querySelector("#iss").append(r);});
   stg.append(c);}
 
@@ -559,13 +579,15 @@ function render(){
   for(let r=0;r<12;r++)for(let col=0;col<24;col++){
    const code=Object.keys(GEO).find(k=>GEO[k][0]===col&&GEO[k][1]===r);
    if(code){const gi=S.geo[code]||0;
-    const t=el(`<div class="tile${gi?" i"+gi:""}" title="${GEO_NAMES[code]}">${GEO[code][2]}</div>`);
+    const label=n=>n===2?"very interested":n===1?"interested":n===-1?"rather not":"neutral";
+    const t=el(`<button type="button" class="tile${gi?" i"+gi:""}" title="${GEO_NAMES[code]}" aria-label="${GEO_NAMES[code]}: ${label(gi)}">${GEO[code][2]}</button>`);
     t.onclick=()=>{const cur=S.geo[code]||0;const next=cur===0?2:cur===2?1:cur===1?-1:0;
      if(next===0)delete S.geo[code];else S.geo[code]=next;
      t.className="tile"+(next?" i"+next:"");
-     toast(`${GEO_NAMES[code]}: ${next===2?"very interested":next===1?"interested":next===-1?"rather not":"neutral"}`);};
+     t.setAttribute("aria-label",`${GEO_NAMES[code]}: ${label(next)}`);
+     toast(`${GEO_NAMES[code]}: ${label(next)}`);};
     map.append(t);}
-   else map.append(el(`<div class="tile sea"></div>`));}
+   else map.append(el(`<div class="tile sea" aria-hidden="true"></div>`));}
   stg.append(c);}
 
  if(step==="reach"){
