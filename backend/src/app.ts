@@ -476,6 +476,21 @@ export function createApp(pool: Pool) {
     res.json({ ok: true });
   });
 
+  // ---------- debug: full vector export (for frontend/iptc-explorer.html's Vectors tab) ----------
+
+  app.get("/onboarding/vectors", auth, async (req: AuthedRequest, res) => {
+    const { rows } = await pool.query<{ qcode: string; vector: "P" | "G" | "K"; weight: number; label: string }>(
+      `SELECT w.qcode, w.vector, w.weight, t.label FROM user_topic_weights w
+       JOIN topics t ON t.qcode = w.qcode
+       WHERE w.user_id = $1 AND w.weight > 0
+       ORDER BY w.weight DESC`,
+      [req.userId]
+    );
+    const out: Record<"P" | "G" | "K", Array<{ qcode: string; label: string; weight: number }>> = { P: [], G: [], K: [] };
+    for (const row of rows) out[row.vector].push({ qcode: row.qcode, label: row.label, weight: row.weight });
+    res.json(out);
+  });
+
   // ---------- step 14: profile read-back ----------
 
   app.get("/onboarding/profile", auth, async (req: AuthedRequest, res) => {

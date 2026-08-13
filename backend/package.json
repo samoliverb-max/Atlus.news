@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun run --watch src/server.ts",
+    "dev:local": "bun run scripts/dev-local.ts",
     "start": "bun run src/server.ts",
     "migrate": "bun run scripts/migrate.ts",
     "load-iptc": "bun run scripts/load-iptc.ts",
