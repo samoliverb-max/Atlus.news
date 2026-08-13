@@ -13,10 +13,22 @@ export function GlobeO({ size = 72, stroke = "var(--color-platinum)" }: { size?:
   );
 }
 
-/* Double, slightly-imperfect underline in amber */
+/* Double, slightly-imperfect underline in amber.
+   Every call site wraps this in a full-width absolutely-positioned span, so the
+   underline tracks the word it sits under. A fixed pixel width would instead
+   push past the viewport on small screens (a 520px underline on a 390px phone
+   forced the whole page to scroll sideways), so size to the parent and cap at
+   `w` for the wide case. */
 export function DoubleUnderline({ w = 260, color = "var(--color-amber)" }: { w?: number; color?: string }) {
   return (
-    <svg width={w} height="22" viewBox="0 0 260 22" aria-hidden="true">
+    <svg
+      width="100%"
+      height="22"
+      viewBox="0 0 260 22"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+      style={{ display: "block", maxWidth: w }}
+    >
       <path d="M4 8 Q 90 2 256 10" fill="none" stroke={color} strokeWidth="4" strokeLinecap="round" />
       <path d="M6 16 Q 110 12 254 18" fill="none" stroke={color} strokeWidth="3.5" strokeLinecap="round" opacity="0.9" />
     </svg>
