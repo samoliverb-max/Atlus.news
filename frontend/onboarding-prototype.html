@@ -120,6 +120,8 @@
   .maplegend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
   .exp-link{display:block;margin-top:14px;font-size:13px;color:var(--purple)}
   .stepnum{font-family:var(--font-serif);font-size:10.5px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+  .demobar{display:none;border:1px solid var(--purple);background:rgba(165,124,224,.12);border-radius:10px;
+    padding:10px 13px;margin-bottom:14px;font-size:12.5px;line-height:1.5;color:var(--ink)}
   /* ===== real site chrome (ported from marketing-site/src/components/atlus/SiteChrome.tsx) ===== */
   .site-header{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;
     padding:18px 24px;background:rgba(13,27,42,.86);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
@@ -156,6 +158,8 @@
 </header>
 
 <div class="wrap">
+  <div id="demobar" class="demobar">Preview mode — no server attached, so nothing is saved and you can't resume.
+  Every screen and the full recommendation logic are the real thing.</div>
   <div class="tag">Onboarding v2 · volunteered data only · every answer editable later, none ever sold</div>
   <div class="progress"><b id="pbar"></b></div>
   <div id="stage"></div>
@@ -405,15 +409,32 @@ function recommend(){
  return out.slice(0,S.mode);
 }
 
-/* ========== API HELPER ========== */
+/* ========== API HELPER ==========
+   DEMO mode: with no API reachable (a static host, or a shared preview link),
+   the flow still runs end-to-end on the local S state every step already
+   maintains. Nothing persists and there's no resuming, so it's for showing the
+   UX, not for real readers — the banner says so. */
+let DEMO=false;
+function enterDemoMode(){
+ if(DEMO)return;
+ DEMO=true;
+ const b=document.getElementById("demobar");
+ if(b)b.style.display="block";
+}
 async function postStep(path,body){
+ if(DEMO)return{ok:true,data:{}};
  try{
   const res=await fetch(API_BASE+path,{method:"POST",
    headers:{"Content-Type":"application/json","X-Atlus-Resume":S.resumeToken||""},
    body:JSON.stringify(body)});
   if(!res.ok){const e=await res.json().catch(()=>({}));toast("Couldn't save: "+(e.error||res.status));return{ok:false};}
   return{ok:true,data:await res.json()};
- }catch(err){toast("Network error — is the API running at "+API_BASE+"?");return{ok:false};}
+ }catch(err){
+  // The API was there at the start and has gone away mid-flow; keep the
+  // reader moving rather than trapping them on a step.
+  enterDemoMode();
+  return{ok:true,data:{}};
+ }
 }
 
 /* ========== UI ========== */
@@ -681,12 +702,31 @@ function render(){
 }
 
 /* ========== PROFILE SCREEN: fetch + render backend-derived truth ========== */
+// Same shape GET /onboarding/profile returns, rebuilt from the local vectors —
+// used only in DEMO mode, where there is no server to be the system of record.
+function localProfile(){
+ const top=(v,n)=>Object.entries(v).sort((a,b)=>b[1]-a[1]).slice(0,n)
+  .map(([q,w])=>({qcode:q,label:(TOPICS[q]&&TOPICS[q].l)||q,weight:w}));
+ return{
+  preference:top(S.P,5),goals:top(S.G,4),knowledge:top(S.K,4),
+  political:S.polConsent==="yes"?{...S.pol,lenses:S.lens}:null,
+  geo:Object.entries(S.geo).map(([country,interest])=>({country,interest})).sort((a,b)=>b.interest-a.interest),
+  demographics:{age_band:S.demog.age,education:S.demog.edu,region:S.demog.region,work_field:S.demog.work},
+  config:{discovery_reach:S.reach,excluded_qcodes:S.excl,mode:S.mode},
+  excluded:S.excl.map(q=>({qcode:q,label:(TOPICS[q]&&TOPICS[q].l)||q})),
+  has_sensitive_consent:S.demogConsent==="yes"
+ };
+}
+
 async function renderProfile(stg){
  let p;
  try{
-  const res=await fetch(API_BASE+"/onboarding/profile",{headers:{"X-Atlus-Resume":S.resumeToken||""}});
-  if(!res.ok)throw new Error(String(res.status));
-  p=await res.json();
+  if(DEMO){p=localProfile();}
+  else{
+   const res=await fetch(API_BASE+"/onboarding/profile",{headers:{"X-Atlus-Resume":S.resumeToken||""}});
+   if(!res.ok)throw new Error(String(res.status));
+   p=await res.json();
+  }
  }catch(err){
   stg.innerHTML="";
   stg.append(el(`<div class="card"><div class="stepnum">Step 14 of ${STEPS.length-1}</div><h1>Couldn't load your profile.</h1>
@@ -738,7 +778,10 @@ async function beginOnboarding(){
   S.email=email;S.resumeToken=data.resume_token;
   history.replaceState(null,"",location.pathname+"?r="+data.resume_token);
   go(1);
- }catch(err){toast("Network error — is the API running at "+API_BASE+"?");}
+ }catch(err){
+  // No API at all — run the flow as a self-contained demo instead of stalling.
+  S.email=email;enterDemoMode();go(1);
+ }
 }
 
 async function stepTopics(){
@@ -880,8 +923,14 @@ async function rehydrate(token){
 
 (async function boot(){
  document.querySelectorAll("[data-site]").forEach(a=>{a.href=SITE_BASE+a.dataset.site;});
+ // Probe the API once so a server-less deploy shows the preview banner from
+ // the first screen, rather than only revealing it on the first save.
+ try{
+  const res=await fetch(API_BASE+"/topics/roots",{method:"GET"});
+  if(!res.ok)throw new Error(String(res.status));
+ }catch(err){enterDemoMode();}
  const token=new URLSearchParams(location.search).get("r");
- if(token){const ok=await rehydrate(token);if(ok)return;}
+ if(token&&!DEMO){const ok=await rehydrate(token);if(ok)return;}
  go(0);
 })();
 </script>
