@@ -11,7 +11,15 @@
       "Bash(psql --version)",
       "Bash(command -v brew)",
       "Bash(brew --version)",
-      "Read(//Applications/**)"
+      "Read(//Applications/**)",
+      "mcp__570270a8-e2ca-4fde-88c6-e8032e317747__create_new_file",
+      "Bash(bun run *)",
+      "Bash(bun -e ' *)",
+      "Bash(curl -s -o /dev/null -w \"backend :4000 -> %{http_code}\\\\n\" http://localhost:4000/)",
+      "Bash(curl -s -o /dev/null -w \"marketing :8080 -> %{http_code}\\\\n\" http://localhost:8080/)",
+      "Bash(curl -s -o /dev/null -w \"artifact preview :4599 -> %{http_code}\\\\n\" http://localhost:4599/preview-onboarding)",
+      "Skill(design-review)",
+      "Skill(design-review:*)"
     ]
   }
 }
