@@ -46,6 +46,7 @@
   --color-platinum: var(--platinum);
   --color-amber: var(--amber);
   --color-amber-soft: var(--amber-soft);
+  --color-amber-ink: var(--amber-ink);
 
   --font-display: "Playfair Display", Georgia, serif;
   --font-serif: "PT Serif", Georgia, serif;
@@ -94,6 +95,12 @@
   --platinum: #F8F9FA;
   --amber: #FF6B35;
   --amber-soft: #FF8656;
+  /* Amber for TEXT on the light grounds. #FF6B35 scores 2.7:1 on platinum and
+     2.4:1 on parchment — under WCAG AA (4.5:1) and under even the 3:1 large-text
+     floor, so eyebrow labels and handwritten accents were failing everywhere the
+     background wasn't royal. This darker burnt tone clears AA on both (5.5:1 and
+     4.8:1). Keep --amber itself for dark grounds, where it already scores 6.1:1. */
+  --amber-ink: #B83A0C;
 }
 
 @layer base {

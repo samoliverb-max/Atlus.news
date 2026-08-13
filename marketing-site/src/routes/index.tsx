@@ -64,11 +64,20 @@ function Section({
   bg?: string;
   color?: string;
 }) {
+  // Bright amber only clears WCAG contrast on the royal ground. On the light
+  // grounds rebind --color-amber to the darker ink here, so the eyebrow and every
+  // <Handwritten> inside inherit a readable accent without each one knowing which
+  // section it landed in.
+  const onRoyal = (bg ?? "").includes("royal");
   return (
     <section
       id={id}
       className="px-6 py-24 sm:px-10 sm:py-32"
-      style={{ background: bg ?? "var(--color-platinum)", color: color ?? "var(--color-royal)" }}
+      style={{
+        background: bg ?? "var(--color-platinum)",
+        color: color ?? "var(--color-royal)",
+        ...(onRoyal ? {} : { ["--color-amber" as string]: "var(--color-amber-ink)" }),
+      }}
     >
       <div className="mx-auto max-w-5xl">
         {eyebrow && (
@@ -292,7 +301,14 @@ function ReadingModes() {
           <div
             key={m.name}
             className="flex flex-col justify-between rounded-2xl p-8"
-            style={{ background: "var(--color-royal)", color: "var(--color-platinum)", minHeight: 260 }}
+            style={{
+              background: "var(--color-royal)",
+              color: "var(--color-platinum)",
+              minHeight: 260,
+              // A royal card inside a light section: restore the bright accent the
+              // surrounding section swapped out for its dark-on-light ink.
+              ["--color-amber" as string]: "var(--amber)",
+            }}
           >
             <div>
               <p
@@ -425,7 +441,11 @@ function Waitlist() {
     <section
       id="waitlist"
       className="relative px-6 py-32 sm:px-10"
-      style={{ background: "var(--color-platinum)", color: "var(--color-royal)" }}
+      style={{
+        background: "var(--color-platinum)",
+        color: "var(--color-royal)",
+        ["--color-amber" as string]: "var(--color-amber-ink)",
+      }}
     >
       <div className="mx-auto max-w-3xl text-center">
         <div className="mb-4 flex justify-center">
