@@ -37,7 +37,11 @@ export function SiteFooter() {
   return (
     <footer
       className="relative px-6 py-14 sm:px-10"
-      style={{ background: "var(--color-royal)", color: "var(--color-platinum)" }}
+      style={{
+        background: "var(--color-royal)",
+        color: "var(--color-platinum)",
+        ["--color-amber" as string]: "var(--amber)",
+      }}
     >
       <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-8 sm:flex-row">
         <div>
@@ -77,7 +81,16 @@ export function SiteFooter() {
 
 export function Page({ children, headerVariant = "light" }: { children: ReactNode; headerVariant?: "light" | "dark" }) {
   return (
-    <div className="relative min-h-screen" style={{ background: "var(--color-platinum)", color: "var(--color-royal)" }}>
+    <div
+      className="relative min-h-screen"
+      style={{
+        background: "var(--color-platinum)",
+        color: "var(--color-royal)",
+        // Light ground, so the accent has to be the darker ink to clear WCAG AA.
+        // SiteFooter sits on royal and puts the bright amber back.
+        ["--color-amber" as string]: "var(--color-amber-ink)",
+      }}
+    >
       <SiteHeader variant={headerVariant} />
       {children}
       <SiteFooter />
