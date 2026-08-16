@@ -32,9 +32,8 @@ export function Hero15a() {
             <span className="relative inline-block">
               <span>Atl</span>
               <span
-                className="relative inline-block align-baseline"
+                className="hand relative inline-block align-baseline"
                 style={{
-                  fontFamily: "var(--font-hand)",
                   color: "var(--color-amber)",
                   fontSize: "0.95em",
                   lineHeight: 1,
@@ -60,11 +59,8 @@ export function Hero15a() {
           </div>
           <SketchyEllipse>
             <span
-              className="block px-2 text-[clamp(1.5rem,3vw,2.4rem)] leading-[1.1]"
-              style={{
-                fontFamily: "var(--font-hand)",
-                color: "var(--color-amber)",
-              }}
+              className="hand block px-2 text-[clamp(1.5rem,3vw,2.4rem)] leading-[1.1]"
+              style={{ color: "var(--color-amber)" }}
             >
               daily news,
               <br className="sm:hidden" /> personalised for you

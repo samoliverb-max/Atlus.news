@@ -105,8 +105,8 @@ function Section({
 function Handwritten({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <span
-      className={className}
-      style={{ fontFamily: "var(--font-hand)", color: "var(--color-amber)", fontSize: "1.35em", lineHeight: 1 }}
+      className={`hand ${className}`}
+      style={{ color: "var(--color-amber)", fontSize: "1.35em", lineHeight: 1 }}
     >
       {children}
     </span>
@@ -458,7 +458,7 @@ function Waitlist() {
           Join{" "}
           <span className="relative inline-block">
             Atl
-            <span style={{ fontFamily: "var(--font-hand)", color: "var(--color-amber)" }}>u</span>
+            <span className="hand" style={{ color: "var(--color-amber)" }}>u</span>
             s
             <span className="pointer-events-none absolute left-0 top-[92%] w-full">
               <DoubleUnderline w={260} />
@@ -466,8 +466,8 @@ function Waitlist() {
           </span>
         </h2>
         <p
-          className="mb-10 text-2xl"
-          style={{ fontFamily: "var(--font-hand)", color: "var(--color-amber)" }}
+          className="hand mb-10 text-2xl"
+          style={{ color: "var(--color-amber)" }}
         >
           daily news, personalised for you
         </p>

@@ -52,6 +52,11 @@
   --font-serif: "PT Serif", Georgia, serif;
   --font-hand: "Reenie Beanie", "Caveat", cursive;
   --font-hand-alt: "Caveat", cursive;
+  /* Reenie Beanie ships one weight (400). The handwritten "u" sits inside the
+     Playfair wordmark at weight 800, so it inherited 800 and the browser faked
+     the bold by smearing the glyph outward — which is why the logo's u stopped
+     looking like Reenie Beanie at all. Always set the real weight, and refuse
+     synthesis outright so this can't silently come back. */
   --font-marker: "Permanent Marker", "Kalam", cursive;
   --font-scrawl: "Kalam", "Reenie Beanie", cursive;
 }
@@ -109,5 +114,12 @@
     background-color: var(--color-parchment);
     color: var(--color-ink);
     font-family: var(--font-serif);
+  }
+  /* Single place the handwriting is set up, so the weight can't drift again. */
+  .hand {
+    font-family: var(--font-hand);
+    font-weight: 400;
+    font-synthesis-weight: none;
+    font-synthesis: none;
   }
 }

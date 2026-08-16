@@ -80,7 +80,7 @@ function ManifestoPage() {
             building.
           </p>
 
-          <p className="pt-6" style={{ fontFamily: "var(--font-hand)", color: "var(--color-amber)", fontSize: "1.8rem", lineHeight: 1.1 }}>
+          <p className="hand pt-6" style={{ color: "var(--color-amber)", fontSize: "1.8rem", lineHeight: 1.1 }}>
             — the team at Atlus
           </p>
         </div>

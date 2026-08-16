@@ -14,7 +14,7 @@ export function SiteHeader({ variant = "light" }: { variant?: "light" | "dark" }
           style={{ fontFamily: "var(--font-display)", fontWeight: 800 }}
         >
           Atl
-          <span style={{ fontFamily: "var(--font-hand)", color: "var(--color-amber)" }}>u</span>
+          <span className="hand" style={{ color: "var(--color-amber)" }}>u</span>
           s
         </span>
       </Link>
@@ -43,7 +43,7 @@ export function SiteFooter() {
         <div>
           <div className="text-3xl" style={{ fontFamily: "var(--font-display)", fontWeight: 800 }}>
             Atl
-            <span style={{ fontFamily: "var(--font-hand)", color: "var(--color-amber)" }}>u</span>
+            <span className="hand" style={{ color: "var(--color-amber)" }}>u</span>
             s
           </div>
           <p className="mt-3 max-w-sm text-sm opacity-70" style={{ fontFamily: "var(--font-serif)" }}>
