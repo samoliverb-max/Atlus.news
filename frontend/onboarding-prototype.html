@@ -22,6 +22,10 @@
   body{background:var(--bg);color:var(--ink);font-family:var(--font-serif);min-height:100vh}
   .wrap{max-width:680px;margin:0 auto;padding:28px 20px 90px}
   .logo{position:relative;display:inline-block;font-family:var(--font-display);font-weight:800;letter-spacing:0;font-size:26px;color:var(--ink)}
+  /* Reenie Beanie only ships weight 400. These sit inside wordmarks set at 800,
+     so without pinning the weight the browser fakes a bold and the letterform
+     stops looking like Reenie Beanie. */
+  .logo .u,.site-header .brand .u,.footer-wordmark .u{font-weight:400;font-synthesis-weight:none;font-synthesis:none}
   .logo .u{font-family:var(--font-hand);color:var(--accent);font-size:1.15em;padding:0 .02em}
   .logo-underline{position:absolute;left:2%;bottom:-9px;pointer-events:none}
   .tag{color:var(--muted);font-size:12.5px;font-family:var(--font-serif);margin:8px 0 20px}
