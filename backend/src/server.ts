@@ -1,5 +1,6 @@
 import "dotenv/config";
 import path from "node:path";
+import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import express from "express";
 import { Pool } from "pg";
@@ -17,13 +18,23 @@ async function main() {
 
   const app = createApp(pool);
 
-  // Serve the frontend from the same origin as the API. In production this
-  // means one URL does everything — no CORS, no API_BASE config, just the
-  // link. onboarding-prototype.html detects same-origin deployment and uses
-  // relative fetch paths automatically (see its API_BASE constant).
+  // The onboarding UI lives in its own repo (atlusnews/atlus-frontend-poc-dev)
+  // and deploys separately, so this is an API-only service by default. CORS is
+  // already permissive, and the UI points at this origin via ?api=.
+  //
+  // If a frontend/ directory happens to sit alongside — a checkout of both
+  // repos side by side, or an image that copies one in — serve it from the
+  // same origin too, so one URL does everything and no ?api= is needed.
   const frontendDir = path.join(__dirname, "..", "..", "frontend");
-  app.use(express.static(frontendDir));
-  app.get("/", (_req, res) => res.sendFile(path.join(frontendDir, "onboarding-prototype.html")));
+  if (existsSync(path.join(frontendDir, "onboarding-prototype.html"))) {
+    app.use(express.static(frontendDir));
+    app.get("/", (_req, res) => res.sendFile(path.join(frontendDir, "onboarding-prototype.html")));
+    console.log(`Serving onboarding UI from ${frontendDir}`);
+  } else {
+    app.get("/", (_req, res) =>
+      res.json({ service: "atlus-onboarding-api", ok: true }),
+    );
+  }
 
   const port = Number(process.env.PORT ?? 4000);
   app.listen(port, () => {

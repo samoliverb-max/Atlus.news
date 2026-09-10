@@ -197,10 +197,20 @@
 
 <script>
 /* ========== BACKEND WIRING ========== */
-// When server.ts serves this file itself (production — one deployed URL
-// does both), same-origin relative paths just work. When opened directly
-// as a local file for dev, fall back to a local API on :4000.
-const API_BASE = location.protocol === "file:" ? "http://localhost:4000" : "";
+const API_BASE = (() => {
+  // ?api=http://host:port wins — this is how the onboarding UI talks to a
+  // backend on another origin (they live in separate repos and deploy apart).
+  const q = new URLSearchParams(location.search).get("api");
+  if (q) return q.replace(/\/$/, "");
+  if (window.ATLUS_API_BASE) return String(window.ATLUS_API_BASE).replace(/\/$/, "");
+  // Opened as a local file, or served by a plain static server on some other
+  // port, means no API alongside it — fall back to a local backend on :4000.
+  if (location.protocol === "file:") return "http://localhost:4000";
+  if (location.port && location.port !== "4000") return "http://localhost:4000";
+  // Same origin as the API (server.ts serving this file itself) — relative
+  // paths just work.
+  return "";
+})();
 
 // The marketing site (TanStack Start) deploys separately from this onboarding
 // app, so the shared chrome links need an absolute base. Locally that's the

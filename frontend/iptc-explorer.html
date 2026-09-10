@@ -144,7 +144,20 @@ let selected = null, view = "tree";
    Overlays a reader's Preference/Goal/Knowledge weights (from
    backend/src/app.ts GET /onboarding/vectors, or synthesised locally
    for a backend-free demo) onto the same constellation layout.       */
-const API_BASE = location.protocol === "file:" ? "http://localhost:4000" : "";
+const API_BASE = (() => {
+  // ?api=http://host:port wins — this is how the onboarding UI talks to a
+  // backend on another origin (they live in separate repos and deploy apart).
+  const q = new URLSearchParams(location.search).get("api");
+  if (q) return q.replace(/\/$/, "");
+  if (window.ATLUS_API_BASE) return String(window.ATLUS_API_BASE).replace(/\/$/, "");
+  // Opened as a local file, or served by a plain static server on some other
+  // port, means no API alongside it — fall back to a local backend on :4000.
+  if (location.protocol === "file:") return "http://localhost:4000";
+  if (location.port && location.port !== "4000") return "http://localhost:4000";
+  // Same origin as the API (server.ts serving this file itself) — relative
+  // paths just work.
+  return "";
+})();
 const VEC_COLOR = { P: "123,174,147", G: "255,107,53", K: "185,139,217" }; // matches --green/--accent/--purple
 const VEC_NAME = { P: "Preference", G: "Goal", K: "Knowledge" };
 let VECTORS = { P:{}, G:{}, K:{} };

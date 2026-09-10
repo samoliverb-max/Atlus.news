@@ -5,7 +5,6 @@ COPY backend/package.json backend/bun.lock ./backend/
 RUN cd backend && bun install --production
 
 COPY backend ./backend
-COPY frontend ./frontend
 
 ENV PORT=4000
 EXPOSE 4000
