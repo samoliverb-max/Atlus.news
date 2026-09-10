@@ -1,0 +1,20 @@
+{
+  // The marketing site is Tailwind v4 — let IntelliSense work inside
+  // className strings and the cn()/cva() helpers the shadcn components use.
+  "tailwindCSS.experimental.classRegex": [
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["cn\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+  ],
+  "files.associations": { "*.css": "tailwindcss" },
+
+  // Search results stay useful: skip deps and build output.
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.output": true,
+    "**/.wrangler": true,
+    "**/.tanstack": true,
+    "**/.pglite-data": true,
+    "**/bun.lock": true
+  },
+  "files.watcherExclude": { "**/.pglite-data/**": true }
+}

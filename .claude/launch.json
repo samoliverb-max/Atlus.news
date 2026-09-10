@@ -2,15 +2,33 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "backend",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "cd backend && bun run dev:local"
+      ],
+      "port": 4000
+    },
+    {
       "name": "marketing-site",
       "runtimeExecutable": "sh",
-      "runtimeArgs": ["-c", "cd marketing-site && bun run dev"],
+      "runtimeArgs": [
+        "-c",
+        "cd marketing-site && bun run dev"
+      ],
       "port": 8080
     },
     {
       "name": "onboarding-prototype",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "5500", "--directory", "frontend"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "5500",
+        "--directory",
+        "frontend"
+      ],
       "port": 5500
     }
   ]
