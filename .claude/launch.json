@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "marketing-site",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "cd marketing-site && bun run dev"],
+      "port": 8080
+    },
+    {
+      "name": "onboarding-prototype",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "5500", "--directory", "frontend"],
+      "port": 5500
+    }
+  ]
+}

@@ -15,6 +15,31 @@ frontend/
   iptc-explorer.html          full topic-map browser (unchanged, not wired)
 ```
 
+## Looking at the front end (no database needed)
+
+Two separate front ends live in this repo, and both run standalone — no Postgres, no `.env`, nothing to configure. Use these when you just want to *see* it.
+
+**The marketing site** (`marketing-site/`) — the public joinatlus.com site: landing page, manifesto, team. TanStack Start + React + Tailwind.
+
+```bash
+cd marketing-site
+bun install     # first time only
+bun run dev
+```
+
+Then open <http://localhost:8080> — `/`, `/manifesto` and `/team`. Hot-reloads on save.
+
+**The onboarding prototype** (`frontend/`) — the reference onboarding flow and the IPTC topic explorer. Plain HTML, so any static server does:
+
+```bash
+python3 -m http.server 5500 --directory frontend
+```
+
+- <http://localhost:5500/onboarding-prototype.html> — the 15-step onboarding flow
+- <http://localhost:5500/iptc-explorer.html> — the full ~1,400-node topic map
+
+Served this way the prototype falls back to in-memory state, which is what you want for looking at the UI. To exercise it against the real API instead, run the backend (below) — `server.ts` serves `frontend/` on the same origin at <http://localhost:4000>.
+
 ## Run it for real
 
 You need Node 18+ (or Bun) and a Postgres database — a local install, Docker, or whatever hosting is already arranged.

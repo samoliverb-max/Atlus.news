@@ -19,7 +19,20 @@
       "Bash(curl -s -o /dev/null -w \"marketing :8080 -> %{http_code}\\\\n\" http://localhost:8080/)",
       "Bash(curl -s -o /dev/null -w \"artifact preview :4599 -> %{http_code}\\\\n\" http://localhost:4599/preview-onboarding)",
       "Skill(design-review)",
-      "Skill(design-review:*)"
+      "Skill(design-review:*)",
+      "Bash(curl -s -o /dev/null -w \"mkt :8080 -> %{http_code}\\\\n\" http://localhost:8080/)",
+      "mcp__83d55e43-1c4e-491d-acff-15386ac00dff__slack_search_public_and_private",
+      "mcp__eaa55f9f-cf71-405d-8160-b42991f2e99d__search_files",
+      "mcp__83d55e43-1c4e-491d-acff-15386ac00dff__slack_search_channels",
+      "mcp__eaa55f9f-cf71-405d-8160-b42991f2e99d__read_file_content",
+      "mcp__daf91191-4599-48e3-ab2e-2f89ef4b00cb__get_me",
+      "mcp__daf91191-4599-48e3-ab2e-2f89ef4b00cb__list_projects",
+      "Bash(xargs ls -lS)",
+      "Bash(awk '{print $5, $9}')",
+      "Bash(curl -s http://localhost:8080/)",
+      "Read(//tmp/**)",
+      "Bash(bun -e 'const h=require\\(\"fs\"\\).readFileSync\\(\"/tmp/ssr-index.html\",\"utf8\"\\);const i=h.indexOf\\(\"<body\"\\);console.log\\(h.slice\\(i,i+300\\)\\);')",
+      "Bash(bun -e 'const h=require\\(\"fs\"\\).readFileSync\\(\"/tmp/ssr-index.html\",\"utf8\"\\);console.log\\(\\(h.match\\(/<\\(script|link\\)[^>]*>/g\\)||[]\\).slice\\(0,12\\).join\\(\"\\\\n\"\\)\\);')"
     ]
   }
 }
