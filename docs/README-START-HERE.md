@@ -1,5 +1,7 @@
 # Atlus Onboarding — Handoff to Claude Code
 
+> **Historical.** This was the brief written before the backend existed, for the first hand-off to Claude Code. That backend is now built — see [`README.md`](../README.md) for the current repo map and how to run everything. Kept here as the origin story, not as current instructions.
+
 This folder is a self-contained brief for building the real onboarding system. Hand the whole folder to Claude Code and it has everything it needs: a working reference UI, a build brief it reads automatically, a data contract, and a database schema.
 
 ## What's in here

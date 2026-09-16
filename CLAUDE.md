@@ -1,6 +1,6 @@
 # CLAUDE.md — Atlus Onboarding Build Brief
 
-You are building the production onboarding system for **Atlus**, a privacy-first, email-first personalised news product. A working reference UI already exists in `frontend/onboarding-prototype.html`. Your job is to build the backend it deserves and wire the frontend to it. Read `DATA-CONTRACT.md` before writing any code — it is the source of truth for the data shapes.
+You are building the production onboarding system for **Atlus**, a privacy-first, email-first personalised news product. A working reference UI already exists in `frontend/onboarding-prototype.html`. Your job is to build the backend it deserves and wire the frontend to it. Read `docs/DATA-CONTRACT.md` before writing any code — it is the source of truth for the data shapes.
 
 ## Product in one paragraph
 
@@ -20,7 +20,7 @@ Treat this JS as the executable spec for the algorithm. Port it faithfully to th
 
 1. **Database** — run `backend/schema.sql`. Tables: `topics`, `topic_edges`, `article_topics`, `users`, `user_topic_weights`, `user_config`, `user_political`, `user_geo`, `user_demographics`, `user_read_history`, `onboarding_progress`.
 2. **IPTC loader** — ingest the official vocabulary (live from `https://cv.iptc.org/newscodes/mediatopic?format=json&lang=en-GB`, CC-BY 4.0) into `topics` + `topic_edges`. Tag edges with provenance (`iptc-tree`, `iptc-related`). Refresh yearly.
-3. **Onboarding API** — save answers **per step** so the flow is resumable (see `DATA-CONTRACT.md` for the per-step payloads and endpoints). Server-side spreading activation writes the resulting weights into `user_topic_weights`. Resume via a magic-link token, since the product is email-first.
+3. **Onboarding API** — save answers **per step** so the flow is resumable (see `docs/DATA-CONTRACT.md` for the per-step payloads and endpoints). Server-side spreading activation writes the resulting weights into `user_topic_weights`. Resume via a magic-link token, since the product is email-first.
 4. **Ingestion + tagging** — pull article metadata from RSS/APIs; tag onto IPTC nodes (publisher codes first, then the open `classla/multilingual-IPTC-news-topic-classifier`, then embedding/LLM for finer nodes). Metadata only — never warehouse full article text (UK CDPA constraint; see docs).
 5. **Daily recommender job** — per reader, run the ported `recommend()` against `article_topics`, fill the reading-mode quota, attach the explanation string, send the email.
 6. **Feedback endpoint** — signed one-tap URLs in each email (`more`/`less`/`basic`/`further`) update `user_topic_weights` on the article's exact nodes. This is the ongoing email-native profiling loop.

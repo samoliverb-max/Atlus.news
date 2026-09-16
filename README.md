@@ -1,74 +1,70 @@
-# Atlus onboarding — built
+# Atlus
 
-This is the working onboarding backend for `CLAUDE.md`'s build brief, stages 1–4: data layer, IPTC loader, resumable onboarding API, and the prototype wired to real `fetch()` calls. See `CLAUDE.md` for what's deliberately **not** built yet (article ingestion, the daily recommender job, email send, the feedback endpoint, post-onboarding profile edit/erase).
+Privacy-first, email-first personalised news. This repo is three separate apps plus the docs that tie them together. If you're lost, start here.
 
-## What's here
+## Repo map — where everything is
 
-```
-backend/
-  schema.sql          the Postgres schema
-  src/                the API (Express + pg), graph engine, weight persistence
-  scripts/            migrate.ts, load-iptc.ts, seed-sources.ts
-  test/e2e.test.ts    full flow test against an ephemeral in-process Postgres — no setup needed
-frontend/
-  onboarding-prototype.html   the reference UI, wired to the real API
-  iptc-explorer.html          full topic-map browser (unchanged, not wired)
-```
+| Path | What it is | Status |
+|---|---|---|
+| [`marketing-site/`](marketing-site/) | Public site (joinatlus.com) — landing page, manifesto, team. TanStack Start + React + Tailwind. | Built |
+| [`frontend/onboarding-prototype.html`](frontend/onboarding-prototype.html) | The onboarding flow reader-facing UI. Vanilla HTML/JS, no build step. Now wired to the real API. | Built |
+| [`frontend/iptc-explorer.html`](frontend/iptc-explorer.html) | Standalone browser for the ~1,400-node IPTC topic map, plus a "Vectors" tab for a reader's own graph. | Built |
+| [`backend/`](backend/) | The API (Express + Postgres), the IPTC vocabulary loader, DB schema, scripts, tests. | Built: data layer, IPTC loader, resumable onboarding API. **Not built:** article ingestion, the daily recommender job, email send, the feedback endpoint, profile edit/erase. |
+| [`CLAUDE.md`](CLAUDE.md) | The build brief — product spec, algorithm to preserve, hard constraints, build order. Claude Code reads this automatically. Lives at the repo root because Claude Code only auto-reads it from there. | Reference — still the spec, keep it current if scope changes |
+| [`docs/`](docs/) | Everything else you'd need to understand a decision, but not to run the apps: | |
+| &nbsp;&nbsp;[`docs/DATA-CONTRACT.md`](docs/DATA-CONTRACT.md) | The exact onboarding answer payload shapes and API endpoints. Source of truth for the frontend/backend interface. | Reference |
+| &nbsp;&nbsp;[`docs/README-START-HERE.md`](docs/README-START-HERE.md) | The original pre-build handoff brief (how this repo was first given to Claude Code). The backend it describes is now built — kept for the origin story, not current status. | Historical |
+| &nbsp;&nbsp;`docs/atlus-*.md`, `docs/STYLE-GUIDE.md` | Design specs: the nodal/IPTC/email architecture, cold-start reasoning, full node breakdown, visual style guide. | Reference |
+| [`Dockerfile`](Dockerfile) | Builds `backend/` + `frontend/` together for deploy. | Reference |
 
-## Looking at the front end (no database needed)
+**tl;dr:** three apps (`marketing-site/`, `frontend/`, `backend/`), one spec at the root (`CLAUDE.md`) because the tooling requires it there, everything else explanatory in `docs/`.
 
-Two separate front ends live in this repo, and both run standalone — no Postgres, no `.env`, nothing to configure. Use these when you just want to *see* it.
+## Run everything locally
 
-**The marketing site** (`marketing-site/`) — the public joinatlus.com site: landing page, manifesto, team. TanStack Start + React + Tailwind.
-
-```bash
-cd marketing-site
-bun install     # first time only
-bun run dev
-```
-
-Then open <http://localhost:8080> — `/`, `/manifesto` and `/team`. Hot-reloads on save.
-
-**The onboarding prototype** (`frontend/`) — the reference onboarding flow and the IPTC topic explorer. Plain HTML, so any static server does:
+No database needed to just *look* at the front ends:
 
 ```bash
+# marketing site — http://localhost:8080
+cd marketing-site && bun install && bun run dev
+
+# onboarding prototype + topic explorer — http://localhost:5500
 python3 -m http.server 5500 --directory frontend
 ```
 
-- <http://localhost:5500/onboarding-prototype.html> — the 15-step onboarding flow
-- <http://localhost:5500/iptc-explorer.html> — the full ~1,400-node topic map
-
-Served this way the prototype falls back to in-memory state, which is what you want for looking at the UI. To exercise it against the real API instead, run the backend (below) — `server.ts` serves `frontend/` on the same origin at <http://localhost:4000>.
-
-## Run it for real
-
-You need Node 18+ (or Bun) and a Postgres database — a local install, Docker, or whatever hosting is already arranged.
+Served this way, the onboarding prototype falls back to in-memory state — fine for looking at the UI, but nothing is saved. To exercise it against the real API:
 
 ```bash
 cd backend
-npm install        # or: bun install
-cp ../.env.example .env
-# edit .env: set DATABASE_URL to your Postgres connection string
-createdb atlus      # or whatever database name your DATABASE_URL points at
+npm install                       # or: bun install
+cp ../.env.example .env           # then set DATABASE_URL
+createdb atlus                    # or whatever DATABASE_URL points at
 
-npm run migrate       # applies schema.sql
-npm run load-iptc     # fetches the live IPTC Media Topic vocabulary (~1,400 nodes) and loads it
-npm run seed-sources  # seeds the outlet/platform fingerprints used by the sources step
+npm run migrate                   # applies backend/schema.sql
+npm run load-iptc                 # fetches the live IPTC vocabulary (~1,400 nodes)
+npm run seed-sources               # seeds outlet/platform fingerprints for the Sources step
 
-npm run dev            # starts the API on :4000 (PORT / DATABASE_URL from .env)
+npm run dev                       # API on :4000
 ```
 
-`server.ts` also serves `frontend/` itself — visiting the deployed URL's `/` opens `onboarding-prototype.html` directly, same origin, no CORS or `API_BASE` config needed. That's the one link to share once this is deployed. (Opening the HTML file locally via `file://` still works for quick dev — it falls back to `http://localhost:4000` automatically.)
+`server.ts` also serves `frontend/` itself at `:4000` — same origin, no CORS/`API_BASE` config needed. That's the one link to share once deployed. (Opening the HTML file directly via `file://` still works too — it falls back to `http://localhost:4000` automatically.)
+
+All three have a ready-made dev config in [`.claude/launch.json`](.claude/launch.json) if you're driving this from Claude Code's browser preview.
+
+## Running the tests
+
+```bash
+cd backend && bun test
+```
+
+No external Postgres needed — `test/e2e.test.ts` boots a real Postgres in-process (`@electric-sql/pglite`), runs the actual migration, IPTC loader, and source seeding, then drives the full onboarding flow through genuine HTTP requests. It does a live fetch to `cv.iptc.org`, so it needs network access.
 
 ## Deploying
 
-There's a `Dockerfile` at the repo root (Bun-based, builds `backend/` + `frontend/` together) — should work on Render, Fly.io, Railway, or whatever free hosting is already arranged. Build from the repo root so both directories are in the build context:
-
 ```bash
-docker build -t atlus-onboarding .
+docker build -t atlus-onboarding .    # from the repo root — build context needs both backend/ and frontend/
 ```
 
-Whatever host you use: give it `DATABASE_URL` (pointing at a real Postgres) and optionally `PORT`, then run the one-time setup once against that database before (or right after) the first deploy:
+Works on Render, Fly.io, Railway, or whatever host is arranged. Give it `DATABASE_URL` (a real Postgres) and optionally `PORT`. One-time setup against that database, before or right after first deploy:
 
 ```bash
 docker run --rm -e DATABASE_URL=... atlus-onboarding bun run scripts/migrate.ts
@@ -76,23 +72,10 @@ docker run --rm -e DATABASE_URL=... atlus-onboarding bun run scripts/load-iptc.t
 docker run --rm -e DATABASE_URL=... atlus-onboarding bun run scripts/seed-sources.ts
 ```
 
-Most PaaS hosts also let you run these as a one-off shell/exec command against the deployed container instead — whichever's easier with the specific host. After that, the deployed URL is the whole thing: onboarding UI at `/`, API alongside it.
+Most PaaS hosts also let you run these as a one-off exec against the deployed container instead. After that, the deployed URL is the whole thing: onboarding UI at `/`, API alongside it.
 
-## Running the tests
-
-```bash
-cd backend
-bun test
-```
-
-No external Postgres needed — `test/e2e.test.ts` boots a real wire-protocol-compatible Postgres in-process (`@electric-sql/pglite` + `pglite-socket`), runs the actual migration, IPTC loader (a live fetch), and source seeding against it, then drives the full 15-step onboarding flow through genuine HTTP requests against the real Express app. It also does a live fetch to `cv.iptc.org`, so it needs network access.
-
-## Re-running the IPTC loader
-
-`npm run load-iptc` is idempotent — safe to re-run any time (e.g. yearly, per CLAUDE.md) to pick up vocabulary changes. It upserts `topics` and `topic_edges`; nothing else touches those tables.
-
-One thing worth knowing: the live IPTC feed has no `related`-type SKOS links at all, so only `iptc-tree` edges get loaded. Cross-branch `related` edges (used by the recommender's Stretch category) are a later addition — see `topic_edges.provenance` in the schema, which already has a slot for `co-occurrence`/`wikidata`-derived edges once that exists.
+`npm run load-iptc` is idempotent — safe to re-run any time (e.g. yearly, per `CLAUDE.md`) to pick up vocabulary changes. It upserts `topics` and `topic_edges` only.
 
 ## A note on qcodes
 
-`backend/src/sources.ts` and the curated topic subset in `onboarding-prototype.html`'s chip UI both had to be re-pointed at real IPTC qcodes — the original prototype used short illustrative codes (`medtop:ai`, `medtop:macro`, …) for its ~40-node demo graph, which don't exist in the real ~1,400-node vocabulary. `SYNTHETIC_TO_REAL` in `sources.ts` documents the mapping (found by searching the live feed for the closest real match to each label). The onboarding chips still only show a curated subset for a clean first-run UX, but every qcode they send is a real, valid IPTC node the backend's full graph recognizes.
+`backend/src/sources.ts` and the curated topic subset in the onboarding chip UI both had to be re-pointed at real IPTC qcodes — the original prototype used short illustrative codes (`medtop:ai`, `medtop:macro`, …) for its ~40-node demo graph, which don't exist in the real ~1,400-node vocabulary. `SYNTHETIC_TO_REAL` in `sources.ts` documents the mapping. The onboarding chips still show only a curated subset for a clean first-run UX, but every qcode they send is a real, valid IPTC node the backend's full graph recognizes.
