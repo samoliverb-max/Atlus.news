@@ -29,8 +29,21 @@ export function DoubleUnderline({ w = 260, color = "var(--color-amber)" }: { w?:
       aria-hidden="true"
       style={{ display: "block", maxWidth: w }}
     >
-      <path d="M4 8 Q 90 2 256 10" fill="none" stroke={color} strokeWidth="4" strokeLinecap="round" />
-      <path d="M6 16 Q 110 12 254 18" fill="none" stroke={color} strokeWidth="3.5" strokeLinecap="round" opacity="0.9" />
+      <path
+        d="M7 7 C64 11 143 2 253 8"
+        fill="none"
+        stroke={color}
+        strokeWidth="2.6"
+        strokeLinecap="round"
+      />
+      <path
+        d="M34 16 C99 20 180 11 236 15"
+        fill="none"
+        stroke={color}
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        opacity="0.72"
+      />
     </svg>
   );
 }

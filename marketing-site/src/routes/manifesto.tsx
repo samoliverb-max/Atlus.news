@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Page } from "@/components/atlus/SiteChrome";
 import { DoubleUnderline } from "@/components/atlus/marks";
+import { Handwriting } from "@/components/atlus/Handwriting";
 
 export const Route = createFileRoute("/manifesto")({
   head: () => ({
@@ -80,9 +81,11 @@ function ManifestoPage() {
             building.
           </p>
 
-          <p className="hand pt-6" style={{ color: "var(--color-amber)", fontSize: "1.8rem", lineHeight: 1.1 }}>
-            — the team at Atlus
-          </p>
+          <Handwriting
+            text="— the team at Atlus"
+            className="block pt-6"
+            style={{ color: "var(--color-amber)", fontSize: "1.8rem", lineHeight: 1.1 }}
+          />
         </div>
       </article>
     </Page>

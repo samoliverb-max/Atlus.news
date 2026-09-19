@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import * as React from "react";
 import type { ReactNode } from "react";
 import { Hero15a } from "@/components/atlus/Hero15a";
+import { Handwriting } from "@/components/atlus/Handwriting";
 import { SiteHeader, SiteFooter } from "@/components/atlus/SiteChrome";
 import { DoubleUnderline, CurvedArrow } from "@/components/atlus/marks";
 
@@ -102,14 +103,13 @@ function Section({
   );
 }
 
-function Handwritten({ children, className = "" }: { children: ReactNode; className?: string }) {
+function Handwritten({ children, className = "" }: { children: string; className?: string }) {
   return (
-    <span
-      className={`hand ${className}`}
+    <Handwriting
+      text={children}
+      className={className}
       style={{ color: "var(--color-amber)", fontSize: "1.35em", lineHeight: 1 }}
-    >
-      {children}
-    </span>
+    />
   );
 }
 
@@ -396,20 +396,21 @@ function WhyNow() {
 // The onboarding app is a separate deploy (Express + the vanilla onboarding UI).
 // Joining the waitlist creates the reader's account there and hands straight off
 // into setup, carrying the resume token so a refresh picks up where they left off.
-const ONBOARDING_BASE =
+const ONBOARDING_BASE = (
   import.meta.env.VITE_ONBOARDING_URL ??
   (typeof window !== "undefined" && /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
     ? "http://localhost:4000"
-    : "https://app.joinatlus.com");
+    : "https://app.joinatlus.com")
+).replace(/\/$/, "");
 
 function Waitlist() {
-  const [status, setStatus] = React.useState<"idle" | "sending" | "error">("idle");
+  const [status, setStatus] = React.useState<"idle" | "sending" | "leaving" | "error">("idle");
   const [message, setMessage] = React.useState("");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const email = new FormData(e.currentTarget).get("email");
-    if (typeof email !== "string" || !email) return;
+    if (typeof email !== "string" || !email.trim()) return;
 
     setStatus("sending");
     setMessage("");
@@ -417,7 +418,7 @@ function Waitlist() {
       const res = await fetch(`${ONBOARDING_BASE}/onboarding/start`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: email.trim() }),
       });
       if (!res.ok) {
         const body = (await res.json().catch(() => ({}))) as { error?: string };
@@ -430,7 +431,14 @@ function Waitlist() {
         return;
       }
       const { resume_token } = (await res.json()) as { resume_token: string };
-      window.location.href = `${ONBOARDING_BASE}/?r=${encodeURIComponent(resume_token)}`;
+      if (!resume_token) throw new Error("Missing resume token");
+      const destination = new URL("/", ONBOARDING_BASE);
+      destination.searchParams.set("r", resume_token);
+      setStatus("leaving");
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        await new Promise((resolve) => window.setTimeout(resolve, 420));
+      }
+      window.location.assign(destination.href);
     } catch {
       setStatus("error");
       setMessage("Couldn't reach Atlus. Check your connection and try again.");
@@ -438,6 +446,7 @@ function Waitlist() {
   }
 
   return (
+    <>
     <section
       id="waitlist"
       className="relative px-6 py-32 sm:px-10"
@@ -458,19 +467,18 @@ function Waitlist() {
           Join{" "}
           <span className="relative inline-block">
             Atl
-            <span className="hand" style={{ color: "var(--color-amber)" }}>u</span>
+            <Handwriting text="u" className="brand-u" style={{ color: "var(--color-amber)" }} />
             s
             <span className="pointer-events-none absolute left-0 top-[92%] w-full">
               <DoubleUnderline w={260} />
             </span>
           </span>
         </h2>
-        <p
-          className="hand mb-10 text-2xl"
+        <Handwriting
+          text="daily news, personalised for you"
+          className="mb-10 block text-2xl"
           style={{ color: "var(--color-amber)" }}
-        >
-          daily news, personalised for you
-        </p>
+        />
 
         <form
           className="mx-auto flex max-w-md flex-col gap-3 sm:flex-row"
@@ -493,7 +501,7 @@ function Waitlist() {
           />
           <button
             type="submit"
-            disabled={status === "sending"}
+            disabled={status === "sending" || status === "leaving"}
             className="rounded-full px-6 py-3 text-sm font-semibold tracking-wide disabled:opacity-60"
             style={{
               background: "var(--color-royal)",
@@ -501,7 +509,7 @@ function Waitlist() {
               fontFamily: "var(--font-serif)",
             }}
           >
-            {status === "sending" ? "Starting…" : "Request early access"}
+            {status === "sending" ? "Starting…" : status === "leaving" ? "Opening…" : "Start onboarding"}
           </button>
         </form>
         {status === "error" && (
@@ -518,5 +526,17 @@ function Waitlist() {
         </p>
       </div>
     </section>
+    {status === "leaving" && (
+      <div className="onboarding-handoff" role="status" aria-live="polite">
+        <div className="onboarding-handoff__content">
+          <span className="onboarding-handoff__wordmark">
+            Atl<Handwriting text="u" className="brand-u" />s
+          </span>
+          <span className="onboarding-handoff__line" aria-hidden="true" />
+          <span>Making this yours…</span>
+        </div>
+      </div>
+    )}
+    </>
   );
 }

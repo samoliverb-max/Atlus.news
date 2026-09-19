@@ -123,3 +123,626 @@
     font-synthesis: none;
   }
 }
+
+/* The dark handoff shares the onboarding page's ground and wordmark. */
+.onboarding-handoff {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: var(--royal);
+  color: var(--platinum);
+  animation: handoff-enter 420ms cubic-bezier(.22, 1, .36, 1) both;
+}
+.onboarding-handoff__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--font-serif);
+  font-size: 14px;
+}
+.onboarding-handoff__wordmark {
+  font-family: var(--font-display);
+  font-size: clamp(48px, 10vw, 78px);
+  font-weight: 800;
+  line-height: 1;
+}
+.onboarding-handoff__wordmark .hand { color: var(--amber); }
+.onboarding-handoff__line {
+  width: 80px;
+  height: 2px;
+  background: var(--amber);
+  transform-origin: left;
+  animation: handoff-line 420ms cubic-bezier(.22, 1, .36, 1) both;
+}
+@keyframes handoff-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes handoff-line {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-handoff, .onboarding-handoff__line { animation: none; }
+}
+
+/* The daily edit: motion resolves into a calm, readable editorial composition. */
+.atlus-hero {
+  position: relative;
+  overflow: clip;
+  background: var(--color-royal);
+  color: var(--color-platinum);
+  padding: 148px 6vw 40px;
+}
+.atlus-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(248, 249, 250, 0.023) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(248, 249, 250, 0.023) 1px, transparent 1px);
+  background-size: 96px 96px;
+}
+.atlus-hero-layout {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1.08fr;
+  column-gap: clamp(36px, 6vw, 100px);
+  align-items: center;
+  max-width: 1240px;
+  margin: 0 auto;
+  min-height: min(720px, 78svh);
+}
+.hero-introduction {
+  padding-bottom: 24px;
+}
+.hero-eyebrow {
+  margin: 0 0 24px;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(248, 249, 250, 0.65);
+}
+.hero-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(90px, 9.4vw, 136px);
+  font-weight: 800;
+  letter-spacing: -0.065em;
+  line-height: 0.99;
+}
+.hero-word {
+  position: relative;
+  display: block;
+  width: fit-content;
+}
+.hero-atlus {
+  padding-bottom: 0.18em;
+}
+.hero-u {
+  display: inline-flex;
+  font-size: 1.04em;
+  line-height: 0.72;
+  vertical-align: -0.035em;
+  letter-spacing: 0;
+  margin: 0 0.015em;
+  color: var(--color-amber);
+  transform: rotate(-2deg);
+}
+.hero-signature {
+  position: absolute;
+  width: 92%;
+  height: 0.17em;
+  left: 4%;
+  bottom: -0.005em;
+  color: var(--color-amber);
+  overflow: visible;
+}
+.hero-tagline {
+  margin: 24px 0 14px;
+  font-size: clamp(19px, 1.8vw, 24px);
+  line-height: 1.2;
+}
+.hero-tagline .hand {
+  display: block;
+  font-size: 1.6em;
+  color: var(--color-amber);
+  margin-top: 4px;
+}
+.hero-description {
+  max-width: 410px;
+  font-size: 15px;
+  line-height: 1.8;
+  color: rgba(248, 249, 250, 0.7);
+}
+.hero-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 22px;
+  margin-top: 27px;
+}
+.hero-primary-cta,
+.hero-secondary-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  min-height: 48px;
+  font-size: 14px;
+  transition:
+    transform 0.2s,
+    background-color 0.2s;
+}
+.hero-primary-cta {
+  border-radius: 999px;
+  padding: 13px 23px;
+  color: var(--color-royal);
+  background: var(--color-amber);
+  font-weight: 700;
+}
+.hero-primary-cta:hover {
+  background: var(--color-amber-soft);
+  transform: translateY(-2px);
+}
+.hero-secondary-cta {
+  color: var(--color-platinum);
+  border-bottom: 1px solid rgba(248, 249, 250, 0.32);
+}
+.hero-secondary-cta:hover {
+  transform: translateY(-2px);
+}
+.hero-footnote {
+  margin-top: 18px;
+  color: rgba(248, 249, 250, 0.55);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.hero-edition {
+  min-width: 0;
+  width: 100%;
+  margin: 0;
+}
+.edition-stage {
+  position: relative;
+  height: 544px;
+  width: 100%;
+  isolation: isolate;
+}
+.edition-orbit {
+  position: absolute;
+  width: 124%;
+  height: 96%;
+  left: -12%;
+  top: 1%;
+  border: 1px solid rgba(248, 249, 250, 0.075);
+  border-radius: 50%;
+  transform: rotate(-25deg);
+  z-index: -2;
+}
+.edition-orbit-inner {
+  width: 103%;
+  height: 83%;
+  top: 7%;
+  left: -2%;
+  transform: rotate(22deg);
+  border-color: rgba(248, 249, 250, 0.035);
+}
+.edition-thread {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
+.edit-thread {
+  opacity: 0;
+}
+.edit-paper {
+  position: absolute;
+  inset: 6px -14px 14px;
+  border: 1px solid rgba(248, 249, 250, 0.2);
+  border-radius: 20px;
+  background: #142234;
+  box-shadow: 0 28px 65px rgba(0, 0, 0, 0.14);
+  z-index: -1;
+}
+.edit-masthead {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  top: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.edit-kicker {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+}
+.edit-for-you {
+  font-size: 27px;
+  color: var(--color-amber);
+  transform: rotate(-5deg);
+}
+.edition-stories {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 84px;
+  display: grid;
+  gap: 11px;
+}
+.edit-story {
+  position: relative;
+  padding: 17px 20px 14px;
+  border: 1px solid rgba(13, 27, 42, 0.12);
+  border-radius: 12px;
+  background: #f5f3ed;
+  color: var(--color-royal);
+  transform-origin: 50% 50%;
+  min-height: 122px;
+}
+.edit-story-stretch {
+  background: #eeece5;
+}
+.edit-story-discovery {
+  background: #e5e9e6;
+}
+.story-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 9px;
+}
+.story-category {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.story-category::before {
+  content: "";
+  display: block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #3f7569;
+}
+.edit-story-stretch .story-category::before {
+  background: var(--color-amber-ink);
+}
+.edit-story-discovery .story-category::before {
+  background: #785892;
+}
+.story-topic {
+  color: #52616a;
+}
+.edit-story h2 {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 1.9vw, 27px);
+  font-weight: 600;
+  line-height: 1.15;
+  margin-top: 12px;
+  letter-spacing: -0.025em;
+}
+.story-baseline {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+}
+.story-reason {
+  font-size: 10px;
+  line-height: 1.45;
+  color: #52616a;
+}
+.story-number {
+  font-size: 9px;
+  color: #69777e;
+}
+.edit-finish {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 31px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 11px;
+  color: rgba(248, 249, 250, 0.7);
+}
+.edit-check {
+  stroke: var(--color-amber);
+}
+.edition-caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2px;
+  color: rgba(248, 249, 250, 0.55);
+  font-size: 10px;
+}
+.hero-replay {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 4px 0 14px;
+  cursor: pointer;
+  color: rgba(248, 249, 250, 0.8);
+  font-size: 11px;
+}
+.hero-replay:hover {
+  color: var(--color-amber);
+}
+.hero-actions a:focus-visible,
+.hero-replay:focus-visible,
+.hero-scroll-note:focus-visible {
+  outline: 2px solid var(--color-amber);
+  outline-offset: 5px;
+}
+.story-fragment {
+  position: absolute;
+  opacity: 0;
+  width: 155px;
+  padding: 15px;
+  border: 1px solid rgba(248, 249, 250, 0.2);
+  border-radius: 8px;
+  background: var(--color-royal);
+  color: rgba(248, 249, 250, 0.75);
+  font-size: 11px;
+  z-index: -1;
+}
+.story-fragment i {
+  display: block;
+  height: 1px;
+  background: rgba(248, 249, 250, 0.22);
+  margin-top: 12px;
+}
+.story-fragment i:last-child {
+  width: 62%;
+  margin-top: 7px;
+}
+.story-fragment-0 {
+  top: -6px;
+  left: -65px;
+  transform: rotate(-12deg);
+}
+.story-fragment-1 {
+  top: 78px;
+  right: -80px;
+  transform: rotate(10deg);
+}
+.story-fragment-2 {
+  top: 217px;
+  left: -78px;
+  transform: rotate(-6deg);
+}
+.story-fragment-3 {
+  bottom: 63px;
+  right: -58px;
+  transform: rotate(14deg);
+}
+.story-fragment-4 {
+  bottom: -3px;
+  left: -26px;
+  transform: rotate(-7deg);
+}
+.story-fragment-5 {
+  top: -35px;
+  right: 16px;
+  transform: rotate(5deg);
+}
+.hero-scroll-note {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 25px;
+  margin-top: 26px;
+  border-top: 1px solid rgba(248, 249, 250, 0.12);
+  font-size: 11px;
+  color: rgba(248, 249, 250, 0.6);
+}
+.hero-scroll-note > span:last-child {
+  font-size: 18px;
+}
+@media (min-width: 1500px) {
+  .atlus-hero {
+    padding-top: 164px;
+  }
+}
+@media (max-width: 999px) {
+  .atlus-hero {
+    padding: 132px 7vw 30px;
+  }
+  .atlus-hero-layout {
+    grid-template-columns: 1fr;
+    max-width: 640px;
+    min-height: auto;
+  }
+  .hero-introduction {
+    text-align: center;
+    padding-bottom: 48px;
+  }
+  .hero-title {
+    font-size: clamp(76px, 12vw, 114px);
+    letter-spacing: -0.06em;
+  }
+  .hero-word {
+    display: inline-block;
+  }
+  .hero-tagline {
+    margin-top: 25px;
+  }
+  .hero-tagline .hand {
+    display: inline;
+    margin-left: 4px;
+  }
+  .hero-description {
+    margin: 15px auto 0;
+  }
+  .hero-actions {
+    justify-content: center;
+  }
+  .hero-edition {
+    max-width: 480px;
+    margin: 12px auto 0;
+  }
+  .edit-story h2 {
+    font-size: 25px;
+  }
+  .hero-scroll-note {
+    margin-top: 26px;
+  }
+}
+@media (max-width: 540px) {
+  .atlus-hero {
+    padding: 118px 24px 26px;
+  }
+  .hero-eyebrow {
+    font-size: 9px;
+    margin-bottom: 18px;
+    letter-spacing: 0.13em;
+  }
+  .hero-title {
+    font-size: clamp(57px, 14vw, 76px);
+  }
+  .hero-tagline {
+    font-size: 18px;
+    margin-top: 19px;
+  }
+  .hero-tagline .hand {
+    display: block;
+    margin-left: 0;
+    font-size: 32px;
+  }
+  .hero-description {
+    font-size: 13px;
+    max-width: 305px;
+    line-height: 1.8;
+  }
+  .hero-desktop-break {
+    display: none;
+  }
+  .hero-introduction {
+    padding-bottom: 29px;
+  }
+  .hero-actions {
+    gap: 18px;
+    margin-top: 24px;
+  }
+  .hero-primary-cta,
+  .hero-secondary-cta {
+    font-size: 12px;
+    gap: 11px;
+  }
+  .hero-primary-cta {
+    padding-inline: 18px;
+  }
+  .hero-footnote {
+    font-size: 9px;
+  }
+  .edition-stage {
+    height: 510px;
+  }
+  .edit-paper {
+    inset-inline: -8px;
+  }
+  .edit-masthead {
+    left: 9px;
+    right: 9px;
+  }
+  .edition-stories {
+    left: 0;
+    right: 0;
+    gap: 10px;
+  }
+  .edit-story {
+    padding: 15px 14px 12px;
+    min-height: 115px;
+  }
+  .edit-story h2 {
+    font-size: clamp(19px, 5.2vw, 24px);
+  }
+  .story-topline {
+    font-size: 8px;
+    gap: 7px;
+  }
+  .story-reason {
+    font-size: 9px;
+  }
+  .edit-finish {
+    bottom: 29px;
+    font-size: 9px;
+    gap: 6px;
+  }
+  .edit-kicker {
+    font-size: 9px;
+  }
+  .edit-for-you {
+    font-size: 25px;
+  }
+  .hero-scroll-note {
+    font-size: 10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-replay {
+    display: none;
+  }
+  .hero-primary-cta,
+  .hero-secondary-cta {
+    transition: none;
+  }
+  .hero-primary-cta:hover,
+  .hero-secondary-cta:hover {
+    transform: none;
+  }
+}
+
+/* HANDWRITING LAYOUT — motion timing lives in src/lib/motion.ts.
+   Each word wraps as a unit, each glyph reveals independently. Don't set an
+   initial opacity here: the complete text must remain readable without JS. */
+.handwriting-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+.handwriting-letter {
+  display: inline-block;
+}
+.brand-u {
+  display: inline-flex;
+  margin: 0 0.015em;
+  line-height: 0.72;
+  vertical-align: -0.035em;
+  transform: rotate(-2deg);
+}
+
+/* ANCHOR SCROLL — the browser handles wheel, trackpad and touch scrolling.
+   This only animates links such as How it works / Join the waitlist.
+   Adjust 28px to change the space above a section after an anchor jump. */
+html {
+  scroll-padding-top: 28px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

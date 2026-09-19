@@ -1,0 +1,45 @@
+# Atlus motion guide
+
+Use this guide for the marketing site and onboarding UI. The aim is a calm, editorial rhythm: motion confirms a choice or helps the reader keep their place. The brand carries the continuity between the two separate apps: royal `#0D1B2A`, platinum `#F8F9FA`, amber `#FF6B35`, Playfair Display for the wordmark, PT Serif for supporting copy, and the handwritten Reenie Beanie `u`.
+
+## Motion values
+
+| Moment | Duration | Movement | Easing |
+| --- | --- | --- | --- |
+| Hero title | 800 ms | Words rise 18% with a 90 ms stagger | `power3.out` |
+| Hero daily edit | About 3.7 s | Loose story cards arrive, align into an edition, reveal reasons, then finish | GSAP sequence |
+| Hero handwriting | Up to 1.7 s | Editable glyphs reveal left to right | `power1.inOut` |
+| Button, chip, or choice hover | 150 ms | Rise 1–2 px | `ease` |
+| Onboarding progress | 400 ms | Width only | browser default ease |
+| New onboarding step | 360 ms | Fade in and rise 12 px | `cubic-bezier(.22, 1, .36, 1)` |
+| Marketing to onboarding handoff | 420 ms | Dark surface fades in and rises 12 px; amber rule draws left to right | `cubic-bezier(.22, 1, .36, 1)` |
+| Toast | 300 ms | Opacity only | browser default ease |
+
+The marketing hero is a finite GSAP sequence. The title arrives first; the handwritten `u`, tagline, and underline draw in; loose story fragments and Core, Stretch, and Discovery cards gather into a small daily edition. It ends after the check mark and only runs again when the reader chooses **Replay**. Every orange Reenie Beanie phrase uses the shared `Handwriting` component and the same left-to-right glyph reveal. Timing lives in `marketing-site/src/lib/motion.ts`.
+
+## Email handoff
+
+1. The reader submits a valid email on the marketing page. Keep the form visible and show **Starting…** while `POST /onboarding/start` runs. Do not animate away on an error.
+2. After a successful response with a `resume_token`, show the full-screen royal handoff. Centre the Atlus wordmark, draw a short amber rule, and say **Making this yours…**. This takes 420 ms.
+3. Navigate to the onboarding origin with `?r=<resume_token>`. The onboarding app rehydrates that session and opens the next unanswered step. Its card enters with the 360 ms step motion. A returning reader sees the correct saved step, not the welcome screen.
+4. If the reader prefers reduced motion, navigate immediately and render cards without entrance animation. Keep all labels, focus states, and progress information available.
+
+The marketing site reads `VITE_ONBOARDING_URL` at build time. Locally it defaults to `http://localhost:4000`; the production fallback is `https://app.joinatlus.com`. Set it to the actual deployed onboarding origin before publishing. The backend must serve the onboarding UI at `/` and accept the marketing origin for `POST /onboarding/start`.
+
+## Onboarding steps
+
+- Animate the new card once after each step change. Keep the page background and header steady so the reader retains context.
+- Progress width changes over 400 ms. Do not make it jump back between steps or run a continuous loading loop.
+- Chips and choices respond within 150 ms. A selected choice must be clear from its fill and text color, without relying on motion alone.
+- Keep hover movement to 1 px. Preserve a visible amber keyboard focus outline.
+- Do not stagger every chip, animate the whole map, or add looping decoration to the form. The reader's answers should remain the focus.
+- Save errors stay on the current step. The same card remains visible so the reader can retry.
+
+## Implementation references
+
+- Marketing email handoff: `marketing-site/src/routes/index.tsx` (`Waitlist`) and `marketing-site/src/styles.css` (`.onboarding-handoff`).
+- Marketing hero composition: `marketing-site/src/components/atlus/Hero15a.tsx` and `AnimatedHero.tsx`.
+- Marketing hero timing: `marketing-site/src/lib/motion.ts`; handwriting reveal: `marketing-site/src/lib/handwriting.ts`.
+- Onboarding step, progress, choice and reduced-motion rules: `frontend/onboarding-prototype.html`.
+
+When adding motion, animate `opacity` and `transform` where possible. Test at narrow and wide widths, with keyboard navigation and `prefers-reduced-motion: reduce` enabled.

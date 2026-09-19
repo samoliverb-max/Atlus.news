@@ -33,6 +33,8 @@
   .progress b{display:block;height:100%;background:var(--accent);width:0%;transition:width .4s}
   .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px;
     box-shadow:0 1px 2px rgba(0,0,0,.25),0 20px 45px rgba(0,0,0,.35)}
+  #stage>.card{animation:step-enter 360ms cubic-bezier(.22,1,.36,1) both}
+  @keyframes step-enter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
   h1{font-family:var(--font-display);font-size:25px;line-height:1.22;margin-bottom:9px;font-weight:800;color:var(--ink)}
   .sub{color:var(--muted);font-size:14.5px;line-height:1.6;margin-bottom:20px}
   .chips{display:flex;flex-wrap:wrap;gap:9px}
@@ -46,6 +48,10 @@
     padding:12px 24px;cursor:pointer;background:var(--accent);color:#fff;font-weight:700;transition:transform .15s}
   button.btn:hover:not(:disabled){transform:translateY(-1px)}
   button.btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+  .chip,.kopt,.mode{transition:background-color 150ms ease,border-color 150ms ease,color 150ms ease,transform 150ms ease}
+  .chip:hover,.kopt:hover,.mode:hover{transform:translateY(-1px)}
+  button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+  @media (prefers-reduced-motion:reduce){#stage>.card{animation:none}.progress b,.chip,.kopt,.mode,button.btn,.toast{transition:none}.chip:hover,.kopt:hover,.mode:hover,button.btn:hover:not(:disabled){transform:none}}
   button.ghost{background:none;border:1px solid var(--line);color:var(--muted)}
   .save{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;
     font-family:var(--font-serif);text-decoration:underline;margin-top:16px;display:block}
@@ -482,7 +488,7 @@ function render(){
   <h1>A thorough setup, on purpose.</h1>
   <p class="sub">Atlus runs entirely on what you choose to tell us — no tracking, no inference behind your back.
   This setup is deliberately long, because you're training your own reader. Every answer saves as you go;
-  stop anytime and a link in your inbox resumes you exactly where you left off. Sensitive sections are
+  stop anytime and copy a link to resume exactly where you left off. Sensitive sections are
   clearly marked, always optional, and always explained.</p>
   <p class="sub" style="margin-bottom:8px">Where should your first issue land?</p>
   <input type="email" id="em" placeholder="you@example.com" value="${S.email}" style="margin-bottom:16px">

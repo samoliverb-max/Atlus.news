@@ -15,6 +15,7 @@ Privacy-first, email-first personalised news. This repo is three separate apps p
 | &nbsp;&nbsp;[`docs/DATA-CONTRACT.md`](docs/DATA-CONTRACT.md) | The exact onboarding answer payload shapes and API endpoints. Source of truth for the frontend/backend interface. | Reference |
 | &nbsp;&nbsp;[`docs/README-START-HERE.md`](docs/README-START-HERE.md) | The original pre-build handoff brief (how this repo was first given to Claude Code). The backend it describes is now built — kept for the origin story, not current status. | Historical |
 | &nbsp;&nbsp;`docs/atlus-*.md`, `docs/STYLE-GUIDE.md` | Design specs: the nodal/IPTC/email architecture, cold-start reasoning, full node breakdown, visual style guide. | Reference |
+| &nbsp;&nbsp;[`docs/ANIMATION-GUIDE.md`](docs/ANIMATION-GUIDE.md) | Motion values and the marketing-to-onboarding handoff. | Reference |
 | [`Dockerfile`](Dockerfile) | Builds `backend/` + `frontend/` together for deploy. | Reference |
 
 **tl;dr:** three apps (`marketing-site/`, `frontend/`, `backend/`), one spec at the root (`CLAUDE.md`) because the tooling requires it there, everything else explanatory in `docs/`.
@@ -47,6 +48,8 @@ npm run dev                       # API on :4000
 ```
 
 `server.ts` also serves `frontend/` itself at `:4000` — same origin, no CORS/`API_BASE` config needed. That's the one link to share once deployed. (Opening the HTML file directly via `file://` still works too — it falls back to `http://localhost:4000` automatically.)
+
+The marketing email form calls `POST /onboarding/start`, then opens the saved onboarding session. Set `VITE_ONBOARDING_URL` in the marketing site's build environment to the deployed onboarding origin. Local development defaults to `http://localhost:4000`; production otherwise falls back to `https://app.joinatlus.com`. The transition and onboarding step motion are documented in [`docs/ANIMATION-GUIDE.md`](docs/ANIMATION-GUIDE.md).
 
 All three have a ready-made dev config in [`.claude/launch.json`](.claude/launch.json) if you're driving this from Claude Code's browser preview.
 

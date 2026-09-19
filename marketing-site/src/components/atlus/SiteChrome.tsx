@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { Handwriting } from "./Handwriting";
 
 export function SiteHeader({ variant = "light" }: { variant?: "light" | "dark" }) {
   const dark = variant === "dark";
@@ -14,7 +15,7 @@ export function SiteHeader({ variant = "light" }: { variant?: "light" | "dark" }
           style={{ fontFamily: "var(--font-display)", fontWeight: 800 }}
         >
           Atl
-          <span className="hand" style={{ color: "var(--color-amber)" }}>u</span>
+          <Handwriting text="u" className="brand-u" style={{ color: "var(--color-amber)" }} />
           s
         </span>
       </Link>
@@ -47,7 +48,7 @@ export function SiteFooter() {
         <div>
           <div className="text-3xl" style={{ fontFamily: "var(--font-display)", fontWeight: 800 }}>
             Atl
-            <span className="hand" style={{ color: "var(--color-amber)" }}>u</span>
+            <Handwriting text="u" className="brand-u" style={{ color: "var(--color-amber)" }} />
             s
           </div>
           <p className="mt-3 max-w-sm text-sm opacity-70" style={{ fontFamily: "var(--font-serif)" }}>
