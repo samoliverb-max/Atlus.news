@@ -22,10 +22,9 @@ export function writeHandwriting(
   );
   timeline.fromTo(
     letters,
-    { clipPath: "inset(-20% 100% -25% -8%)", opacity: 0 },
+    { clipPath: "inset(-35% 108% -35% -8%)" },
     {
-      clipPath: "inset(-20% -12% -25% -8%)",
-      opacity: 1,
+      clipPath: "inset(-35% -12% -35% -8%)",
       duration: HANDWRITING_MOTION.letterDuration,
       stagger,
       ease: HANDWRITING_MOTION.ease,

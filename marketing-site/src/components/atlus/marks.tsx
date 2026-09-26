@@ -1,17 +1,4 @@
-import type { ReactNode } from "react";
-
-/* Hand-drawn globe "o" — meridian + latitudes, sized to sit inside a word */
-export function GlobeO({ size = 72, stroke = "var(--color-platinum)" }: { size?: number; stroke?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 100 100" aria-hidden="true" style={{ display: "inline-block", verticalAlign: "baseline" }}>
-      <circle cx="50" cy="50" r="44" fill="none" stroke={stroke} strokeWidth="6" />
-      <ellipse cx="50" cy="50" rx="18" ry="44" fill="none" stroke={stroke} strokeWidth="4" />
-      <path d="M8 38 Q 50 30 92 38" fill="none" stroke={stroke} strokeWidth="3" strokeLinecap="round" />
-      <path d="M6 50 H 94" fill="none" stroke={stroke} strokeWidth="3" strokeLinecap="round" />
-      <path d="M8 62 Q 50 70 92 62" fill="none" stroke={stroke} strokeWidth="3" strokeLinecap="round" />
-    </svg>
-  );
-}
+import { useInkReveal } from "./useInkReveal";
 
 /* Double, slightly-imperfect underline in amber.
    Every call site wraps this in a full-width absolutely-positioned span, so the
@@ -19,9 +6,17 @@ export function GlobeO({ size = 72, stroke = "var(--color-platinum)" }: { size?:
    push past the viewport on small screens (a 520px underline on a 390px phone
    forced the whole page to scroll sideways), so size to the parent and cap at
    `w` for the wide case. */
-export function DoubleUnderline({ w = 260, color = "var(--color-amber)" }: { w?: number; color?: string }) {
+export function DoubleUnderline({
+  w = 260,
+  color = "var(--color-amber)",
+}: {
+  w?: number;
+  color?: string;
+}) {
+  const ref = useInkReveal<SVGSVGElement>("mark", true, 0.45);
   return (
     <svg
+      ref={ref}
       width="100%"
       height="22"
       viewBox="0 0 260 22"
@@ -34,6 +29,7 @@ export function DoubleUnderline({ w = 260, color = "var(--color-amber)" }: { w?:
         fill="none"
         stroke={color}
         strokeWidth="2.6"
+        vectorEffect="non-scaling-stroke"
         strokeLinecap="round"
       />
       <path
@@ -41,6 +37,7 @@ export function DoubleUnderline({ w = 260, color = "var(--color-amber)" }: { w?:
         fill="none"
         stroke={color}
         strokeWidth="1.6"
+        vectorEffect="non-scaling-stroke"
         strokeLinecap="round"
         opacity="0.72"
       />
@@ -50,8 +47,9 @@ export function DoubleUnderline({ w = 260, color = "var(--color-amber)" }: { w?:
 
 /* Curved arrow annotation — from the underlined word down to the caption */
 export function CurvedArrow({ color = "var(--color-amber)" }: { color?: string }) {
+  const ref = useInkReveal<SVGSVGElement>("mark");
   return (
-    <svg width="70" height="86" viewBox="0 0 70 86" aria-hidden="true">
+    <svg ref={ref} width="70" height="86" viewBox="0 0 70 86" aria-hidden="true">
       <path
         d="M50 4 Q 20 20 22 68"
         fill="none"
@@ -59,25 +57,75 @@ export function CurvedArrow({ color = "var(--color-amber)" }: { color?: string }
         strokeWidth="3"
         strokeLinecap="round"
       />
-      <path d="M22 68 L 10 56 M22 68 L 34 58" fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" />
+      <path
+        d="M22 68 L 10 56 M22 68 L 34 58"
+        fill="none"
+        stroke={color}
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
 
-/* Sketchy double ellipse used to circle the caption */
-export function SketchyEllipse({ children, color = "var(--color-amber)" }: { children: ReactNode; color?: string }) {
+/** A positionable, hand-drawn photo annotation. */
+export function PhotoCircle({
+  x,
+  y,
+  w,
+  h,
+  label,
+  labelPosition,
+  color = "var(--color-amber)",
+}: {
+  x: string;
+  y: string;
+  w: string;
+  h: string;
+  label: string;
+  labelPosition: "right" | "above";
+  color?: string;
+}) {
+  const ref = useInkReveal<SVGSVGElement>("mark");
+  const labelStyle =
+    labelPosition === "right"
+      ? { left: "104%", top: "46%" }
+      : { left: "50%", bottom: "104%", transform: "translateX(-50%)" };
+
   return (
-    <span className="relative inline-block px-6 py-3">
+    <span
+      className="pointer-events-none absolute z-10"
+      aria-hidden="true"
+      style={{ left: x, top: y, width: w, height: h, transform: "translate(-50%, -50%)" }}
+    >
       <svg
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 h-full w-full"
-        viewBox="0 0 400 140"
+        ref={ref}
+        className="absolute inset-0 h-full w-full"
+        viewBox="0 0 100 100"
         preserveAspectRatio="none"
       >
-        <ellipse cx="200" cy="70" rx="188" ry="58" fill="none" stroke={color} strokeWidth="3" transform="rotate(-3 200 70)" />
-        <ellipse cx="200" cy="70" rx="180" ry="52" fill="none" stroke={color} strokeWidth="2.5" transform="rotate(-1 200 70)" opacity="0.75" />
+        <path
+          d="M4 52 C3 23 25 5 51 5 C79 5 97 25 96 50 C96 77 77 96 50 95 C22 95 4 78 4 52Z"
+          fill="none"
+          stroke={color}
+          strokeWidth="2.6"
+          strokeLinecap="round"
+        />
+        <path
+          d="M8 49 C9 22 29 8 52 8 C77 8 93 26 92 52 C91 76 75 91 49 91 C24 90 7 75 8 49Z"
+          fill="none"
+          stroke={color}
+          strokeWidth="2"
+          strokeLinecap="round"
+          opacity="0.72"
+        />
       </svg>
-      <span className="relative">{children}</span>
+      <span
+        className="hand absolute whitespace-nowrap text-[clamp(1.7rem,3vw,2.6rem)] leading-none"
+        style={{ color, ...labelStyle }}
+      >
+        {label}
+      </span>
     </span>
   );
 }

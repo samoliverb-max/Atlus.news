@@ -20,34 +20,34 @@ export const HANDWRITING_MOTION = {
   enabled: true,
   start: "top 84%",
   delay: 0.22, // Lets a section heading arrive before its annotation writes in.
-  letterDuration: 0.2, // Each real Reenie Beanie glyph is revealed left to right.
-  letterStagger: 0.035, // Increase to slow the writing; decrease to speed it up.
+  letterDuration: 0.28, // Solid ink reveals without fading each letter.
+  letterStagger: 0.06,
   maxDuration: 1.7, // Caps long phrases so readers aren't kept waiting.
-  ease: "power1.inOut",
+  ease: "none", // Constant movement through each glyph, without repeated starts/stops.
   markDuration: 0.75, // Time to draw one underline / arrow stroke.
-  markStagger: 0.12,
+  markStagger: 0.45,
 } as const;
 
 export const HERO_MOTION = {
-  playbackRate: 0.7, // A calmer pace: the full editorial sequence now takes about 5.3 seconds.
-  title: { liftPercent: 18, duration: 0.8, stagger: 0.09, ease: "power3.out" },
-  writing: { uAt: 0.5, signatureAt: 0.75, taglineAt: 0.8, signatureDuration: 0.65 },
+  playbackRate: 0.7, // Shared ink pace; the editorial sequence takes about 5.6 seconds.
+  title: { liftPercent: 10, duration: 0.8, stagger: 0.12, ease: "power3.out" },
+  writing: { uAt: 0.55, signatureAt: 1.05, taglineAt: 1.25, signatureDuration: 0.7 },
   visibleThreshold: 0.25, // Fraction of the illustration visible before it starts.
   // Edit these poses to change the initial loose arrangement of the three cards.
   cardPoses: [
-    { x: -44, y: 28, rotation: -9 },
-    { x: 28, y: -18, rotation: 7 },
-    { x: -20, y: -52, rotation: -5 },
+    { x: -24, y: 18, rotation: -5 },
+    { x: 18, y: -10, rotation: 4 },
+    { x: -12, y: -28, rotation: -3 },
   ],
   // Named beats in the editorial sequence. Overlap is deliberate.
   beats: {
     arrive: 0,
-    select: 1.1,
-    arrange: 1.3,
-    frame: 1.4,
-    masthead: 1.75,
-    explain: 2.4,
-    finish: 3.05,
-    check: 3.3,
+    select: 1.35,
+    arrange: 1.5,
+    frame: 1.45,
+    masthead: 2.15,
+    explain: 2.75,
+    finish: 3.3,
+    check: 3.55,
   },
 } as const;

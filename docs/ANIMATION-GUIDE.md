@@ -6,16 +6,20 @@ Use this guide for the marketing site and onboarding UI. The aim is a calm, edit
 
 | Moment | Duration | Movement | Easing |
 | --- | --- | --- | --- |
-| Hero title | 800 ms | Words rise 18% with a 90 ms stagger | `power3.out` |
-| Hero daily edit | About 3.7 s | Loose story cards arrive, align into an edition, reveal reasons, then finish | GSAP sequence |
-| Hero handwriting | Up to 1.7 s | Editable glyphs reveal left to right | `power1.inOut` |
+| Hero title | Same as closing Join Atlus | Static serif letters; shared handwriting reveal and double underline | Shared ink easing |
+| Hero daily edit | About 5.6 s | Cards arrive, settle into an edition, reveal reasons, then finish | GSAP sequence at 0.7 speed |
+| Handwriting | Up to 2.43 s per phrase | Solid glyphs reveal left to right without fading | Linear |
+| Shared underline / arrow | About 1.07 s per stroke | Stroke draws along its path; second stroke begins 643 ms after the first | `power1.inOut` |
+| Replay reset | 160 ms out, 300 ms in | Edition fades out before cards reset, then fades in as playback begins | `power1.out` |
 | Button, chip, or choice hover | 150 ms | Rise 1–2 px | `ease` |
-| Onboarding progress | 400 ms | Width only | browser default ease |
-| New onboarding step | 360 ms | Fade in and rise 12 px | `cubic-bezier(.22, 1, .36, 1)` |
-| Marketing to onboarding handoff | 420 ms | Dark surface fades in and rises 12 px; amber rule draws left to right | `cubic-bezier(.22, 1, .36, 1)` |
+| Onboarding progress | 400 ms | Width only | `cubic-bezier(.22, 1, .36, 1)` |
+| New onboarding step | 360 ms | Fade in and rise 8 px | `cubic-bezier(.22, 1, .36, 1)` |
+| Marketing to onboarding handoff | 420 ms | Dark surface fades in; amber rule draws left to right | `cubic-bezier(.22, 1, .36, 1)` |
 | Toast | 300 ms | Opacity only | browser default ease |
 
-The marketing hero is a finite GSAP sequence. The title arrives first; the handwritten `u`, tagline, and underline draw in; loose story fragments and Core, Stretch, and Discovery cards gather into a small daily edition. It ends after the check mark and only runs again when the reader chooses **Replay**. Every orange Reenie Beanie phrase uses the shared `Handwriting` component and the same left-to-right glyph reveal. Timing lives in `marketing-site/src/lib/motion.ts`.
+The marketing hero is a finite GSAP sequence. The title uses the closing Join Atlus components and viewport timing: the handwritten `u`, tagline, and double underline draw in while the serif letters stay still; loose story fragments and Core, Stretch, and Discovery cards gather into a small daily edition. It ends after the check mark and only runs again when the reader chooses **Replay**. Every orange Reenie Beanie phrase uses the shared `Handwriting` component and the same left-to-right glyph reveal. Timing lives in `marketing-site/src/lib/motion.ts`.
+
+Timings in the table are visible durations, after the shared 0.7 playback rate. Source timeline values are divided by 0.7. For the hero heading and the rest of the page, `useInkReveal` triggers text and marks once as they enter the viewport and reverts inline animation styles if reduced motion is enabled. The brief navigation overlay keeps its wordmark fully visible so navigation cannot interrupt a half-written letter.
 
 ## Email handoff
 

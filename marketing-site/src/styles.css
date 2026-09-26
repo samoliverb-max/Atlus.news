@@ -61,7 +61,6 @@
   --font-scrawl: "Kalam", "Reenie Beanie", cursive;
 }
 
-
 :root {
   --radius: 0.625rem;
 
@@ -75,52 +74,59 @@
   --primary: oklch(0.22 0.02 250);
   --primary-foreground: oklch(0.97 0.01 85);
 
-  --parchment: oklch(0.96 0.02 85);      /* #FBF6EE */
-  --parchment-2: oklch(0.97 0.014 85);   /* #FAF9F5 */
-  --ink: oklch(0.22 0.02 250);           /* #2B2621-ish deep */
+  --parchment: oklch(0.96 0.02 85); /* #FBF6EE */
+  --parchment-2: oklch(0.97 0.014 85); /* #FAF9F5 */
+  --ink: oklch(0.22 0.02 250); /* #2B2621-ish deep */
   --ink-soft: oklch(0.32 0.02 250);
-  --navy: oklch(0.28 0.045 255);         /* #172033 */
-  --navy-deep: oklch(0.22 0.05 260);     /* darker */
-  --peach: oklch(0.85 0.08 55);          /* #F6C8A0 */
-  --sky: oklch(0.83 0.06 235);           /* #AFCFE0 */
-  --butter: oklch(0.89 0.09 90);         /* #F1DC9B */
-  --coral: oklch(0.7 0.15 25);           /* #E56A5C */
-  --teal: oklch(0.58 0.08 190);          /* #3F9E93 */
-  --purple: oklch(0.65 0.16 300);        /* #A57CE0 */
+  --navy: oklch(0.28 0.045 255); /* #172033 */
+  --navy-deep: oklch(0.22 0.05 260); /* darker */
+  --peach: oklch(0.85 0.08 55); /* #F6C8A0 */
+  --sky: oklch(0.83 0.06 235); /* #AFCFE0 */
+  --butter: oklch(0.89 0.09 90); /* #F1DC9B */
+  --coral: oklch(0.7 0.15 25); /* #E56A5C */
+  --teal: oklch(0.58 0.08 190); /* #3F9E93 */
+  --purple: oklch(0.65 0.16 300); /* #A57CE0 */
   --purple-deep: oklch(0.55 0.14 305);
-  --blue: oklch(0.62 0.14 260);          /* #4E7DDB */
+  --blue: oklch(0.62 0.14 260); /* #4E7DDB */
   --blue-deep: oklch(0.35 0.12 265);
-  --marker: oklch(0.7 0.19 45);          /* orange marker */
-  --lime: oklch(0.9 0.19 115);           /* #D6F03A */
-  --orange: oklch(0.72 0.18 45);         /* #F26D3A */
+  --marker: oklch(0.7 0.19 45); /* orange marker */
+  --lime: oklch(0.9 0.19 115); /* #D6F03A */
+  --orange: oklch(0.72 0.18 45); /* #F26D3A */
 
   /* Atlus 15a — deep royal blue / platinum / burnt orange */
-  --royal: #0D1B2A;
+  --royal: #0d1b2a;
   --royal-soft: #142234;
-  --platinum: #F8F9FA;
-  --amber: #FF6B35;
-  --amber-soft: #FF8656;
+  --platinum: #f8f9fa;
+  --amber: #ff6b35;
+  --amber-soft: #ff8656;
   /* Amber for TEXT on the light grounds. #FF6B35 scores 2.7:1 on platinum and
      2.4:1 on parchment — under WCAG AA (4.5:1) and under even the 3:1 large-text
      floor, so eyebrow labels and handwritten accents were failing everywhere the
      background wasn't royal. This darker burnt tone clears AA on both (5.5:1 and
      4.8:1). Keep --amber itself for dark grounds, where it already scores 6.1:1. */
-  --amber-ink: #B83A0C;
+  --amber-ink: #b83a0c;
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
-  html, body {
+  * {
+    border-color: var(--color-border);
+  }
+  html,
+  body {
     background-color: var(--color-parchment);
     color: var(--color-ink);
     font-family: var(--font-serif);
   }
   /* Single place the handwriting is set up, so the weight can't drift again. */
+  .handwriting,
   .hand {
     font-family: var(--font-hand);
     font-weight: 400;
     font-synthesis-weight: none;
     font-synthesis: none;
+  }
+  .hand {
+    color: var(--color-amber);
   }
 }
 
@@ -133,7 +139,7 @@
   place-items: center;
   background: var(--royal);
   color: var(--platinum);
-  animation: handoff-enter 420ms cubic-bezier(.22, 1, .36, 1) both;
+  animation: handoff-enter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .onboarding-handoff__content {
   display: flex;
@@ -149,27 +155,199 @@
   font-weight: 800;
   line-height: 1;
 }
-.onboarding-handoff__wordmark .hand { color: var(--amber); }
+.onboarding-handoff__wordmark .brand-u {
+  color: var(--amber);
+}
 .onboarding-handoff__line {
   width: 80px;
   height: 2px;
   background: var(--amber);
   transform-origin: left;
-  animation: handoff-line 420ms cubic-bezier(.22, 1, .36, 1) both;
+  animation: handoff-line 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 @keyframes handoff-enter {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 @keyframes handoff-line {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .onboarding-handoff, .onboarding-handoff__line { animation: none; }
+  .onboarding-handoff,
+  .onboarding-handoff__line {
+    animation: none;
+  }
 }
 
-/* The daily edit: motion resolves into a calm, readable editorial composition. */
+/* Compact white backings keep the supplied university marks crisp on the warm ground. */
+.university-marks {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 38px;
+}
+.university-mark {
+  display: block;
+  object-fit: contain;
+  padding: 4px 7px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(13, 27, 42, 0.07);
+  opacity: 0.84;
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease;
+}
+.university-mark--durham {
+  width: 140px;
+}
+.university-mark--cambridge {
+  width: 60px;
+}
+.butler-crest {
+  position: absolute;
+  right: clamp(12px, 2vw, 24px);
+  bottom: clamp(12px, 2vw, 24px);
+  z-index: 10;
+  width: clamp(56px, 9vw, 104px);
+  filter: drop-shadow(0 5px 10px rgba(13, 27, 42, 0.24));
+}
+@media (prefers-reduced-motion: no-preference) {
+  .why-us-pop:not(.is-revealed) .university-mark,
+  .why-us-pop:not(.is-revealed) .butler-crest {
+    opacity: 0;
+  }
+  .why-us-pop.is-revealed .university-mark {
+    animation: university-mark-arrive 640ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .why-us-pop.is-revealed .university-mark--cambridge {
+    animation-delay: 110ms;
+  }
+  .why-us-pop.is-revealed .butler-crest {
+    animation: butler-crest-arrive 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+@keyframes university-mark-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  to {
+    opacity: 0.84;
+    transform: translateY(0);
+  }
+}
+@keyframes butler-crest-arrive {
+  from {
+    opacity: 0;
+    transform: scale(0.82) rotate(4deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  .university-mark:hover {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+  .butler-crest:hover {
+    transform: scale(1.05) rotate(-2deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .university-mark,
+  .butler-crest {
+    animation: none;
+    transition: none;
+  }
+}
+@media (max-width: 480px) {
+  .university-marks {
+    gap: 14px;
+  }
+  .university-mark--durham {
+    width: 120px;
+  }
+  .university-mark--cambridge {
+    width: 52px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .why-now-pop:not(.is-revealed) .why-now-stat,
+  .problem-pop:not(.is-revealed) .problem-pop__item {
+    opacity: 0;
+  }
+  .why-now-pop.is-revealed .why-now-stat {
+    animation: why-now-stat-arrive 680ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .why-now-pop.is-revealed .why-now-stat:nth-child(2) {
+    animation-delay: 110ms;
+  }
+}
+@keyframes why-now-stat-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .why-now-stat {
+    animation: none;
+  }
+}
+
+/* The problem reveals as a short editorial sequence once it enters the viewport. */
+.problem-pop.is-revealed .problem-pop__item {
+  animation: problem-pop-arrive 680ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.problem-pop.is-revealed > div .problem-pop__item {
+  animation-delay: 110ms;
+}
+.problem-pop.is-revealed > div .problem-pop__item:nth-child(2) {
+  animation-delay: 220ms;
+}
+@keyframes problem-pop-arrive {
+  from {
+    opacity: 0;
+    filter: blur(5px);
+    transform: translateX(-24px) rotate(-1deg);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0) rotate(0);
+  }
+}
+@media (max-width: 640px) {
+  .founder-photo-note {
+    right: 4% !important;
+    top: 8% !important;
+    width: 44% !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .problem-pop.is-revealed .problem-pop__item {
+    animation: none;
+  }
+}
+
+/* The Daily Atlus: motion resolves into a calm, readable editorial composition. */
 .atlus-hero {
   position: relative;
   overflow: clip;
@@ -196,6 +374,22 @@
   max-width: 1240px;
   margin: 0 auto;
   min-height: min(720px, 78svh);
+}
+.atlus-hero-layout--intro {
+  grid-template-columns: minmax(0, 1fr);
+  min-height: min(560px, 68svh);
+}
+.daily-atlus-dash {
+  display: block;
+  max-width: 760px;
+  min-height: auto;
+  margin: 0 auto;
+}
+.daily-atlus-dash .edition-stage {
+  height: 660px;
+}
+.daily-atlus-dash .edit-story {
+  min-height: 0;
 }
 .hero-introduction {
   padding-bottom: 24px;
@@ -235,10 +429,10 @@
 }
 .hero-signature {
   position: absolute;
-  width: 92%;
-  height: 0.17em;
-  left: 4%;
+  width: 100%;
+  left: 0;
   bottom: -0.005em;
+  pointer-events: none;
   color: var(--color-amber);
   overflow: visible;
 }
@@ -275,7 +469,7 @@
   min-height: 48px;
   font-size: 14px;
   transition:
-    transform 0.2s,
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
     background-color 0.2s;
 }
 .hero-primary-cta {
@@ -434,6 +628,15 @@
   margin-top: 12px;
   letter-spacing: -0.025em;
 }
+.edit-story h2 a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.edit-story h2 a:hover {
+  color: var(--color-amber-ink);
+}
 .story-baseline {
   display: flex;
   align-items: end;
@@ -572,6 +775,9 @@
     max-width: 640px;
     min-height: auto;
   }
+  .atlus-hero-layout--intro {
+    min-height: auto;
+  }
   .hero-introduction {
     text-align: center;
     padding-bottom: 48px;
@@ -599,6 +805,9 @@
   .hero-edition {
     max-width: 480px;
     margin: 12px auto 0;
+  }
+  .daily-atlus-dash .edition-stage {
+    height: 720px;
   }
   .edit-story h2 {
     font-size: 25px;
@@ -656,6 +865,9 @@
   }
   .edition-stage {
     height: 510px;
+  }
+  .daily-atlus-dash .edition-stage {
+    height: 770px;
   }
   .edit-paper {
     inset-inline: -8px;
@@ -730,8 +942,23 @@
   transform: rotate(-2deg);
 }
 
+/* Short feedback on deliberate actions; decorative movement stays in the timelines. */
+.hero-replay {
+  transition: color 180ms ease;
+}
+.hero-primary-cta:active,
+.hero-secondary-cta:active {
+  transform: translateY(0);
+}
+@media (hover: none) {
+  .hero-primary-cta:hover,
+  .hero-secondary-cta:hover {
+    transform: none;
+  }
+}
+
 /* ANCHOR SCROLL — the browser handles wheel, trackpad and touch scrolling.
-   This only animates links such as How it works / Join the waitlist.
+   This only animates links such as The solution / Join the waitlist.
    Adjust 28px to change the space above a section after an anchor jump. */
 html {
   scroll-padding-top: 28px;

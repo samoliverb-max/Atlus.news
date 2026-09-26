@@ -1,6 +1,5 @@
-import { useLayoutEffect, useRef, type CSSProperties } from "react";
-import { gsap } from "gsap";
-import { writeHandwriting } from "@/lib/handwriting";
+import type { CSSProperties } from "react";
+import { useInkReveal } from "./useInkReveal";
 
 /**
  * ANIMATED REENIE BEANIE — change `text` freely; letters update automatically.
@@ -22,37 +21,12 @@ export function Handwriting({
   mode?: "scroll" | "hero";
   delay?: number;
 }) {
-  const rootRef = useRef<HTMLSpanElement>(null);
-
-  useLayoutEffect(() => {
-    if (mode === "hero" || !rootRef.current || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      return;
-    }
-
-    const element = rootRef.current;
-    const timeline = gsap.timeline({ paused: true });
-    writeHandwriting(timeline, element, delay ?? 0);
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          timeline.play();
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.2 },
-    );
-    observer.observe(element);
-
-    return () => {
-      observer.disconnect();
-      timeline.revert();
-    };
-  }, [delay, mode, text]);
+  const rootRef = useInkReveal<HTMLSpanElement>("text", mode !== "hero", delay, text);
 
   return (
     <span
       ref={rootRef}
-      className={`hand handwriting ${className}`}
+      className={`handwriting ${className}`}
       style={style}
       data-handwriting={mode}
       data-writing-delay={delay}

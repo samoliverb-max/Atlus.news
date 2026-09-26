@@ -1,17 +1,18 @@
 import { AnimatedHero } from "./AnimatedHero";
 
-/** The brand's editorial introduction and the daily-edit motion sequence. */
+/** The brand's editorial introduction. The Daily Atlus lives in the solution section. */
 export function Hero15a() {
   return (
     <section className="atlus-hero" aria-label="Welcome to Atlus">
       <AnimatedHero
+        showEdition={false}
         ctas={
           <>
             <a href="#waitlist" className="hero-primary-cta">
               Join the waitlist <span aria-hidden="true">↗</span>
             </a>
             <a href="#how" className="hero-secondary-cta">
-              How it works <span aria-hidden="true">↓</span>
+              The solution <span aria-hidden="true">↓</span>
             </a>
           </>
         }

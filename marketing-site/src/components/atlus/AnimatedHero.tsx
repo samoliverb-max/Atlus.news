@@ -1,29 +1,36 @@
 import { useLayoutEffect, useRef, type ReactNode } from "react";
 import { gsap } from "gsap";
 import { Handwriting } from "./Handwriting";
+import { DoubleUnderline } from "./marks";
 import { writeHandwriting } from "@/lib/handwriting";
 import { HERO_MOTION } from "@/lib/motion";
 
 const stories = [
   {
     category: "Core",
-    title: "The hidden life of cities",
-    reason: "Follow what fascinates you.",
-    topic: "Culture & society",
+    publication: "The Guardian",
+    title:
+      "Canada is seeking new global neighbours – no wonder, as Trump rolls out stupidities at scale",
+    url: "https://www.theguardian.com/commentisfree/2026/sep/21/canada-donald-trump-mark-carney-global-eu",
+    reason: "Chosen because of your strong interest in geopolitics.",
     number: "01",
   },
   {
     category: "Stretch",
-    title: "What makes an economy grow?",
-    reason: "Get closer to what you want to understand.",
-    topic: "Economics",
+    publication: "Works in Progress",
+    title: "Why Arab armies don't win wars",
+    url: "https://worksinprogress.co/issue/why-arab-armies-dont-win-wars/",
+    reason:
+      "You have a strong interest in geopolitics, and this piece runs parallel to it. It touches geopolitical themes while taking you into the Middle East and its history, which is vital background for understanding geopolitics.",
     number: "02",
   },
   {
     category: "Discovery",
-    title: "The ocean’s quiet architects",
-    reason: "Find something you didn’t know you’d love.",
-    topic: "The natural world",
+    publication: "The Times of India",
+    title: "From Russian oil to Belarusian potash: more hypocrisy from Washington",
+    url: "https://timesofindia.indiatimes.com/business/international-business/from-russian-oil-to-belarusian-potash-more-hypocrisy-from-washington/articleshow/134410271.cms",
+    reason:
+      "You like global issues, but we don't think you already follow Indian affairs. India is a growing counterweight on the world stage, so what's being said in its press matters more and more.",
     number: "03",
   },
 ];
@@ -36,15 +43,25 @@ const fragments = [
   "Culture & curiosity",
 ];
 
-/** A finite editorial sequence: a world of stories becomes a small daily edit. */
-export function AnimatedHero({ ctas }: { ctas: ReactNode }) {
+/** A finite editorial sequence: a world of stories becomes The Daily Atlus. */
+export function AnimatedHero({
+  ctas,
+  showIntroduction = true,
+  showEdition = true,
+}: {
+  ctas?: ReactNode;
+  showIntroduction?: boolean;
+  showEdition?: boolean;
+}) {
   const rootRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
+  const replayRef = useRef<gsap.core.Timeline | null>(null);
 
   useLayoutEffect(() => {
     const root = rootRef.current!;
-    const stage = stageRef.current!;
+    const stage = stageRef.current;
+    if (!stage) return;
     const media = gsap.matchMedia();
 
     // All readable content is rendered by React in its finished state. GSAP
@@ -57,41 +74,12 @@ export function AnimatedHero({ ctas }: { ctas: ReactNode }) {
       (context) => {
         if (context.conditions?.reduced) {
           root.dataset.motion = "reduced";
-          return;
+          return () => {
+            delete root.dataset.motion;
+          };
         }
         const select = gsap.utils.selector(root);
-        // HERO WORDMARK: edit the overall speed and these entrance values in
-        // src/lib/motion.ts. The timeline offsets below are seconds from load.
-        const intro = gsap.timeline().timeScale(HERO_MOTION.playbackRate);
-        intro.from(
-          select(".hero-word"),
-          {
-            yPercent: HERO_MOTION.title.liftPercent,
-            opacity: 0,
-            duration: HERO_MOTION.title.duration,
-            stagger: HERO_MOTION.title.stagger,
-            ease: HERO_MOTION.title.ease,
-          },
-          0,
-        );
-        writeHandwriting(intro, root.querySelector(".hero-u"), HERO_MOTION.writing.uAt);
-        writeHandwriting(
-          intro,
-          root.querySelector(".hero-tagline .handwriting"),
-          HERO_MOTION.writing.taglineAt,
-        );
-        intro.fromTo(
-          select(".hero-signature path"),
-          { strokeDashoffset: 1 },
-          {
-            strokeDashoffset: 0,
-            duration: HERO_MOTION.writing.signatureDuration,
-            stagger: 0.12,
-            ease: "power2.out",
-          },
-          HERO_MOTION.writing.signatureAt,
-        );
-
+        // The heading uses the same viewport-driven ink as the closing CTA.
         const cards = select(".edit-story");
         const noise = select(".story-fragment");
         const placements = HERO_MOTION.cardPoses;
@@ -114,14 +102,14 @@ export function AnimatedHero({ ctas }: { ctas: ReactNode }) {
 
         timeline.fromTo(
           noise,
-          { opacity: 0, y: 22 },
-          { opacity: 0.65, y: 0, duration: 0.65, stagger: 0.055, ease: "power2.out" },
+          { opacity: 0, y: 12 },
+          { opacity: 0.45, y: 0, duration: 0.65, stagger: 0.055, ease: "power2.out" },
           0,
         );
         cards.forEach((card, index) => {
           timeline.fromTo(
             card,
-            { ...placements[index], opacity: 0, scale: 0.94 },
+            { ...placements[index], opacity: 0, scale: 0.98 },
             { ...placements[index], opacity: 1, scale: 1, duration: 0.85, ease: "power3.out" },
             0.2 + index * 0.14,
           );
@@ -135,12 +123,12 @@ export function AnimatedHero({ ctas }: { ctas: ReactNode }) {
         // 2. SELECT: surrounding fragments leave; the chosen stories align.
         timeline.to(
           noise,
-          { opacity: 0, y: -18, duration: 0.65, stagger: 0.035, ease: "power2.in" },
+          { opacity: 0, y: -8, duration: 0.55, stagger: 0.035, ease: "power2.inOut" },
           "select",
         );
         timeline.fromTo(
           select(".edit-paper"),
-          { opacity: 0, scale: 0.965 },
+          { opacity: 0, scale: 0.99 },
           { opacity: 1, scale: 1, duration: 1, ease: "power3.out" },
           "frame",
         );
@@ -152,7 +140,7 @@ export function AnimatedHero({ ctas }: { ctas: ReactNode }) {
             rotation: 0,
             scale: 1,
             duration: 1.25,
-            stagger: 0.17,
+            stagger: 0.12,
             ease: "power3.inOut",
           },
           "arrange",
@@ -165,11 +153,11 @@ export function AnimatedHero({ ctas }: { ctas: ReactNode }) {
           "masthead",
         );
         writeHandwriting(timeline, root.querySelector(".edit-for-you"), "masthead+=0.2");
-        timeline.to(select(".edit-thread"), { opacity: 0, duration: 0.5 }, 2.2);
+        timeline.to(select(".edit-thread"), { opacity: 0, duration: 0.5 }, "arrange+=0.6");
         timeline.fromTo(
           select(".story-reason"),
           { opacity: 0, y: 5 },
-          { opacity: 1, y: 0, duration: 0.6, stagger: 0.17, ease: "power2.out" },
+          { opacity: 1, y: 0, duration: 0.6, stagger: 0.12, ease: "power2.out" },
           "explain",
         );
         // 4. FINISH: the check mark closes the sequence; nothing loops.
@@ -186,12 +174,20 @@ export function AnimatedHero({ ctas }: { ctas: ReactNode }) {
           "check",
         );
 
+        // Hide the reset between replays so cards never snap to their start poses.
+        const replay = gsap
+          .timeline({ paused: true })
+          .to(stage, { opacity: 0, duration: 0.16, ease: "power1.out" })
+          .call(() => timeline.restart())
+          .to(stage, { opacity: 1, duration: 0.3, ease: "power1.out" });
+        replayRef.current = replay;
+
         // On small screens the illustration can sit below the fold. Begin its
         // story when it is visible, instead of finishing before the reader arrives.
         const observer = new IntersectionObserver(
           ([entry]) => {
             if (entry.isIntersecting) {
-              timeline.play();
+              timeline.play(0);
               observer.disconnect();
             }
           },
@@ -201,6 +197,7 @@ export function AnimatedHero({ ctas }: { ctas: ReactNode }) {
         return () => {
           observer.disconnect();
           timelineRef.current = null;
+          replayRef.current = null;
           delete root.dataset.motion;
         };
       },
@@ -210,140 +207,137 @@ export function AnimatedHero({ ctas }: { ctas: ReactNode }) {
   }, []);
 
   return (
-    <div ref={rootRef} className="atlus-hero-layout">
-      <div className="hero-introduction">
-        <p className="hero-eyebrow">A little perspective. Every day.</p>
-        <h1 className="hero-title" aria-label="Join Atlus">
-          <span className="hero-word hero-join" aria-hidden="true">
-            Join
-          </span>{" "}
-          <span className="hero-word hero-atlus" aria-hidden="true">
-            Atl
-            <Handwriting text="u" mode="hero" className="hero-u" />s
-            <svg className="hero-signature" viewBox="0 0 320 24" fill="none" aria-hidden="true">
-              <path
-                pathLength="1"
-                strokeDasharray="1"
-                d="M8 8 C78 13 174 2 312 8"
-                stroke="currentColor"
-                strokeWidth="2.6"
-                strokeLinecap="round"
-              />
-              <path
-                pathLength="1"
-                strokeDasharray="1"
-                d="M42 17 C116 21 218 11 294 15"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                opacity="0.72"
-              />
-            </svg>
-          </span>
-        </h1>
-        <p className="hero-tagline">
-          Daily news, <Handwriting text="personalised for you." mode="hero" />
-        </p>
-        <p className="hero-description">
-          From a world of stories, a few worth your time.
-          <br className="hero-desktop-break" /> Chosen to follow your interests — and widen them.
-        </p>
-        <div className="hero-actions">{ctas}</div>
-        <p className="hero-footnote">Your curiosity. Your perspective. Your daily edit.</p>
-      </div>
-
-      <figure
-        className="hero-edition"
-        aria-label="An illustrative daily edit with a Core, Stretch and Discovery story"
-      >
-        <div ref={stageRef} className="edition-stage">
-          <div className="edition-orbit" aria-hidden="true" />
-          <div className="edition-orbit edition-orbit-inner" aria-hidden="true" />
-          <div className="story-fragments" aria-hidden="true">
-            {fragments.map((fragment, index) => (
-              <div key={fragment} className={`story-fragment story-fragment-${index}`}>
-                <span>{fragment}</span>
-                <i />
-                <i />
-              </div>
-            ))}
-          </div>
-          <svg className="edition-thread" viewBox="0 0 540 550" fill="none" aria-hidden="true">
-            <path
-              className="edit-thread"
-              pathLength="1"
-              strokeDasharray="1"
-              d="M18 335 C-35 80 454 -28 499 189 C538 352 116 464 68 277 C32 126 367 148 498 375"
-              stroke="var(--color-amber)"
-              strokeWidth="1.5"
-            />
-          </svg>
-          <div className="edit-paper" aria-hidden="true" />
-          <div className="edit-masthead">
-            <span className="edit-kicker">THE DAILY EDIT</span>
-            <Handwriting text="made for you" mode="hero" className="edit-for-you" />
-          </div>
-          <div className="edition-stories">
-            {stories.map((story) => (
-              <article
-                key={story.category}
-                className={`edit-story edit-story-${story.category.toLowerCase()}`}
-              >
-                <div className="story-topline">
-                  <span className="story-category">{story.category}</span>
-                  <span className="story-topic">{story.topic}</span>
-                </div>
-                <h2>{story.title}</h2>
-                <div className="story-baseline">
-                  <p className="story-reason">{story.reason}</p>
-                  <span className="story-number" aria-hidden="true">
-                    {story.number}
-                  </span>
-                </div>
-              </article>
-            ))}
-          </div>
-          <div className="edit-finish">
-            <svg viewBox="0 0 20 20" width="18" height="18" fill="none" aria-hidden="true">
-              <path
-                className="edit-check"
-                pathLength="1"
-                strokeDasharray="1"
-                d="M3 10 L8 15 L17 5"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <span>A wider view. Then get on with your day.</span>
-          </div>
+    <div
+      ref={rootRef}
+      className={`atlus-hero-layout${showIntroduction ? "" : " daily-atlus-dash"}${
+        showEdition ? "" : " atlus-hero-layout--intro"
+      }`}
+    >
+      {showIntroduction && (
+        <div className="hero-introduction">
+          <h1 className="hero-title" aria-label="Join Atlus">
+            <span className="hero-word hero-join" aria-hidden="true">
+              Join
+            </span>{" "}
+            <span className="hero-word hero-atlus" aria-hidden="true">
+              Atl
+              <Handwriting text="u" className="hero-u" />s
+              <span className="hero-signature">
+                <DoubleUnderline w={520} />
+              </span>
+            </span>
+          </h1>
+          <p className="hero-description">
+            We pick three stories a day for you from over 250 leading news sources.
+          </p>
+          <div className="hero-actions">{ctas}</div>
         </div>
-        <figcaption className="edition-caption">
-          <span>An illustrative edition</span>
-          <button
-            className="hero-replay"
-            type="button"
-            onClick={() => timelineRef.current?.restart()}
-            aria-label="Replay the daily edit animation"
-          >
-            <svg viewBox="0 0 20 20" width="15" height="15" fill="none" aria-hidden="true">
+      )}
+
+      {showEdition && (
+        <figure
+          className="hero-edition"
+          aria-label="An illustrative Daily Atlus with a Core, Stretch and Discovery story"
+        >
+          <div ref={stageRef} className="edition-stage">
+            <div className="edition-orbit" aria-hidden="true" />
+            <div className="edition-orbit edition-orbit-inner" aria-hidden="true" />
+            <div className="story-fragments" aria-hidden="true">
+              {fragments.map((fragment, index) => (
+                <div key={fragment} className={`story-fragment story-fragment-${index}`}>
+                  <span>{fragment}</span>
+                  <i />
+                  <i />
+                </div>
+              ))}
+            </div>
+            <svg className="edition-thread" viewBox="0 0 540 550" fill="none" aria-hidden="true">
               <path
-                d="M4 7a6 6 0 1 1-.2 5M4 3v4h4"
-                stroke="currentColor"
-                strokeWidth="1.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                className="edit-thread"
+                pathLength="1"
+                strokeDasharray="1"
+                d="M18 335 C-35 80 454 -28 499 189 C538 352 116 464 68 277 C32 126 367 148 498 375"
+                stroke="var(--color-amber)"
+                strokeWidth="1.5"
               />
             </svg>
-            Replay
-          </button>
-        </figcaption>
-      </figure>
-      <a className="hero-scroll-note" href="#how">
-        <span>Good stories. A wider world.</span>
-        <span aria-hidden="true">↓</span>
-      </a>
+            <div className="edit-paper" aria-hidden="true" />
+            <div className="edit-masthead">
+              <span className="edit-kicker">THE DAILY ATLUS</span>
+              <Handwriting text="made for you" mode="hero" className="edit-for-you" />
+            </div>
+            <div className="edition-stories">
+              {stories.map((story) => (
+                <article
+                  key={story.category}
+                  className={`edit-story edit-story-${story.category.toLowerCase()}`}
+                >
+                  <div className="story-topline">
+                    <span className="story-category">{story.category}</span>
+                    <span className="story-topic">{story.publication}</span>
+                  </div>
+                  <h2>
+                    <a href={story.url} target="_blank" rel="noopener">
+                      {story.title}
+                    </a>
+                  </h2>
+                  <div className="story-baseline">
+                    <p className="story-reason">{story.reason}</p>
+                    <span className="story-number" aria-hidden="true">
+                      {story.number}
+                    </span>
+                  </div>
+                </article>
+              ))}
+            </div>
+            <div className="edit-finish">
+              <svg viewBox="0 0 20 20" width="18" height="18" fill="none" aria-hidden="true">
+                <path
+                  className="edit-check"
+                  pathLength="1"
+                  strokeDasharray="1"
+                  d="M3 10 L8 15 L17 5"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span>A wider view. Then get on with your day.</span>
+            </div>
+          </div>
+          <figcaption className="edition-caption">
+            <span>An illustrative Daily Atlus</span>
+            <button
+              className="hero-replay"
+              type="button"
+              onClick={() => {
+                if (replayRef.current?.isActive()) return;
+                timelineRef.current?.pause();
+                replayRef.current?.restart();
+              }}
+              aria-label="Replay the Daily Atlus animation"
+            >
+              <svg viewBox="0 0 20 20" width="15" height="15" fill="none" aria-hidden="true">
+                <path
+                  d="M4 7a6 6 0 1 1-.2 5M4 3v4h4"
+                  stroke="currentColor"
+                  strokeWidth="1.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              Replay
+            </button>
+          </figcaption>
+        </figure>
+      )}
+      {showIntroduction && (
+        <a className="hero-scroll-note" href="#how">
+          <span>Good stories. A wider world.</span>
+          <span aria-hidden="true">↓</span>
+        </a>
+      )}
     </div>
   );
 }

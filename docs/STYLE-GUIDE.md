@@ -106,7 +106,7 @@ Sizes are fluid (`clamp()`) on the marketing site, fixed pixels in the onboardin
 
 | Use | Marketing site | Onboarding flow |
 |---|---|---|
-| Hero headline | `clamp(4.5rem, 14vw, 11rem)`, weight 800, `leading-[0.95]`, Playfair Display | — (no hero) |
+| Hero headline | `clamp(90px, 9.4vw, 136px)`, weight 800, `line-height: .99`, Playfair Display | — (no hero) |
 | Section heading (h2) | `clamp(2rem, 4.5vw, 3.6rem)`, weight 700, `leading-[1.05]`, Playfair Display | `h1`: 25px, weight 800, `line-height:1.22`, Playfair Display |
 | Eyebrow label | `text-sm`, `tracking-[0.25em]`, uppercase, PT Serif, amber | — |
 | Body / explainer | `text-lg`, `leading-relaxed`, PT Serif | `.sub`: 14.5px, `line-height:1.6`, muted colour |
@@ -141,11 +141,16 @@ i.e. generous vertical breathing room (24–32 Tailwind units ≈ 96–128px) th
 
 ### 3.3 Motion
 
-Deliberately minimal — nothing bounces, nothing spins.
+Motion is calm, finite and editorial. Nothing loops automatically, bounces or spins.
 
-- **Buttons on hover:** `translateY(-1px)` (onboarding) or `hover:-translate-y-0.5` (marketing) — a small lift, nothing more.
-- **Transitions:** `transition-transform` / `transition: transform .15s` — fast, and scoped to the one property that's actually changing. No `transition: all`.
-- **Progress bar fill, toast fade:** `.4s` / `.3s` — the only "slow" transitions in the system, both communicating state change rather than decoration.
+- **Hero:** a GSAP sequence turns loose story fragments into a three-story daily edition. It runs at `0.7` playback speed, takes about 5.6 seconds, and fades through the reset when replayed.
+- **Orange handwriting:** every Reenie Beanie phrase uses `Handwriting.tsx` and the same left-to-right glyph reveal. Each phrase starts when it enters the viewport. The hero controls the timing of its own phrases within its sequence.
+- **Hand-drawn underline:** two thin, uneven strokes draw beneath the hero wordmark. Keep strokes light (`2.6px` and `1.6px`) and offset; avoid thick, symmetrical swooshes.
+- **Onboarding step:** the new card fades in and rises 8px over 360ms. The progress bar eases into its next width over 400ms.
+- **Buttons and choices:** rise 1–2px on hover over 150–200ms.
+- **Reduced motion:** `prefers-reduced-motion: reduce` shows the completed composition immediately and removes entrance and hover movement.
+
+The timing source of truth is `marketing-site/src/lib/motion.ts`. Full implementation guidance lives in [`ANIMATION-GUIDE.md`](ANIMATION-GUIDE.md).
 
 ---
 
@@ -200,7 +205,7 @@ This is a three-state toggle pattern (off / on / excluded) rather than a plain c
   box-shadow: 0 1px 2px rgba(0,0,0,.25), 0 20px 45px rgba(0,0,0,.35);
   ```
   Every step of the flow is one card, centred, `max-width: 680px`. This is the **only** shadow in either front end — reserved for "the one thing on screen you're meant to focus on," not applied to chips, buttons, or nested rows inside the card.
-- **Marketing site:** cards are less prominent — content mostly sits directly in sections rather than boxed, and nothing there uses a shadow at all. Depth on the marketing site comes from colour contrast (royal-soft on royal, platinum on parchment) and border only.
+- **Marketing site:** most content sits directly in sections. The animated hero's daily-edition paper is the exception: it uses a restrained shadow to separate the assembled edition from the royal ground. Supporting marketing cards use borders and colour contrast without shadows.
 
 ### 4.4 Category tags (Core / Stretch / Discovery)
 
