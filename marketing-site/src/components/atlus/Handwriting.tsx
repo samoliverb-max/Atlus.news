@@ -35,13 +35,16 @@ export function Handwriting({
       <span aria-hidden="true">
         {text.split(/(\s+)/).map((word, wordIndex) =>
           /\s/.test(word) ? (
-            <span key={wordIndex}>{word}</span>
+            <span
+              aria-hidden="true"
+              className="handwriting-space"
+              data-space={word}
+              key={wordIndex}
+            />
           ) : (
             <span className="handwriting-word" key={wordIndex}>
               {Array.from(word).map((letter, letterIndex) => (
-                <span className="handwriting-letter" key={letterIndex}>
-                  {letter}
-                </span>
+                <span className="handwriting-letter" data-letter={letter} key={letterIndex} />
               ))}
             </span>
           ),

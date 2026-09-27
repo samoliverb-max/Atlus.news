@@ -276,11 +276,11 @@ export function AnimatedHero({
                     <span className="story-category">{story.category}</span>
                     <span className="story-topic">{story.publication}</span>
                   </div>
-                  <h2>
+                  <h3>
                     <a href={story.url} target="_blank" rel="noopener">
                       {story.title}
                     </a>
-                  </h2>
+                  </h3>
                   <div className="story-baseline">
                     <p className="story-reason">{story.reason}</p>
                     <span className="story-number" aria-hidden="true">

@@ -1,79 +1,134 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
-  createRootRouteWithContext,
+  createRootRoute,
   useRouter,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
 import { siteStructuredData } from "../lib/seo";
+import { SiteFooter, SiteHeader } from "../components/atlus/SiteChrome";
 
-function NotFoundComponent() {
+const socialImage = "https://joinatlus.com/og-atlus.png";
+
+function FallbackHead({ title, description }: { title: string; description: string }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
-        </p>
-        <div className="mt-6">
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            Go home
-          </Link>
-        </div>
-      </div>
+    <>
+      <title>{title}</title>
+      <meta name="description" content={description} />
+      <meta name="robots" content="noindex, nofollow" />
+      <meta property="og:title" content={title} />
+      <meta property="og:description" content={description} />
+      <meta property="og:type" content="website" />
+      <meta property="og:site_name" content="Atlus" />
+      <meta property="og:image" content={socialImage} />
+      <meta property="og:image:alt" content="Atlus — daily news, personalised for you" />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content={title} />
+      <meta name="twitter:description" content={description} />
+      <meta name="twitter:image" content={socialImage} />
+    </>
+  );
+}
+
+function FallbackPage({ children }: { children: ReactNode }) {
+  return (
+    <div
+      className="relative min-h-screen"
+      style={{ background: "var(--color-platinum)", color: "var(--color-royal)" }}
+    >
+      <SiteHeader />
+      <main className="flex min-h-[75vh] items-center justify-center px-6 pb-20 pt-32 sm:px-10">
+        <div className="max-w-xl text-center">{children}</div>
+      </main>
+      <SiteFooter />
     </div>
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
-  console.error(error);
-  const router = useRouter();
-  useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
-  }, [error]);
+function NotFoundComponent() {
+  const title = "Page not found | Atlus";
+  const description = "That page is no longer here. Return to Atlus and keep exploring.";
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+    <>
+      <FallbackHead title={title} description={description} />
+      <FallbackPage>
+        <p
+          className="text-2xl"
+          style={{ color: "var(--color-amber-ink)", fontFamily: "var(--font-hand)" }}
+        >
+          A wrong turn.
+        </p>
+        <h1
+          className="mt-3 text-[clamp(4.5rem,16vw,8rem)] font-bold leading-none"
+          style={{ fontFamily: "var(--font-display)" }}
+        >
+          404
+        </h1>
+        <h2 className="mt-5 text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
+          Page not found
+        </h2>
+        <p className="mx-auto mt-4 max-w-md text-base opacity-70">{description}</p>
+        <Link
+          to="/"
+          className="mt-8 inline-flex min-h-11 items-center justify-center rounded-full px-6 py-3 text-sm font-semibold"
+          style={{ background: "var(--color-royal)", color: "var(--color-platinum)" }}
+        >
+          Back to Atlus
+        </Link>
+      </FallbackPage>
+    </>
+  );
+}
+
+function ErrorComponent({ reset }: { error: Error; reset: () => void }) {
+  const router = useRouter();
+  const title = "This page didn't load | Atlus";
+  const description = "Atlus hit a temporary problem. Try the page again or return home.";
+
+  return (
+    <>
+      <FallbackHead title={title} description={description} />
+      <FallbackPage>
+        <p
+          className="text-2xl"
+          style={{ color: "var(--color-amber-ink)", fontFamily: "var(--font-hand)" }}
+        >
+          Something went awry.
+        </p>
+        <h1 className="mt-4 text-4xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
           This page didn't load
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
-        </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
+        <p className="mt-4 text-base opacity-70">{description}</p>
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
           <button
             onClick={() => {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex min-h-11 items-center justify-center rounded-full px-6 py-3 text-sm font-semibold"
+            style={{ background: "var(--color-royal)", color: "var(--color-platinum)" }}
           >
             Try again
           </button>
-          <a
-            href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+          <Link
+            to="/"
+            className="inline-flex min-h-11 items-center justify-center rounded-full border px-6 py-3 text-sm font-semibold"
+            style={{ borderColor: "rgba(13,27,42,0.25)" }}
           >
             Go home
-          </a>
+          </Link>
         </div>
-      </div>
-    </div>
+      </FallbackPage>
+    </>
   );
 }
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -82,7 +137,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+      { rel: "icon", href: "/favicon.ico", sizes: "any" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
@@ -112,12 +169,5 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 function RootComponent() {
-  const { queryClient } = Route.useRouteContext();
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-    </QueryClientProvider>
-  );
+  return <Outlet />;
 }

@@ -1,6 +1,5 @@
 @import "tailwindcss" source(none);
 @source "../src";
-@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -501,6 +500,9 @@
   width: 100%;
   margin: 0;
 }
+.daily-atlus-dash {
+  overflow: clip;
+}
 .edition-stage {
   position: relative;
   height: 544px;
@@ -620,7 +622,7 @@
 .story-topic {
   color: #52616a;
 }
-.edit-story h2 {
+.edit-story h3 {
   font-family: var(--font-display);
   font-size: clamp(20px, 1.9vw, 27px);
   font-weight: 600;
@@ -628,13 +630,13 @@
   margin-top: 12px;
   letter-spacing: -0.025em;
 }
-.edit-story h2 a {
+.edit-story h3 a {
   color: inherit;
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
 }
-.edit-story h2 a:hover {
+.edit-story h3 a:hover {
   color: var(--color-amber-ink);
 }
 .story-baseline {
@@ -809,7 +811,7 @@
   .daily-atlus-dash .edition-stage {
     height: 720px;
   }
-  .edit-story h2 {
+  .edit-story h3 {
     font-size: 25px;
   }
   .hero-scroll-note {
@@ -885,7 +887,7 @@
     padding: 15px 14px 12px;
     min-height: 115px;
   }
-  .edit-story h2 {
+  .edit-story h3 {
     font-size: clamp(19px, 5.2vw, 24px);
   }
   .story-topline {
@@ -931,8 +933,15 @@
   display: inline-block;
   white-space: nowrap;
 }
+.handwriting-space::before {
+  content: attr(data-space);
+  white-space: pre;
+}
 .handwriting-letter {
   display: inline-block;
+}
+.handwriting-letter::before {
+  content: attr(data-letter);
 }
 .brand-u {
   display: inline-flex;

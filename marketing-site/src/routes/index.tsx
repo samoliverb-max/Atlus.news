@@ -800,6 +800,7 @@ function Waitlist() {
             <CurvedArrow />
           </div>
           <h2
+            aria-label="Join Atlus"
             className="mb-6 text-[clamp(2.4rem,6vw,4.4rem)] leading-[1]"
             style={{ fontFamily: "var(--font-display)", fontWeight: 800 }}
           >
@@ -874,8 +875,11 @@ function Waitlist() {
         <div className="onboarding-handoff" role="status" aria-live="polite">
           <div className="onboarding-handoff__content">
             <span className="onboarding-handoff__wordmark">
-              Atl
-              <Handwriting text="u" mode="hero" className="brand-u" />s
+              <span className="sr-only">Atlus</span>
+              <span aria-hidden="true">
+                Atl
+                <Handwriting text="u" mode="hero" className="brand-u" />s
+              </span>
             </span>
             <span className="onboarding-handoff__line" aria-hidden="true" />
             <span>Making this yours…</span>

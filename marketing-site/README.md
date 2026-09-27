@@ -1,29 +1,36 @@
-# Welcome to your Lovable project
+# Atlus marketing site
 
-This project was built with [Lovable](https://lovable.dev).
+The public site for [joinatlus.com](https://joinatlus.com), built with TanStack Start, React,
+TypeScript and Tailwind CSS.
 
-## Build with Lovable
+## Local development
 
-Open your project in the [Lovable editor](https://lovable.dev) and keep building.
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
-- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Use Node.js 20 or newer.
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+npm install
 npm run dev
 ```
 
-## Built with
+The development server prints its local address when it starts. To use a fixed port:
 
-- TanStack Start
-- TypeScript
-- React
-- Tailwind CSS
+```sh
+npm run dev -- --port 8080
+```
+
+## Checks
+
+```sh
+npm run lint
+npm run build
+```
+
+## Site structure
+
+- `src/routes` contains the public pages and their page metadata.
+- `src/components/atlus` contains the shared Atlus interface and motion components.
+- `src/lib/seo.ts` owns canonical URLs, social metadata and structured data.
+- `public` contains the sitemap, crawler rules, social preview and brand images.
+
+Set `VITE_ONBOARDING_URL` when the onboarding app is hosted somewhere other than
+`https://app.joinatlus.com`.
