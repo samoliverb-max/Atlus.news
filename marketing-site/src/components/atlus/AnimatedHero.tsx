@@ -17,20 +17,20 @@ const stories = [
   },
   {
     category: "Stretch",
-    publication: "Works in Progress",
-    title: "Why Arab armies don't win wars",
-    url: "https://worksinprogress.co/issue/why-arab-armies-dont-win-wars/",
+    publication: "Quanta Magazine",
+    title: "An Early Step on the Long, Strange Road to Photosynthesis",
+    url: "https://www.quantamagazine.org/an-early-step-on-the-long-strange-road-to-photosynthesis-20260610/",
     reason:
-      "You have a strong interest in geopolitics, and this piece runs parallel to it. It touches geopolitical themes while taking you into the Middle East and its history, which is vital background for understanding geopolitics.",
+      "You follow energy and climate policy. This takes you deeper into the biology that first made sunlight usable as energy on Earth.",
     number: "02",
   },
   {
     category: "Discovery",
-    publication: "The Times of India",
-    title: "From Russian oil to Belarusian potash: more hypocrisy from Washington",
-    url: "https://timesofindia.indiatimes.com/business/international-business/from-russian-oil-to-belarusian-potash-more-hypocrisy-from-washington/articleshow/134410271.cms",
+    publication: "Works in Progress",
+    title: "Why science needs outsiders",
+    url: "https://worksinprogress.co/issue/why-science-needs-outsiders/",
     reason:
-      "You like global issues, but we don't think you already follow Indian affairs. India is a growing counterweight on the world stage, so what's being said in its press matters more and more.",
+      "You haven't asked for science policy, but this argument about expertise and fresh perspectives may change how you think about institutions.",
     number: "03",
   },
 ];
@@ -215,7 +215,7 @@ export function AnimatedHero({
     >
       {showIntroduction && (
         <div className="hero-introduction">
-          <h1 className="hero-title" aria-label="Join Atlus">
+          <h1 className="hero-title" aria-label="Start Atlus onboarding">
             <span className="hero-word hero-join" aria-hidden="true">
               Join
             </span>{" "}
@@ -228,7 +228,8 @@ export function AnimatedHero({
             </span>
           </h1>
           <p className="hero-description">
-            We pick three stories a day for you from over 250 leading news sources.
+            A finite daily edition: three stories chosen from more than 250 sources, with a clear
+            reason for every recommendation.
           </p>
           <div className="hero-actions">{ctas}</div>
         </div>

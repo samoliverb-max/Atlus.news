@@ -2,15 +2,39 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Page } from "@/components/atlus/SiteChrome";
 import { pageHead } from "@/lib/seo";
 
-const title = "Atlus FAQ — personalised daily news, explained";
+const title = "Atlus FAQ: personalised daily news, explained";
 const description =
-  "Answers to common questions about Atlus: a small, personalised daily news briefing built around core, stretch, and discovery stories.";
+  "How Atlus delivers three free, personalised articles by email each day, chooses sources, learns from feedback, and protects reader data.";
 
 const questions = [
   {
     question: "What is Atlus?",
     answer:
-      "Atlus is a personalised daily news briefing. It brings together a small number of stories chosen around the interests you share and the subjects you want to understand.",
+      "Atlus is a personalised daily edition of three full-length articles, chosen around the interests you share, the subjects you want to understand, and worthwhile ideas outside your usual reading.",
+  },
+  {
+    question: "Where and when does Atlus arrive?",
+    answer:
+      "By email, once a day, at the time you choose. We recommend setting it for about 30 minutes after you wake up: early enough to shape your morning, but not the first thing you see.",
+  },
+  {
+    question: "Do I read full articles or Atlus summaries?",
+    answer:
+      "Full articles. Each recommendation links to the original publisher. Atlus does not replace their reporting with an AI summary, and it does not recommend articles hidden behind a paywall.",
+  },
+  {
+    question: "What does Atlus cost?",
+    answer: "Nothing. Atlus is free to use.",
+  },
+  {
+    question: "When does Atlus launch?",
+    answer:
+      "Soon. You can complete onboarding now; when Atlus launches, your first edition will arrive at the delivery time you selected.",
+  },
+  {
+    question: "What happens when I start onboarding?",
+    answer:
+      "You tell Atlus about your interests, what you want to understand, what you already know, what to avoid, and when your email should arrive. You then review the profile Atlus has assembled and correct anything it has misunderstood.",
   },
   {
     question: "What are Core, Stretch, and Discovery stories?",
@@ -18,14 +42,34 @@ const questions = [
       "Core stories connect to subjects you already care about. Stretch stories help you move towards a subject you want to understand. Discovery stories introduce a useful perspective from beyond your usual reading.",
   },
   {
-    question: "Is Atlus an endless news feed?",
+    question: "How are the sources selected?",
     answer:
-      "No. Atlus is designed as a finite daily paper: a short edition intended to be read, considered, and put down.",
+      "Founder Sam Oliver reviews each outlet before it enters the source list, looking at ownership, sourcing, editorial standards, corrections, and whether a piece is reporting, analysis, or opinion. The list mixes established publishers with specialist newsletters, independent writers, small outlets, and international journalism. We do not treat a political leaning as a reason to exclude otherwise sound journalism.",
   },
   {
-    question: "Does Atlus sell personal data?",
+    question: "How does Atlus deal with political bias?",
     answer:
-      "No. Atlus states that reader information is held to improve recommendations and is never sold.",
+      "We make the source visible and are developing a short, sourced description of its broad political perspective to sit beside each recommendation. We also aim to prevent one viewpoint from dominating a reader's recommendations over time. An outlet label is context, not a claim that every article has the same slant, that a 'centre' outlet is unbiased, or that left/right predicts factual accuracy. If a source cannot sensibly be put on a left-right scale, we should say that rather than invent a label.",
+  },
+  {
+    question: "Can I exclude a publisher, subject, or political perspective?",
+    answer:
+      "Yes. Add it to your Avoid list during onboarding or later from your profile. An exclusion can be edited or removed whenever you change your mind.",
+  },
+  {
+    question: "Does Atlus learn from what I click?",
+    answer:
+      "Yes, but your explicit choices remain the foundation. Onboarding creates the first profile; the stories you open and the feedback you give then help Atlus refine it. Those changing assumptions remain visible and editable in your profile.",
+  },
+  {
+    question: "How does feedback change my next edition?",
+    answer:
+      "Feedback such as More like this, Less like this, Too basic, or Go further adjusts the relevant interests and knowledge in your profile. The next edition is selected using that updated picture of you.",
+  },
+  {
+    question: "What information does Atlus keep about me?",
+    answer:
+      "Your email, onboarding answers, delivery settings, exclusions, evolving recommendation profile, article opens, and direct feedback. It is kept while your account is active so Atlus can maintain your edition. You can inspect and change the information used to choose your articles, and delete your account and its data at any time. It is never sold.",
   },
   {
     question: "How can I contact Atlus?",

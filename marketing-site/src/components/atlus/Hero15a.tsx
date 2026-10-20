@@ -9,7 +9,7 @@ export function Hero15a() {
         ctas={
           <>
             <a href="#waitlist" className="hero-primary-cta">
-              Join the waitlist <span aria-hidden="true">↗</span>
+              Start onboarding <span aria-hidden="true">↗</span>
             </a>
             <a href="#how" className="hero-secondary-cta">
               The solution <span aria-hidden="true">↓</span>

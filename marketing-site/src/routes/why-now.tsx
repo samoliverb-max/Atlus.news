@@ -456,7 +456,7 @@ function WhyNowPage() {
             className="mt-7 inline-flex rounded-full px-6 py-3 text-sm font-semibold tracking-wide"
             style={{ background: "var(--color-amber)", color: "var(--color-royal)" }}
           >
-            Join Atlus
+            Start onboarding
           </a>
         </section>
       </article>

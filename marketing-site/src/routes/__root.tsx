@@ -25,7 +25,7 @@ function FallbackHead({ title, description }: { title: string; description: stri
       <meta property="og:type" content="website" />
       <meta property="og:site_name" content="Atlus" />
       <meta property="og:image" content={socialImage} />
-      <meta property="og:image:alt" content="Atlus — daily news, personalised for you" />
+      <meta property="og:image:alt" content="Atlus: daily news, personalised for you" />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />

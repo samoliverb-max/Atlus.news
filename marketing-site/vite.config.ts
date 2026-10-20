@@ -1,10 +1,10 @@
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import netlify from "@netlify/vite-plugin-tanstack-start";
 import react from "@vitejs/plugin-react";
-import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 
-export default defineConfig(({ command }) => ({
+export default defineConfig({
   plugins: [
     tailwindcss(),
     tanstackStart({
@@ -17,7 +17,7 @@ export default defineConfig(({ command }) => ({
       },
       server: { entry: "server" },
     }),
-    ...(command === "build" ? [nitro({ defaultPreset: "cloudflare-module" })] : []),
+    netlify(),
     react(),
   ],
   resolve: {
@@ -28,4 +28,4 @@ export default defineConfig(({ command }) => ({
     host: "::",
     port: 8080,
   },
-}));
+});

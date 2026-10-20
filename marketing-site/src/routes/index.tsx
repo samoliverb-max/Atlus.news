@@ -11,12 +11,12 @@ import { pageHead, webPageStructuredData } from "@/lib/seo";
 export const Route = createFileRoute("/")({
   head: () =>
     pageHead({
-      title: "Atlus — daily news, personalised for you",
+      title: "Atlus: daily news, personalised for you",
       description:
-        "Atlus is a small, deliberate daily paper. Personalisation that widens your view instead of narrowing it — never sold, never the feed.",
+        "Atlus is a small, deliberate daily paper. Personalisation that widens your view instead of narrowing it. Never sold. Never the feed.",
       path: "/",
       structuredData: webPageStructuredData(
-        "Atlus — daily news, personalised for you",
+        "Atlus: daily news, personalised for you",
         "Atlus is a small, deliberate daily paper. Personalisation widens your view instead of narrowing it.",
         "/",
       ),
@@ -34,11 +34,10 @@ function LandingPage() {
       <Hero15a />
 
       <Problem />
-      <WhyNow />
-      <Experts />
       <Solution />
+      <SourceCarousel />
+      <PracticalDetails />
       <Personalisation />
-      <Discovery />
       <WhyUs />
       <Explore />
       <Waitlist />
@@ -115,37 +114,18 @@ function Handwritten({ children, className = "" }: { children: string; className
   );
 }
 
-/* ---------- sections ---------- */
-
-function Problem() {
-  const { ref, revealed } = useViewportReveal();
-
-  return (
-    <Section title="The problem" className="pb-10 sm:pb-14">
-      <div ref={ref} className={`problem-pop${revealed ? " is-revealed" : ""}`}>
-        <p
-          className="problem-pop__item max-w-3xl text-[clamp(1.6rem,3vw,2.25rem)] leading-snug"
-          style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}
-        >
-          Mainstream news sucks.
-        </p>
-        <div className="mt-4 max-w-3xl space-y-1">
-          <p className="problem-pop__item">It's designed to make you click, not educate you.</p>
-          <p className="problem-pop__item">It isn't designed to encourage curiosity or learning.</p>
-        </div>
-      </div>
-    </Section>
-  );
-}
-
-/** Reveals the problem copy on arrival while leaving reduced-motion users static. */
+/** Adds one reveal class when an element first enters the viewport. */
 function useViewportReveal() {
-  const ref = React.useRef<HTMLDivElement>(null);
+  const ref = React.useRef<HTMLElement>(null);
   const [revealed, setRevealed] = React.useState(false);
 
   React.useEffect(() => {
     const element = ref.current;
-    if (!element || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!element) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setRevealed(true);
+      return;
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -153,7 +133,7 @@ function useViewportReveal() {
         setRevealed(true);
         observer.disconnect();
       },
-      { threshold: 0.35 },
+      { threshold: 0.22 },
     );
 
     observer.observe(element);
@@ -163,136 +143,114 @@ function useViewportReveal() {
   return { ref, revealed };
 }
 
-function Experts() {
+/* ---------- sections ---------- */
+
+function Problem() {
   return (
-    <section
-      className="px-6 py-16 sm:px-10 sm:py-20"
-      style={{
-        background: "var(--color-platinum)",
-        color: "var(--color-royal)",
-        ["--color-amber" as string]: "var(--color-amber-ink)",
-      }}
-    >
-      <div className="mx-auto max-w-5xl">
-        <Handwriting
-          text="Don't just trust us. Trust the experts."
-          className="hand block"
-          style={{
-            color: "var(--color-amber)",
-            fontSize: "clamp(2.2rem, 5vw, 3.8rem)",
-            lineHeight: 0.85,
-          }}
-        />
-        <div
-          className="mt-5 grid gap-4 rounded-2xl p-4 sm:grid-cols-2 sm:p-5"
-          style={{ background: "var(--color-royal)" }}
+    <Section eyebrow="The problem" title="The news is broken.">
+      <p className="max-w-3xl">
+        The journalism is often good. The way it reaches us is not. Three problems explain why so
+        many people feel poorly informed, even when news is everywhere.
+      </p>
+
+      <div className="mt-12 grid gap-5 lg:grid-cols-3">
+        <article
+          className="rounded-2xl border p-6 sm:p-7"
+          style={{ borderColor: "rgba(13,27,42,0.14)", background: "white" }}
         >
-          <ExpertCard
-            href="https://academic.oup.com/pnasnexus/article/4/3/pgaf062/8052060"
-            title="Milli et al., 2025"
+          <p className="text-xs tracking-[0.2em] opacity-55">01</p>
+          <h3
+            className="mt-4 text-3xl leading-tight"
+            style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}
           >
-            <p>
-              Twitter's engagement ranking{" "}
-              <strong>amplified emotionally charged, hostile content</strong> that users said made
-              them feel worse about the other side of politics.{" "}
-              <strong>Users didn't prefer the political posts the algorithm chose.</strong> Ranking
-              by what users <em>said</em> they wanted{" "}
-              <strong>reduced angry, partisan and hostile content.</strong>
-            </p>
-          </ExpertCard>
-          <ExpertCard
-            href="https://arxiv.org/abs/2604.11517"
-            title="Kim, Buntain & Ciampaglia, 2026"
+            It rewards <Handwritten>reaction</Handwritten>, not understanding.
+          </h3>
+          <p className="mt-5 text-base leading-relaxed opacity-80">
+            Engagement ranking pushes angry, hostile content because it keeps people clicking, even
+            when readers say that content makes them feel worse.
+          </p>
+          <p className="mt-5 text-sm opacity-65">
+            <StudyLink href="https://academic.oup.com/pnasnexus/article/4/3/pgaf062/8052060">
+              Milli et al., PNAS Nexus (2025)
+            </StudyLink>
+          </p>
+        </article>
+
+        <article
+          className="rounded-2xl border p-6 sm:p-7"
+          style={{ borderColor: "rgba(13,27,42,0.14)", background: "white" }}
+        >
+          <p className="text-xs tracking-[0.2em] opacity-55">02</p>
+          <h3
+            className="mt-4 text-3xl leading-tight"
+            style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}
           >
-            <p>
-              <em>
-                Understanding the Gap Between Stated and Revealed Preferences in News Curation.
-              </em>{" "}
-              Young adults <strong>often engage with low-quality content they don't endorse</strong>
-              , even though they <strong>want high-quality information.</strong>
-            </p>
-          </ExpertCard>
-        </div>
+            It mistakes <Handwritten>attention</Handwritten> for approval.
+          </h3>
+          <p className="mt-5 text-base leading-relaxed opacity-80">
+            People often open low-quality stories they do not endorse. A click shows what caught
+            your eye, not what you value or want more of.
+          </p>
+          <p className="mt-5 text-sm opacity-65">
+            <StudyLink href="https://arxiv.org/abs/2604.11517">
+              Kim, Buntain &amp; Ciampaglia (2026 preprint)
+            </StudyLink>
+          </p>
+        </article>
+
+        <article
+          className="rounded-2xl border p-6 sm:p-7"
+          style={{ borderColor: "rgba(13,27,42,0.14)", background: "white" }}
+        >
+          <p className="text-xs tracking-[0.2em] opacity-55">03</p>
+          <h3
+            className="mt-4 text-3xl leading-tight"
+            style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}
+          >
+            It makes staying informed feel <Handwritten>exhausting</Handwritten>.
+          </h3>
+          <p className="mt-5 text-base leading-relaxed opacity-80">
+            Forty-two per cent of people now sometimes or often avoid the news, while global trust
+            has fallen to 37 per cent. More news has not created more confidence.
+          </p>
+          <p className="mt-5 text-sm opacity-65">
+            <StudyLink href="https://reutersinstitute.politics.ox.ac.uk/digital-news-report/2026/dnr-executive-summary">
+              Reuters Institute Digital News Report 2026
+            </StudyLink>
+          </p>
+        </article>
       </div>
-    </section>
+    </Section>
   );
 }
 
-/** Shared card treatment keeps both cited studies equally clear and accessible. */
-function ExpertCard({
-  href,
-  title,
-  children,
-}: {
-  href: string;
-  title: string;
-  children: ReactNode;
-}) {
+function StudyLink({ href, children }: { href: string; children: ReactNode }) {
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener"
-      className="rounded-xl p-5 transition-transform hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
-      style={{ background: "white" }}
+      className="underline decoration-1 underline-offset-4 transition-opacity hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
     >
-      <p className="text-lg" style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}>
-        {title}
-      </p>
-      <div className="mt-2 text-sm leading-relaxed opacity-80">{children}</div>
+      {children}
     </a>
   );
 }
 
 function Solution() {
   return (
-    <Section id="how" title="The solution" className="pt-10 sm:pt-14">
+    <Section id="how" eyebrow="The solution" title="Three stories. Chosen for you." bg="#F1E9DE">
       <p className="max-w-3xl">
-        Three articles a day, personalised for you, from high-quality sources. Designed to spark
-        curiosity and make the news not <Handwritten>suck</Handwritten>.
+        Atlus is a finite daily edition: three articles selected to reflect what you care about,
+        deepen what you want to learn, and introduce something worth discovering.
       </p>
       <p className="mt-8 max-w-3xl">
-        Built on the same recommendation technology that makes Instagram and Snapchat so addictive,
-        pointed at a different goal. Your Daily Atlus gives you three articles:
+        It uses recommendation technology to serve the interests you name, not to maximise the time
+        you spend scrolling. Each edition contains a <strong>Core</strong>, <strong>Stretch</strong>
+        , and <strong>Discovery</strong> story.
       </p>
-
-      <div className="mt-14 grid gap-6 sm:grid-cols-3">
-        {[
-          {
-            k: "Core",
-            body: "Articles close to what you already care about. Familiar ground.",
-            tone: "var(--color-royal)",
-          },
-          {
-            k: "Stretch",
-            body: "Pieces aimed at what you want to understand better.",
-            tone: "var(--color-amber)",
-          },
-          {
-            k: "Discovery",
-            body: "Perspectives and subjects from outside your usual media diet. Productive serendipity.",
-            tone: "var(--color-royal)",
-          },
-        ].map((c) => (
-          <div
-            key={c.k}
-            className="rounded-2xl border p-6"
-            style={{ borderColor: "rgba(13,27,42,0.12)", background: "white" }}
-          >
-            <p
-              className="mb-2 text-2xl"
-              style={{ fontFamily: "var(--font-display)", fontWeight: 700, color: c.tone }}
-            >
-              {c.k}
-            </p>
-            <p className="text-base opacity-80" style={{ fontFamily: "var(--font-serif)" }}>
-              {c.body}
-            </p>
-          </div>
-        ))}
-      </div>
       <div
-        className="mt-14 rounded-2xl px-5 py-7 sm:px-8"
+        className="mt-10 rounded-2xl px-5 py-7 sm:px-8"
         style={{ background: "var(--color-royal)", ["--color-amber" as string]: "var(--amber)" }}
       >
         <p
@@ -307,9 +265,152 @@ function Solution() {
   );
 }
 
+const FEATURED_SOURCES = [
+  {
+    name: "Associated Press",
+    logo: "https://commons.wikimedia.org/wiki/Special:FilePath/Associated_Press_logo_2012.svg",
+  },
+  {
+    name: "Reuters",
+    logo: "https://commons.wikimedia.org/wiki/Special:FilePath/Reuters_Logo.svg",
+  },
+  {
+    name: "BBC News",
+    logo: "https://commons.wikimedia.org/wiki/Special:FilePath/BBC_News_2022_(Alt).svg",
+  },
+  {
+    name: "Financial Times",
+    logo: "https://commons.wikimedia.org/wiki/Special:FilePath/Financial_Times_corporate_logo.svg",
+  },
+  {
+    name: "The Economist",
+    logo: "https://commons.wikimedia.org/wiki/Special:FilePath/The_Economist_Logo.svg",
+  },
+  {
+    name: "The Guardian",
+    logo: "https://cdn.simpleicons.org/theguardian/052962",
+  },
+  {
+    name: "Works in Progress",
+    logo: "https://worksinprogress.co/wip-image/uploads/2025/04/Logo.png",
+  },
+  {
+    name: "Al Jazeera English",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/f/f2/Aljazeera_eng.svg",
+  },
+] as const;
+
+function SourceCarousel() {
+  return (
+    <Section
+      eyebrow="The sources"
+      title="A wider view starts with wider sources."
+      bg="var(--color-royal)"
+      color="var(--color-platinum)"
+      className="overflow-hidden"
+    >
+      <p className="max-w-3xl opacity-80">
+        Our starting list mixes familiar institutions with specialist, independent and international
+        publishers. Every outlet is reviewed before inclusion. We are developing a short political-
+        perspective note for each source, so you can judge the source as well as the story.
+      </p>
+      <div className="source-marquee mt-10" aria-label="A selection of Atlus sources">
+        <div className="source-marquee__track">
+          {[false, true].map((duplicate) => (
+            <div
+              className="source-marquee__group"
+              aria-hidden={duplicate || undefined}
+              key={duplicate ? "duplicate" : "primary"}
+            >
+              {FEATURED_SOURCES.map((source) => (
+                <div className="source-card" key={source.name}>
+                  <img
+                    src={source.logo}
+                    alt={`${source.name} logo`}
+                    className="source-card__logo"
+                    loading="lazy"
+                    decoding="async"
+                    referrerPolicy="no-referrer"
+                  />
+                  <span className="source-card__name" aria-hidden="true">
+                    {source.name}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+      <p className="mt-6 max-w-3xl text-sm opacity-70">
+        Political leaning is context, not a quality score. No outlet label can guarantee an
+        individual article is impartial or accurate; we will publish each assessment with its basis
+        and update it when the evidence changes.
+      </p>
+    </Section>
+  );
+}
+
+function PracticalDetails() {
+  const details = [
+    {
+      eyebrow: "DELIVERY",
+      title: "Once a day, in your inbox",
+      body: "Choose the time it arrives. We recommend about 30 minutes after you wake up, when there is space to read but before the day runs away with you.",
+    },
+    {
+      eyebrow: "READING",
+      title: "The publisher's full article",
+      body: "Atlus sends you to the original article, not an AI summary. We only recommend stories you can read without meeting a paywall.",
+    },
+    {
+      eyebrow: "PRICE",
+      title: "Free",
+      body: "Atlus costs nothing to use.",
+    },
+    {
+      eyebrow: "AVAILABILITY",
+      title: "Launching soon",
+      body: "Complete onboarding now. When Atlus launches, your first edition will arrive at the delivery time you selected.",
+    },
+  ];
+
+  return (
+    <Section eyebrow="The practical bit" title="A daily habit, not another feed." bg="#F1E9DE">
+      <div className="grid gap-5 sm:grid-cols-2">
+        {details.map((detail) => (
+          <div
+            key={detail.eyebrow}
+            className="rounded-2xl border p-6 sm:p-7"
+            style={{ borderColor: "rgba(13,27,42,0.14)", background: "white" }}
+          >
+            <p
+              className="text-xs tracking-[0.2em]"
+              style={{ color: "var(--color-amber)", fontFamily: "var(--font-serif)" }}
+            >
+              {detail.eyebrow}
+            </p>
+            <h3
+              className="mt-3 text-2xl leading-tight"
+              style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}
+            >
+              {detail.title}
+            </h3>
+            <p className="mt-3 text-base leading-relaxed opacity-80">{detail.body}</p>
+          </div>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
 function Personalisation() {
   return (
-    <Section title="Personalisation" bg="var(--color-royal)" color="var(--color-platinum)">
+    <Section
+      eyebrow="Personalisation"
+      title="You set the direction."
+      bg="var(--color-royal)"
+      color="var(--color-platinum)"
+    >
       <p className="max-w-3xl">
         The Atlus onboarding process lets <Handwritten>you</Handwritten> tell{" "}
         <Handwritten>us</Handwritten> what you want, in an intuitive way.
@@ -353,48 +454,10 @@ function Personalisation() {
       </div>
 
       <p className="mt-16 max-w-3xl text-lg opacity-80">
-        Every assumption Atlus makes about you is visible in your web app. Adjust it by chatting
-        with the model, or start onboarding again.
+        Every assumption Atlus makes about you is visible and adjustable. Every recommendation also
+        carries a short explanation: the interest it maps to, the goal it answers, or the new
+        perspective it introduces. If it misses the mark, tell us and correct it.
       </p>
-      <p className="mt-4 max-w-3xl text-lg opacity-80">
-        Unlike social media, you know how we choose your content, and <Handwritten>you</Handwritten>{" "}
-        control it.
-      </p>
-    </Section>
-  );
-}
-
-function Discovery() {
-  return (
-    <Section eyebrow="Intelligent discovery" title="Each story tells you why it's there">
-      <div className="grid gap-12 sm:grid-cols-[1.1fr_1fr]">
-        <p>
-          Each recommendation carries a short explanation of why it was chosen: the interest it maps
-          to, the goal it answers, or the corner of the world it introduces. A handful of reasons we
-          think you should read it. If you disagree, don't read it. Tell us.
-        </p>
-
-        <div
-          className="relative rounded-2xl border p-6"
-          style={{ borderColor: "rgba(13,27,42,0.12)", background: "white" }}
-        >
-          <p
-            className="mb-2 text-xs uppercase tracking-widest"
-            style={{ color: "var(--color-amber)" }}
-          >
-            A reason to read
-          </p>
-          <p
-            className="mb-3 text-xl"
-            style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}
-          >
-            Personal, visible, adjustable
-          </p>
-          <p className="text-sm opacity-70" style={{ fontFamily: "var(--font-serif)" }}>
-            Every recommendation gives you a reason. If it misses the mark, tell Atlus.
-          </p>
-        </div>
-      </div>
     </Section>
   );
 }
@@ -403,107 +466,74 @@ function WhyUs() {
   const { ref, revealed } = useViewportReveal();
 
   return (
-    <Section
-      title={
-        <span className="block">
-          <Handwriting
-            text="Meet the founders."
-            className="mb-3 block"
-            style={{
-              color: "var(--color-amber)",
-              fontSize: "clamp(2.1rem, 4.5vw, 3.2rem)",
-              lineHeight: 0.8,
-            }}
-          />
-          Why us
-        </span>
-      }
-      bg="#F1E9DE"
-      className="pt-16 sm:pt-20"
-    >
-      <div ref={ref} className={`why-us-pop${revealed ? " is-revealed" : ""}`}>
+    <Section eyebrow="Why us" title="Two perspectives, one purpose." bg="#F1E9DE">
+      <figure
+        ref={ref}
+        className={`why-us-pop relative mx-auto mt-10 max-w-4xl overflow-hidden rounded-2xl${revealed ? " is-revealed" : ""}`}
+      >
+        <img
+          src="/images/founders.jpg"
+          alt="Sam Oliver and Henry Hudson with friends at a Durham formal."
+          className="founders-photo aspect-[4/3] w-full object-cover"
+          loading="lazy"
+        />
         <UniversityMarks />
-        <figure className="relative mx-auto mt-6 max-w-4xl overflow-hidden rounded-2xl">
-          <img
-            src="/images/founders.jpg"
-            alt="Sam Oliver and Henry Hudson with friends at a Durham formal."
-            className="aspect-[4/3] w-full object-cover"
-            loading="lazy"
-          />
-          <Handwriting
-            text="Refreshingly inexperienced."
-            className="founder-photo-note hand absolute right-[6%] top-[13%] z-10 block text-right"
-            style={{
-              width: "40%",
-              color: "var(--amber)",
-              fontSize: "clamp(2.5rem, 6.1vw, 5.8rem)",
-              lineHeight: 0.72,
-            }}
-          />
-          <img
-            src="/images/josephine-butler-college-crest-transparent.png"
-            alt="Josephine Butler College crest"
-            className="butler-crest"
-            loading="lazy"
-          />
-          <PhotoCircle
-            x="65%"
-            y="56%"
-            w="15%"
-            h="24%"
-            label="Sam"
-            labelPosition="above"
-            color="var(--amber)"
-          />
-          <PhotoCircle
-            x="52%"
-            y="53%"
-            w="15%"
-            h="24%"
-            label="Henry"
-            labelPosition="above"
-            color="var(--amber)"
-          />
-        </figure>
-        <p className="mt-5 max-w-3xl">
-          Despite our dapper appearance in these photos, we are not "another suit". We're two Durham
-          grads who became friends in first year.
-        </p>
-        <div className="mt-2 max-w-3xl">
-          <p>
-            We understand the problem because we're two young people who have lived it. We have been
-            fooled by a polemical TikTok and a misleading headline, and we have seen our peers do
-            the same. Crucially, we are well placed to fix it.
+        <img
+          src="/images/josephine-butler-college-crest-transparent.png"
+          alt="Josephine Butler College crest"
+          className="butler-crest"
+          loading="lazy"
+        />
+        <PhotoCircle
+          x="65%"
+          y="56%"
+          w="15%"
+          h="24%"
+          label="Sam"
+          labelPosition="above"
+          color="var(--amber)"
+        />
+        <PhotoCircle
+          x="52%"
+          y="53%"
+          w="15%"
+          h="24%"
+          label="Henry"
+          labelPosition="above"
+          color="var(--amber)"
+        />
+      </figure>
+      <p className="mt-5 max-w-3xl">
+        We are building Atlus for a problem our generation lives with. Sam brings editorial context,
+        economic history and natural-language processing; Henry brings computer science, machine
+        learning and experience working on news recommendation systems. Together, that gives Atlus
+        both a point of view about healthier news and the technical ability to build it.
+      </p>
+      <div className="mt-12 grid gap-8 sm:grid-cols-2">
+        <div
+          className="rounded-2xl p-8"
+          style={{ background: "var(--color-royal)", color: "var(--color-platinum)" }}
+        >
+          <h3 className="text-2xl" style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}>
+            Sam Oliver, CEO &amp; Co-founder
+          </h3>
+          <p className="mt-3 text-base leading-relaxed opacity-80">
+            First-Class Honours in History from Durham University, focused on economic history and
+            natural-language processing. Participant in the Durham Venture School accelerator.
           </p>
         </div>
-        <div className="mt-12 grid gap-8 sm:grid-cols-2">
-          <div
-            className="rounded-2xl p-8"
-            style={{ background: "var(--color-royal)", color: "var(--color-platinum)" }}
-          >
-            <h3 className="text-2xl" style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}>
-              Sam Oliver, CEO &amp; Co-founder
-            </h3>
-            <p className="mt-3 text-base leading-relaxed opacity-80">
-              First-Class Honours in History from Durham University, with a focus on economic
-              history and natural language processing. Participant in the Durham Venture School
-              accelerator, 2026–27.
-            </p>
-          </div>
-          <div
-            className="rounded-2xl p-8"
-            style={{ background: "var(--color-royal)", color: "var(--color-platinum)" }}
-          >
-            <h3 className="text-2xl" style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}>
-              Henry B. Hudson, CTO &amp; Co-founder
-            </h3>
-            <p className="mt-3 text-base leading-relaxed opacity-80">
-              First-Class Honours in Computer Science from Durham University. Incoming MPhil in
-              Machine Learning and Machine Intelligence at the University of Cambridge. Founder and
-              leader of the British Algorithmic Olympiad. Previously worked on recommendation
-              systems at News UK for <em>The Sun</em> and <em>The Times</em>.
-            </p>
-          </div>
+        <div
+          className="rounded-2xl p-8"
+          style={{ background: "var(--color-royal)", color: "var(--color-platinum)" }}
+        >
+          <h3 className="text-2xl" style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}>
+            Henry B. Hudson, CTO &amp; Co-founder
+          </h3>
+          <p className="mt-3 text-base leading-relaxed opacity-80">
+            First-Class Honours in Computer Science from Durham University. Incoming MPhil in
+            Machine Learning and Machine Intelligence at Cambridge. Previously worked on
+            recommendation systems at News UK for <em>The Sun</em> and <em>The Times</em>.
+          </p>
         </div>
       </div>
     </Section>
@@ -529,126 +559,8 @@ function UniversityMarks() {
   );
 }
 
-function WhyNow() {
-  const { ref, revealed } = useViewportReveal();
-
-  return (
-    <section
-      className="px-6 py-24 sm:px-10 sm:py-32"
-      style={{ background: "var(--color-royal)", color: "var(--color-royal)" }}
-    >
-      <div
-        ref={ref}
-        className={`why-now-pop mx-auto max-w-5xl rounded-2xl p-7 sm:p-12${revealed ? " is-revealed" : ""}`}
-        style={{ background: "white" }}
-      >
-        <p
-          className="mb-5 text-sm tracking-[0.25em]"
-          style={{ color: "var(--color-amber-ink)", fontFamily: "var(--font-serif)" }}
-        >
-          THE MOMENT FOR ATLUS
-        </p>
-        <h2
-          className="text-[clamp(2rem,4.5vw,3.6rem)] leading-[1.05] tracking-tight"
-          style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}
-        >
-          Why now
-        </h2>
-        <p
-          className="mt-5 max-w-3xl text-[clamp(1.3rem,2.6vw,1.8rem)] leading-snug"
-          style={{ fontFamily: "var(--font-display)" }}
-        >
-          The problem isn't the news. It's the feed.
-        </p>
-        <div className="mt-10 grid gap-4 sm:grid-cols-2">
-          <div
-            className="why-now-stat rounded-xl p-6"
-            style={{ background: "var(--color-royal)", color: "white" }}
-          >
-            <p
-              className="text-[clamp(3.5rem,8vw,5.5rem)] leading-none"
-              style={{ fontFamily: "var(--font-display)", fontWeight: 800 }}
-            >
-              42%
-            </p>
-            <p className="mt-3 text-lg leading-snug opacity-85">
-              of people sometimes or often avoid the news.
-            </p>
-          </div>
-          <div
-            className="why-now-stat rounded-xl p-6"
-            style={{ background: "var(--color-royal)", color: "white" }}
-          >
-            <p
-              className="text-[clamp(3.5rem,8vw,5.5rem)] leading-none"
-              style={{ fontFamily: "var(--font-display)", fontWeight: 800 }}
-            >
-              37%
-            </p>
-            <p className="mt-3 text-lg leading-snug opacity-85">
-              global trust in news, the lowest recorded since 2015.
-            </p>
-          </div>
-        </div>
-        <div
-          className="mt-8 grid gap-6 text-base leading-relaxed sm:grid-cols-3"
-          style={{ fontFamily: "var(--font-serif)" }}
-        >
-          <div>
-            <h3 className="text-xl" style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}>
-              Audiences are leaving the feed.
-            </h3>
-            <p className="mt-2 opacity-75">
-              Social and video networks have overtaken news sites and apps as a route to news.
-            </p>
-          </div>
-          <div>
-            <h3 className="text-xl" style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}>
-              People are paying to scroll less.
-            </h3>
-            <p className="mt-2 opacity-75">
-              Blocker tools show that attention is something people want back.
-            </p>
-          </div>
-          <div>
-            <h3 className="text-xl" style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}>
-              Policy is moving against engagement design.
-            </h3>
-            <p className="mt-2 opacity-75">
-              Regulators are targeting infinite scroll, autoplay and opaque recommenders.
-            </p>
-          </div>
-        </div>
-        <Link
-          to="/why-now"
-          className="mt-10 inline-flex rounded-full px-6 py-3 text-sm font-semibold tracking-wide transition-transform hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
-          style={{ background: "var(--color-amber)", color: "var(--color-royal)" }}
-        >
-          Read the full case for Atlus →
-        </Link>
-        <p className="mt-6 text-sm opacity-65" style={{ fontFamily: "var(--font-serif)" }}>
-          <a
-            href="https://reutersinstitute.politics.ox.ac.uk/digital-news-report/2026/dnr-executive-summary"
-            target="_blank"
-            rel="noopener"
-            className="underline decoration-1 underline-offset-4"
-          >
-            Reuters Institute Digital News Report 2026
-          </a>
-        </p>
-      </div>
-    </section>
-  );
-}
-
 function Explore() {
   const pages = [
-    {
-      to: "/how-it-works",
-      eyebrow: "Product",
-      title: "How the daily paper works",
-      body: "How preferences, goals and knowledge become a finite Core, Stretch and Discovery edition.",
-    },
     {
       to: "/science/stated-preference-feed",
       eyebrow: "Research",
@@ -660,12 +572,6 @@ function Explore() {
       eyebrow: "Privacy",
       title: "Personalisation, kept personal",
       body: "What reader information is for, and why it is never a product to be sold.",
-    },
-    {
-      to: "/why-now",
-      eyebrow: "Why now",
-      title: "The case for a finite feed",
-      body: "Why audiences, attention habits and regulation are all moving away from engagement by default.",
     },
     {
       to: "/faq",
@@ -684,9 +590,10 @@ function Explore() {
   return (
     <Section
       id="explore"
-      eyebrow="Learn more"
+      eyebrow="Go deeper"
       title="Read the thinking behind the paper."
-      bg="#F1E9DE"
+      bg="var(--color-royal)"
+      color="var(--color-platinum)"
     >
       <p className="max-w-3xl">
         Atlus is built around a simple question: what would news feel like if it followed the
@@ -699,7 +606,11 @@ function Explore() {
             key={page.to}
             to={page.to}
             className="group flex min-h-56 flex-col justify-between rounded-2xl border p-6 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
-            style={{ borderColor: "rgba(13,27,42,0.16)", background: "white" }}
+            style={{
+              borderColor: "rgba(13,27,42,0.16)",
+              background: "white",
+              color: "var(--color-royal)",
+            }}
           >
             <div>
               <p
@@ -732,160 +643,67 @@ function Explore() {
   );
 }
 
-// The onboarding app is a separate deploy (Express + the vanilla onboarding UI).
-// Joining the waitlist creates the reader's account there and hands straight off
-// into setup, carrying the resume token so a refresh picks up where they left off.
-const ONBOARDING_BASE = (
-  import.meta.env.VITE_ONBOARDING_URL ??
-  (typeof window !== "undefined" && /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
-    ? "http://localhost:4000"
-    : "https://app.joinatlus.com")
+// The product app is deployed separately. Local development opens its demo
+// onboarding; the public Join link opens account creation first.
+const PRODUCT_URL = (
+  import.meta.env.VITE_APP_URL ??
+  (import.meta.env.DEV ? "http://localhost:3000" : "https://app.joinatlus.com")
 ).replace(/\/$/, "");
+const JOIN_URL = import.meta.env.DEV
+  ? `${PRODUCT_URL}/onboarding`
+  : `${PRODUCT_URL}/login?mode=signup`;
 
 function Waitlist() {
-  const [status, setStatus] = React.useState<"idle" | "sending" | "leaving" | "error">("idle");
-  const [message, setMessage] = React.useState("");
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const email = new FormData(e.currentTarget).get("email");
-    if (typeof email !== "string" || !email.trim()) return;
-
-    setStatus("sending");
-    setMessage("");
-    try {
-      const res = await fetch(`${ONBOARDING_BASE}/onboarding/start`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim() }),
-      });
-      if (!res.ok) {
-        const body = (await res.json().catch(() => ({}))) as { error?: string };
-        setStatus("error");
-        setMessage(
-          res.status === 400
-            ? (body.error ?? "That doesn't look like a valid email address.")
-            : "Something went wrong. Please try again in a moment.",
-        );
-        return;
-      }
-      const { resume_token } = (await res.json()) as { resume_token: string };
-      if (!resume_token) throw new Error("Missing resume token");
-      const destination = new URL("/", ONBOARDING_BASE);
-      destination.searchParams.set("r", resume_token);
-      setStatus("leaving");
-      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        await new Promise((resolve) => window.setTimeout(resolve, 420));
-      }
-      window.location.assign(destination.href);
-    } catch {
-      setStatus("error");
-      setMessage("Couldn't reach Atlus. Check your connection and try again.");
-    }
-  }
-
   return (
-    <>
-      <section
-        id="waitlist"
-        className="relative px-6 py-32 sm:px-10"
-        style={{
-          background: "var(--color-platinum)",
-          color: "var(--color-royal)",
-          ["--color-amber" as string]: "var(--color-amber-ink)",
-        }}
-      >
-        <div className="mx-auto max-w-3xl text-center">
-          <div className="mb-4 flex justify-center">
-            <CurvedArrow />
-          </div>
-          <h2
-            aria-label="Join Atlus"
-            className="mb-6 text-[clamp(2.4rem,6vw,4.4rem)] leading-[1]"
-            style={{ fontFamily: "var(--font-display)", fontWeight: 800 }}
-          >
-            Join{" "}
-            <span className="relative inline-block">
-              Atl
-              <Handwriting text="u" className="brand-u" style={{ color: "var(--color-amber)" }} />s
-              <span className="pointer-events-none absolute left-0 top-[92%] w-full">
-                <DoubleUnderline w={260} />
-              </span>
-            </span>
-          </h2>
-          <Handwriting
-            text="daily news, personalised for you"
-            className="mb-10 block text-2xl"
-            style={{ color: "var(--color-amber)" }}
-          />
+    <section
+      id="waitlist"
+      className="relative px-6 py-32 sm:px-10"
+      style={{
+        background: "var(--color-platinum)",
+        color: "var(--color-royal)",
+        ["--color-amber" as string]: "var(--color-amber-ink)",
+      }}
+    >
+      <div className="mx-auto max-w-3xl text-center">
+        <div className="mb-4 flex justify-center">
+          <CurvedArrow />
+        </div>
+        <h2
+          className="mb-6 text-[clamp(2.4rem,6vw,4.4rem)] leading-[1]"
+          style={{ fontFamily: "var(--font-display)", fontWeight: 800 }}
+        >
+          Join{" "}
+          <span className="relative inline-block">
+            Atl
+            <Handwriting text="u" className="brand-u" style={{ color: "var(--color-amber)" }} />s
+          </span>
+        </h2>
+        <Handwriting
+          text="begin with what matters to you"
+          className="mb-10 block text-2xl"
+          style={{ color: "var(--color-amber)" }}
+        />
 
-          <form
-            className="mx-auto flex max-w-md flex-col gap-3 sm:flex-row"
-            onSubmit={handleSubmit}
-          >
-            <label className="sr-only" htmlFor="email">
-              Email
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              placeholder="you@morning.paper"
-              className="flex-1 rounded-full border px-5 py-3 text-base outline-none focus:border-[color:var(--color-amber)]"
-              style={{
-                borderColor: "rgba(13,27,42,0.2)",
-                background: "white",
-                fontFamily: "var(--font-serif)",
-                color: "var(--color-royal)",
-              }}
-            />
-            <button
-              type="submit"
-              disabled={status === "sending" || status === "leaving"}
-              className="rounded-full px-6 py-3 text-sm font-semibold tracking-wide disabled:opacity-60"
-              style={{
-                background: "var(--color-royal)",
-                color: "var(--color-platinum)",
-                fontFamily: "var(--font-serif)",
-              }}
-            >
-              {status === "sending"
-                ? "Starting…"
-                : status === "leaving"
-                  ? "Opening…"
-                  : "Start onboarding"}
-            </button>
-          </form>
-          {status === "error" && (
-            <p
-              role="alert"
-              className="mt-4 text-sm"
-              style={{ color: "#B4402F", fontFamily: "var(--font-serif)" }}
-            >
-              {message}
-            </p>
-          )}
-          <p className="mt-4 text-sm opacity-60" style={{ fontFamily: "var(--font-serif)" }}>
-            No feed. No selling your data. One paper, when the day begins.
-          </p>
-        </div>
-      </section>
-      {status === "leaving" && (
-        <div className="onboarding-handoff" role="status" aria-live="polite">
-          <div className="onboarding-handoff__content">
-            <span className="onboarding-handoff__wordmark">
-              <span className="sr-only">Atlus</span>
-              <span aria-hidden="true">
-                Atl
-                <Handwriting text="u" mode="hero" className="brand-u" />s
-              </span>
-            </span>
-            <span className="onboarding-handoff__line" aria-hidden="true" />
-            <span>Making this yours…</span>
-          </div>
-        </div>
-      )}
-    </>
+        <a
+          href={JOIN_URL}
+          className="inline-flex min-h-11 items-center justify-center rounded-full px-7 py-3 text-sm font-semibold tracking-wide transition-opacity hover:opacity-85"
+          style={{
+            background: "var(--color-royal)",
+            color: "var(--color-platinum)",
+            fontFamily: "var(--font-serif)",
+          }}
+        >
+          Join Atlus{" "}
+          <span className="ml-2" aria-hidden="true">
+            ↗
+          </span>
+        </a>
+        <p className="mt-4 text-sm opacity-60" style={{ fontFamily: "var(--font-serif)" }}>
+          {import.meta.env.DEV
+            ? "Local preview — explore the full flow without an account or email."
+            : "No endless feed. No selling your data. Three stories, then you're done."}
+        </p>
+      </div>
+    </section>
   );
 }
