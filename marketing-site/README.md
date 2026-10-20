@@ -38,9 +38,24 @@ the local link opens demo onboarding at `http://localhost:3000/onboarding`.
 
 ## Netlify deployment
 
-Create a separate Netlify site from this repository with `marketing-site` as
-its base directory. The included `netlify.toml` builds the TanStack Start app
-and publishes `dist/client`; the Netlify Vite plugin supplies its server function.
+Connect the `samoliverb-max/Atlus.news` GitHub repository as a **separate
+Netlify site** for marketing. Set the production branch to `main`. In the
+Netlify import screen, use these build settings, overriding automatic monorepo
+detection if needed:
+
+| Setting | Value |
+| --- | --- |
+| Base directory | `marketing-site` |
+| Package directory | Leave unset |
+| Build command | `npm run build` |
+| Publish directory | `dist/client` |
+
+The included `netlify.toml` supplies the build command and publish directory;
+the Netlify Vite plugin supplies its server function. The base directory matters
+because the repository root has no `package.json`.
+
+Netlify will build new commits from GitHub after the pull request is merged into
+`main`. A Deploy Preview can be built from the pull request branch before then.
 
 Before assigning `joinatlus.com` to this site, move the product app to
 `app.joinatlus.com`, set its `NEXT_PUBLIC_APP_URL` to that address, and allow
