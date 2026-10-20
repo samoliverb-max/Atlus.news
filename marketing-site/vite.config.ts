@@ -4,7 +4,7 @@ import netlify from "@netlify/vite-plugin-tanstack-start";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   plugins: [
     tailwindcss(),
     tanstackStart({
@@ -17,7 +17,7 @@ export default defineConfig({
       },
       server: { entry: "server" },
     }),
-    netlify(),
+    ...(command === "build" ? [netlify()] : []),
     react(),
   ],
   resolve: {
@@ -28,4 +28,4 @@ export default defineConfig({
     host: "::",
     port: 8080,
   },
-});
+}));

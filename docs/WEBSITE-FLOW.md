@@ -24,7 +24,10 @@ flowchart TD
 
     Mode -->|Deployed build| SignupLink[Join Atlus link]
     SignupLink --> Signup[Newer Next app<br/>/login?mode=signup]
-    Signup --> RealOnboarding
+    Signup --> Confirmation{Does Supabase require<br/>email confirmation?}
+    Confirmation -->|Yes| EmailConfirm[Confirm email, then sign in]
+    EmailConfirm --> RealOnboarding
+    Confirmation -->|No| RealOnboarding
 
     DirectProduct[Direct visit to a Next app route<br/>/login, /today, /profile, etc.] --> Auth{Demo mode or signed in?}
     Auth -->|Demo mode| DemoToday
@@ -50,7 +53,7 @@ flowchart TD
 - **The live public domain is not marketing yet.** On 20 October 2026, opening `https://joinatlus.com/` reached the Next app's `/login` screen. `app.joinatlus.com` did not resolve in the browser. The root redirect intentionally avoids sending the live domain back to itself. Making marketing the live first page requires deploying it at `joinatlus.com` and putting the product app on a separate host. The domain uses `dns1.p05.nsone.net` through `dns4.p05.nsone.net` name servers, consistent with Netlify-managed DNS; the Netlify account is not connected in this workspace.
 - **The local Join button opens the newer Next app.** With the default development configuration it links to `http://localhost:3000/onboarding`. Demo submission leads to a sample Today edition. Demo changes are not saved.
 - **The prepared deployed Join link uses the newer product.** It opens `https://app.joinatlus.com/login?mode=signup` by default (or the `VITE_APP_URL` host). Account creation then leads into Next app onboarding and its Supabase-backed Today edition. The former email handoff to the Express prototype has been removed from the prepared marketing code. This path cannot work live until the product app is available on its own host.
-- **The Next app has its own account journey.** A direct visit to its `/login` or `/today` routes follows Supabase authentication and the newer onboarding flow when demo mode is off. The marketing site's deployed form is not currently wired to that journey.
+- **The Next app has its own account journey.** A direct visit to its `/login` or `/today` routes follows Supabase authentication and the newer onboarding flow when demo mode is off. If Supabase requires email confirmation, a new reader confirms their address and signs in before onboarding.
 
 ## Source files
 
