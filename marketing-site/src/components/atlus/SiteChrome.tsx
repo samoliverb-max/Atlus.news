@@ -36,11 +36,11 @@ export function SiteHeader({ variant = "light" }: { variant?: "light" | "dark" }
           Team
         </Link>
         <a
-          href="/#waitlist"
+          href="/#join"
           className="inline-flex min-h-11 items-center rounded-full px-4 py-2 text-xs font-semibold tracking-wide"
           style={{ background: "var(--color-amber)", color: "var(--color-royal)" }}
         >
-          Join
+          Start
         </a>
       </nav>
     </header>
@@ -128,7 +128,7 @@ export function SiteFooter() {
         className="mx-auto mt-12 max-w-6xl text-xs opacity-50"
         style={{ fontFamily: "var(--font-serif)" }}
       >
-        © {new Date().getFullYear()} Atlus. Your data is private to you alone.
+        © {new Date().getFullYear()} Atlus. Your data personalises your edition and is never sold.
       </p>
     </footer>
   );

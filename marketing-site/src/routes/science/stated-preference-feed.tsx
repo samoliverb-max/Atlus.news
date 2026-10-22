@@ -504,11 +504,11 @@ function StatedPreferenceFeedPage() {
             A small daily paper, chosen with you in mind.
           </p>
           <a
-            href="/#waitlist"
+            href="/#join"
             className="mt-7 inline-flex rounded-full px-6 py-3 text-sm font-semibold tracking-wide transition-transform hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
             style={{ background: "var(--color-amber)", color: "var(--color-royal)" }}
           >
-            Join Atlus
+            Start onboarding
           </a>
         </section>
       </article>

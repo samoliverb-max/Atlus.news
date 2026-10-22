@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Page } from "@/components/atlus/SiteChrome";
 import { pageHead, webPageStructuredData } from "@/lib/seo";
 
-const title = "How Atlus works — a personalised daily news briefing";
+const title = "How Atlus works: a personalised daily news briefing";
 const description =
   "Atlus builds a small daily paper around the interests you share: core stories you care about, stretch stories to help you learn, and discovery stories to widen your view.";
 
@@ -34,10 +34,34 @@ function HowItWorksPage() {
           A daily paper built around what matters to you.
         </h1>
         <p className="text-xl leading-relaxed">
-          Atlus is a personalised daily news briefing. You tell us what interests you and what you
-          want to understand; we use that context to assemble a small, deliberate paper each
-          morning.
+          Atlus is a personalised daily edition delivered by email once a day, at the time you
+          choose. You tell us what interests you and what you want to understand; we use that
+          context to select three full-length articles for you.
         </p>
+
+        <section className="mt-14">
+          <h2 className="text-3xl" style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}>
+            From onboarding to your inbox
+          </h2>
+          <div className="mt-6 grid gap-5 sm:grid-cols-3">
+            <StoryType
+              name="Tell us"
+              text="Share your interests, learning goals, existing knowledge, exclusions, and sources you already read."
+            />
+            <StoryType
+              name="Check us"
+              text="Review the profile Atlus assembles and correct anything it has misunderstood."
+            />
+            <StoryType
+              name="Choose when"
+              text="Set your delivery time. We recommend about 30 minutes after you wake up."
+            />
+          </div>
+          <p className="mt-5 text-lg leading-relaxed">
+            Create an account, complete onboarding, and see your first recommendations on Today.
+            Choose when your daily email arrives.
+          </p>
+        </section>
 
         <section className="mt-14">
           <h2 className="text-3xl" style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}>
@@ -69,9 +93,42 @@ function HowItWorksPage() {
             useful connection you might otherwise miss.
           </p>
           <p>
-            The aim is not an endless feed. It is a finite daily edition that helps you stay
-            informed and occasionally surprised.
+            Onboarding creates the first version of your profile. The articles you open and feedback
+            such as More like this, Less like this, Too basic, or Go further refine it over time.
+            The assumptions behind those choices remain visible and editable.
           </p>
+        </section>
+
+        <section className="mt-14 space-y-5 text-lg leading-relaxed">
+          <h2 className="text-3xl" style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}>
+            Original reporting, chosen more widely
+          </h2>
+          <p>
+            Atlus links you to each publisher's full article rather than replacing it with an AI
+            summary. Access to the original article depends on the publisher; if a link is blocked
+            for you, let us know so we can improve future picks.
+          </p>
+          <p>
+            Founder Sam Oliver curates the source list. It combines established publishers with
+            specialist newsletters, independent Substacks, small outlets and international sources
+            that rarely enter a typical Western media diet, including{" "}
+            <a
+              href="https://kuwaittimes.com/"
+              target="_blank"
+              rel="noopener"
+              className="underline decoration-1 underline-offset-4"
+            >
+              Kuwait Times
+            </a>
+            .
+          </p>
+          <p>
+            Every outlet is reviewed before inclusion. Alongside a recommendation, we aim to show
+            its broad political perspective and where that assessment came from. A label is a clue
+            about viewpoint, not a guarantee that an individual article is unbiased or accurate; the
+            goal is to help you read with context and encounter more than one perspective.
+          </p>
+          <p>Atlus is free to use.</p>
         </section>
       </article>
     </Page>

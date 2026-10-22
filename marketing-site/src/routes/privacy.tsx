@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Page } from "@/components/atlus/SiteChrome";
 import { pageHead, webPageStructuredData } from "@/lib/seo";
 
-const title = "Privacy at Atlus — personalisation without selling your data";
+const title = "Privacy at Atlus: personalisation without selling your data";
 const description =
   "Atlus is designed around information readers choose to share. It is used to improve their recommendations and is never sold.";
 
@@ -46,9 +46,26 @@ function PrivacyPage() {
               What it is for
             </h2>
             <p>
-              Your interests and preferences are used to make your daily paper more relevant,
-              explain why stories have been selected, and help you discover worthwhile subjects
-              beyond your usual reading.
+              Atlus keeps your email, the answers you choose to give during onboarding, your
+              delivery settings and exclusions, the recommendation profile built from those answers,
+              the articles you open, and the feedback you give. This information is used to select
+              your daily edition, explain why each story is there, and improve future
+              recommendations.
+            </p>
+          </section>
+          <section>
+            <h2
+              className="mb-3 text-3xl"
+              style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}
+            >
+              How it learns
+            </h2>
+            <p>
+              Your explicit choices are the foundation: interests, goals, existing knowledge and
+              anything you want Atlus to avoid. As you use it, article opens and feedback such as
+              More like this, Less like this, Too basic, or Go further refine that profile. Atlus
+              uses the same broad family of recommendation methods as large social platforms, but
+              with a different objective: usefulness to you, rather than keeping you on a feed.
             </p>
           </section>
           <section>
@@ -59,8 +76,10 @@ function PrivacyPage() {
               Your control
             </h2>
             <p>
-              The information Atlus holds about you should be understandable and editable. You can
-              contact us at{" "}
+              The information used to choose your articles is available in your profile in plain
+              language. You can correct an assumption, change an exclusion or delivery setting, and
+              delete your account and its data at any time. Until you delete it, the information is
+              kept so Atlus can maintain and improve your daily edition. You can contact us at{" "}
               <a className="underline" href="mailto:sam@joinatlus.com">
                 sam@joinatlus.com
               </a>{" "}
