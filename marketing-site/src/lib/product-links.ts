@@ -8,3 +8,11 @@ export const joinUrl = import.meta.env.DEV
   : `${productUrl}/login?mode=signup`;
 
 export const signInUrl = `${productUrl}/login`;
+
+// Temporary route while some networks still cache an old DNS answer for the app subdomain.
+const backupProductUrl = (
+  import.meta.env.VITE_APP_BACKUP_URL?.trim() || "https://atlus-mvp-deploy.vercel.app"
+).replace(/\/$/, "");
+
+export const backupJoinUrl = `${backupProductUrl}/login?mode=signup`;
+export const backupSignInUrl = `${backupProductUrl}/login`;

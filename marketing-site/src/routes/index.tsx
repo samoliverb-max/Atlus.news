@@ -7,7 +7,7 @@ import { Handwriting } from "@/components/atlus/Handwriting";
 import { SiteHeader, SiteFooter } from "@/components/atlus/SiteChrome";
 import { DoubleUnderline, CurvedArrow, PhotoCircle } from "@/components/atlus/marks";
 import { pageHead, webPageStructuredData } from "@/lib/seo";
-import { joinUrl, signInUrl } from "@/lib/product-links";
+import { backupJoinUrl, backupSignInUrl, joinUrl, signInUrl } from "@/lib/product-links";
 
 export const Route = createFileRoute("/")({
   head: () =>
@@ -700,6 +700,18 @@ function JoinSection() {
             Sign in
           </a>
         </p>
+        {!import.meta.env.DEV && (
+          <p className="mt-5 text-sm" style={{ fontFamily: "var(--font-serif)" }}>
+            App address not opening?{" "}
+            <a className="underline underline-offset-4" href={backupJoinUrl}>
+              Create an account at our backup address
+            </a>
+            {" · "}
+            <a className="underline underline-offset-4" href={backupSignInUrl}>
+              Sign in there
+            </a>
+          </p>
+        )}
       </div>
     </section>
   );

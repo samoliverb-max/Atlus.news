@@ -36,6 +36,13 @@ Set `VITE_APP_URL` when the newer product app is hosted somewhere other than
 `https://app.joinatlus.com`. The public Join link opens account creation there;
 the local link opens demo onboarding at `http://localhost:3000/onboarding`.
 
+During app-subdomain DNS propagation, the Join section also offers a backup
+link at `https://atlus-mvp-deploy.vercel.app`. Set `VITE_APP_BACKUP_URL` if that
+stable Vercel address changes. The app deployment must allow
+`https://atlus-mvp-deploy.vercel.app/auth/callback` in Supabase Auth and send
+confirmation links back to the host the reader used. Verify signup on the
+backup address before deploying this marketing link.
+
 ## Netlify deployment
 
 Connect the `samoliverb-max/Atlus.news` GitHub repository as a **separate
