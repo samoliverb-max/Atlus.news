@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, type ReactNode } from "react";
+import { usePostHog } from "@posthog/react";
 import { gsap } from "gsap";
 import { Handwriting } from "./Handwriting";
 import { DoubleUnderline } from "./marks";
@@ -53,6 +54,7 @@ export function AnimatedHero({
   showIntroduction?: boolean;
   showEdition?: boolean;
 }) {
+  const posthog = usePostHog();
   const rootRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
@@ -314,6 +316,8 @@ export function AnimatedHero({
               type="button"
               onClick={() => {
                 if (replayRef.current?.isActive()) return;
+                posthog?.capture("daily_edition_replayed");
+                posthog?.logger.info("Marketing site daily edition replayed");
                 timelineRef.current?.pause();
                 replayRef.current?.restart();
               }}
