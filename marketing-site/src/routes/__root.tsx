@@ -7,6 +7,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { PostHogErrorBoundary, PostHogProvider } from "@posthog/react";
 
 import appCss from "../styles.css?url";
 import { siteStructuredData } from "../lib/seo";
@@ -169,5 +170,46 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 function RootComponent() {
-  return <Outlet />;
+  const apiKey = import.meta.env.VITE_PUBLIC_POSTHOG_PROJECT_TOKEN;
+  const apiHost = import.meta.env.VITE_PUBLIC_POSTHOG_HOST;
+
+  if (!apiKey) {
+    if (import.meta.env.DEV) {
+      throw new Error(
+        "VITE_PUBLIC_POSTHOG_PROJECT_TOKEN variable required by PostHog is missing or un-configured, this causes events to be silently missed. This error stops appearing once VITE_PUBLIC_POSTHOG_PROJECT_TOKEN is configured",
+      );
+    }
+
+    return <Outlet />;
+  }
+
+  if (!apiHost) {
+    if (import.meta.env.DEV) {
+      throw new Error(
+        "VITE_PUBLIC_POSTHOG_HOST variable required by PostHog is missing or un-configured, this causes events to be silently missed. This error stops appearing once VITE_PUBLIC_POSTHOG_HOST is configured",
+      );
+    }
+
+    return <Outlet />;
+  }
+
+  return (
+    <PostHogProvider
+      apiKey={apiKey}
+      options={{
+        api_host: apiHost,
+        defaults: "2025-05-24",
+        capture_exceptions: true,
+        debug: import.meta.env.DEV,
+        logs: {
+          serviceName: "atlus-marketing-site-web",
+          environment: import.meta.env.MODE,
+        },
+      }}
+    >
+      <PostHogErrorBoundary>
+        <Outlet />
+      </PostHogErrorBoundary>
+    </PostHogProvider>
+  );
 }

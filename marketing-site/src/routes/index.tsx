@@ -1,6 +1,7 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import * as React from "react";
 import type { ReactNode } from "react";
+import { usePostHog } from "@posthog/react";
 import { Hero15a } from "@/components/atlus/Hero15a";
 import { AnimatedHero } from "@/components/atlus/AnimatedHero";
 import { Handwriting } from "@/components/atlus/Handwriting";
@@ -645,6 +646,8 @@ function Explore() {
 }
 
 function JoinSection() {
+  const posthog = usePostHog();
+
   return (
     <section
       id="join"
@@ -677,6 +680,12 @@ function JoinSection() {
 
         <a
           href={joinUrl}
+          onClick={() => {
+            posthog?.capture("onboarding_started", { placement: "join_section" });
+            posthog?.logger.info("Marketing site onboarding started", {
+              placement: "join_section",
+            });
+          }}
           className="inline-flex min-h-11 items-center justify-center rounded-full px-7 py-3 text-sm font-semibold tracking-wide transition-opacity hover:opacity-85"
           style={{
             background: "var(--color-royal)",
@@ -696,7 +705,16 @@ function JoinSection() {
         </p>
         <p className="mt-3 text-sm" style={{ fontFamily: "var(--font-serif)" }}>
           Already have an account?{" "}
-          <a className="underline underline-offset-4" href={signInUrl}>
+          <a
+            className="underline underline-offset-4"
+            href={signInUrl}
+            onClick={() => {
+              posthog?.capture("sign_in_started", { placement: "join_section" });
+              posthog?.logger.info("Marketing site sign-in started", {
+                placement: "join_section",
+              });
+            }}
+          >
             Sign in
           </a>
         </p>
