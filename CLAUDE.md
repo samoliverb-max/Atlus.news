@@ -29,7 +29,7 @@ Treat this JS as the executable spec for the algorithm. Port it faithfully to th
 ## Hard constraints (do not violate)
 
 - **IPTC is the only taxonomy.** Reader interests and article tags share these QCodes. No parallel category system.
-- **Volunteered data only.** No pixels, no behavioural tracking, no silent inference of ethnicity/politics/orientation.
+- **Volunteered data for personalisation; consented analytics only.** Recommendations use only what the reader volunteers. Product analytics (PostHog, EU) is anonymous and cookie-free until the reader accepts the cookie banner; cookies, autocapture and session replay run only after opt-in (UK PECR). No ad pixels, no silent inference of ethnicity/politics/orientation, and never put onboarding answers or special-category data in analytics events; block them from replay with `ph-no-capture`.
 - **Special-category data gated.** Political opinion and sensitive demographics (ethnicity, religion, orientation) require explicit opt-in consent stored with a timestamp (UK GDPR Art. 9). Every such field must support "prefer not to say" and be independently deletable.
 - **Metadata-only ingestion.** Classify from titles/descriptions/OpenGraph; analyse-and-discard any full text; never store or surface article body text.
 - **Everything editable.** A reader can view, change, or erase any stored value. Build the profile read/edit endpoints alongside the write path.
